@@ -1,0 +1,6 @@
+
+FILES[] = def lexer parser main
+PROGRAM = main
+
+.DEFAULT: $( OCamlProgram $(PROGRAM) , $(FILES) )
+
