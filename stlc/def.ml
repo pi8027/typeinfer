@@ -17,16 +17,14 @@ let print_bracket (flag : bool) (printer : unit lazy_t) : unit =
 let rec print_lexpr (level : int) : lexpr -> unit =
   function
     | ELambda (ident, expr) ->
-      print_bracket
-        (level <= 1)
-        (lazy (print_string "\\" ;
-               print_string ident ;
-               print_string " -> " ;
+      print_bracket (level <= 1)
+        (lazy (print_string ("\\" ^ ident ^ " -> ") ;
                print_lexpr 2 expr))
-    | EApply (e1, e2) -> print_bracket (level = 0)
-      (lazy (print_lexpr 1 e1 ;
-             print_string " " ;
-             print_lexpr 0 e2))
+    | EApply (e1, e2) ->
+      print_bracket (level <= 0)
+        (lazy (print_lexpr 1 e1 ;
+               print_string " " ;
+               print_lexpr 0 e2))
     | EVar str -> print_string str
   ;;
 
