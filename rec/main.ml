@@ -4,7 +4,7 @@ let parse (input : in_channel) : Def.lexpr =
 
 let expr = parse stdin;;
 
-let _, cr, ty = Infer.constraints 0 [] expr;;
+let _, cr, ty = Infer.constraints 0 Infer.StrMap.empty expr;;
 
 print_string "expression :\n";;
 Def.print_lexpr 2 expr;;
@@ -26,7 +26,7 @@ print_string "\n\n";;
 
 print_string "solve :\n";;
 
-let tenv = List.fold_left Infer.solve Infer.esubst cr;;
+let tenv = List.fold_left Infer.solve Infer.IntMap.empty cr;;
 
 Def.print_ltype 1 (Infer.expand_type tenv ty);;
 print_string "\n";;
