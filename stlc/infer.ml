@@ -1,4 +1,6 @@
 
+open Def
+
 module IntMap = Map.Make(
     struct
       type t = int
@@ -8,46 +10,46 @@ module IntMap = Map.Make(
 
 module StrMap = Map.Make(String);;
 
-type subst = Def.ltype IntMap.t;;
+type tconst = ltype * ltype;;
+type assump = ltype StrMap.t;;
+type subst = ltype IntMap.t;;
 
 exception Occurs_check;;
 
-let rec constraints (n : int) (env : Def.ltype StrMap.t) :
-  Def.lexpr -> int * (Def.ltype * Def.ltype) list * Def.ltype =
-    let nt = Def.VarType n in
-    function
-      | Def.ELambda (ident, expr) ->
-        let n', c, t = constraints (succ n) (StrMap.add ident nt env) expr in
-          n', c, Def.FunctionType (nt, t)
-      | Def.EApply (expr1, expr2) ->
-        let n1, c1, t1 = constraints (succ n) env expr1 in
-        let n2, c2, t2 = constraints n1 env expr2 in
-          n2, (t1, Def.FunctionType (t2, nt)) :: c1 @ c2, nt
-      | Def.EVar str -> n, [], StrMap.find str env
-  ;;
-
-let rec solve (env : subst) : Def.ltype * Def.ltype -> subst =
-  let rec occurs_check (n : int) : Def.ltype -> unit = function
-    | Def.VarType n' when IntMap.mem n' env ->
-      occurs_check n (IntMap.find n' env)
-    | Def.VarType n' -> if n = n' then raise Occurs_check else ()
-    | Def.FunctionType (tl, tr) -> occurs_check n tl ; occurs_check n tr
-  in
+let rec infer (n : int) (env : assump) : lexpr -> int * tconst list * ltype =
+  let nt = TVar n in
   function
-    | Def.VarType n, Def.VarType n' when n = n' -> env
-    | Def.VarType n, t | t, Def.VarType n when IntMap.mem n env ->
-      solve env (IntMap.find n env, t)
-    | Def.VarType n, t | t, Def.VarType n ->
-      occurs_check n t ; IntMap.add n t env
-    | Def.FunctionType (t1l, t1r), Def.FunctionType (t2l, t2r) ->
-      solve (solve env (t1l, t2l)) (t1r, t2r)
-  ;;
+    | EVar str -> n, [], StrMap.find str env
+    | EApp (expr1, expr2) ->
+      let n1, c1, t1 = infer (succ n) env expr1 in
+      let n2, c2, t2 = infer n1 env expr2 in
+      n2, (t1, TFun (t2, nt)) :: c1 @ c2, nt
+    | EAbs (ident, expr) ->
+      let n', c, t = infer (succ n) (StrMap.add ident nt env) expr in
+      n', c, TFun (nt, t)
+;;
 
-let rec expand_type (env : subst) : Def.ltype -> Def.ltype = function
-  | Def.VarType n when IntMap.mem n env ->
-    expand_type env (IntMap.find n env)
-  | Def.VarType n -> Def.VarType n
-  | Def.FunctionType (tl, tr) ->
-    Def.FunctionType (expand_type env tl, expand_type env tr)
-  ;;
+let rec type_reduction (env : subst) : ltype -> ltype = function
+  | TVar n when IntMap.mem n env -> type_reduction env (IntMap.find n env)
+  | t -> t
+;;
+
+let rec solve (env : subst) ((lt, rt) : tconst) : subst =
+  let rec occurs_check n t =
+    match type_reduction env t with
+      | TVar n' -> if n = n' then raise Occurs_check else ()
+      | TFun (tl, tr) -> occurs_check n tl ; occurs_check n tr
+  in
+  match type_reduction env lt, type_reduction env rt with
+    | TVar n, TVar n' when n = n' -> env
+    | TVar n, t | t, TVar n -> occurs_check n t ; IntMap.add n t env
+    | TFun (t1l, t1r), TFun (t2l, t2r) ->
+      solve (solve env (t1l, t2l)) (t1r, t2r)
+;;
+
+let rec expand_type (env : subst) (t : ltype) : ltype =
+  match type_reduction env t with
+    | TVar n -> TVar n
+    | TFun (tl, tr) -> TFun (expand_type env tl, expand_type env tr)
+;;
 

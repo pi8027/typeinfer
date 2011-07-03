@@ -7,11 +7,11 @@
 main: expr EOF { $1 }
 
 expr:
-    expr factor { Def.EApply ($1, $2) }
+    expr factor { Def.EApp ($1, $2) }
   | factor      { $1 }
 
 factor:
     IDENT                   { Def.EVar $1 }
   | LPAREN expr RPAREN      { $2 }
-  | LAMBDA IDENT ARROW expr { Def.ELambda ($2, $4) }
+  | LAMBDA IDENT ARROW expr { Def.EAbs ($2, $4) }
 
