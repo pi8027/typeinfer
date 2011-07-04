@@ -1,0 +1,7 @@
+
+open build/OCaml
+
+DefineCommandVars()
+
+.SUBDIRS: . src/bottom-up/stlc src/bottom-up/rec src/top-down/stlc src/top-down/rec
+
