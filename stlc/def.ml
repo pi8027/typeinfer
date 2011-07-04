@@ -12,7 +12,7 @@ let print_bracket (flag : bool) (printer : unit lazy_t) : unit =
   if flag
     then (print_string "(" ; Lazy.force printer ; print_string ")")
     else Lazy.force printer
-  ;;
+;;
 
 let rec print_lexpr (level : int) : lexpr -> unit =
   function
@@ -23,7 +23,7 @@ let rec print_lexpr (level : int) : lexpr -> unit =
     | EAbs (ident, expr) ->
       print_bracket (level <= 1)
         (lazy (print_string ("\\" ^ ident ^ " -> ") ; print_lexpr 2 expr))
-  ;;
+;;
 
 let rec print_ltype (level : int) : ltype -> unit =
   function
@@ -31,4 +31,5 @@ let rec print_ltype (level : int) : ltype -> unit =
       print_bracket (level = 0)
         (lazy (print_ltype 0 t1 ; print_string " -> " ; print_ltype 1 t2))
     | TVar n -> print_int n
+;;
 
