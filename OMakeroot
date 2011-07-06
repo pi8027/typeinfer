@@ -1,7 +1,8 @@
 
 open build/OCaml
+open build/LaTeX
 
 DefineCommandVars()
 
-.SUBDIRS: . src
+.SUBDIRS: . src book
 
