@@ -54,11 +54,10 @@ let generalize (enva : assump) (envs : subst) (ty : ltype) : typescheme =
 ;;
 
 let instantiate (n : int) (pvs, ty : typescheme) : int * ltype =
-  let rec replace (env : subst) : ltype -> ltype =
-    function
-      | TVar n when IntMap.mem n env -> IntMap.find n env
-      | TFun (tl, tr) -> TFun (replace env tl, replace env tr)
-      | t -> t
+  let rec replace (env : subst) : ltype -> ltype = function
+    | TVar n when IntMap.mem n env -> IntMap.find n env
+    | TFun (tl, tr) -> TFun (replace env tl, replace env tr)
+    | t -> t
   in
   let phi v (n, s) = succ n, IntMap.add v (TVar n) s in
   let n', s = IntSet.fold phi pvs (n, IntMap.empty) in n', replace s ty
