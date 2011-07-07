@@ -4,10 +4,12 @@ type lexpr
   | EApp of (lexpr * lexpr)
   | EAbs of (string * lexpr)
   | ERec of (string * lexpr)
+;;
 
 type ltype
   = TFun of (ltype * ltype)
   | TVar of int
+;;
 
 let print_bracket (flag : bool) (printer : unit lazy_t) : unit =
   if flag

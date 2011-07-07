@@ -3,10 +3,12 @@ type lexpr
   = EVar of string
   | EApp of (lexpr * lexpr)
   | EAbs of (string * lexpr)
+;;
 
 type ltype
   = TFun of (ltype * ltype)
   | TVar of int
+;;
 
 let print_bracket (flag : bool) (printer : unit lazy_t) : unit =
   if flag
