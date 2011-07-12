@@ -18,13 +18,13 @@ type subst = ltype IntMap.t;;
 
 exception Occurs_check;;
 
-let rec type_reduction (env : subst) : ltype -> ltype = function
-  | TVar n when IntMap.mem n env -> type_reduction env (IntMap.find n env)
+let rec type_pc (env : subst) : ltype -> ltype = function
+  | TVar n when IntMap.mem n env -> type_pc env (IntMap.find n env)
   | t -> t
 ;;
 
 let rec expand_type (env : subst) (t : ltype) : ltype =
-  match type_reduction env t with
+  match type_pc env t with
     | TVar n -> TVar n
     | TFun (tl, tr) -> TFun (expand_type env tl, expand_type env tr)
 ;;
@@ -35,7 +35,7 @@ let rec freevars : ltype -> IntSet.t = function
 ;;
 
 let rec solve (env : subst) ((lt, rt) : tconst) : subst =
-  match type_reduction env lt, type_reduction env rt with
+  match type_pc env lt, type_pc env rt with
     | TVar n, TVar n' when n = n' -> env
     | TVar n, t | t, TVar n ->
       if IntSet.mem n (freevars (expand_type env t))

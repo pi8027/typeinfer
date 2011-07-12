@@ -29,18 +29,18 @@ let rec infer (n : int) (env : assump) : lexpr -> int * tconst list * ltype =
       n', c, TFun (nt, t)
 ;;
 
-let rec type_reduction (env : subst) : ltype -> ltype = function
-  | TVar n when IntMap.mem n env -> type_reduction env (IntMap.find n env)
+let rec type_pc (env : subst) : ltype -> ltype = function
+  | TVar n when IntMap.mem n env -> type_pc env (IntMap.find n env)
   | t -> t
 ;;
 
 let rec solve (env : subst) ((lt, rt) : tconst) : subst =
   let rec occurs_check n t =
-    match type_reduction env t with
+    match type_pc env t with
       | TVar n' -> if n = n' then raise Occurs_check else ()
       | TFun (tl, tr) -> occurs_check n tl ; occurs_check n tr
   in
-  match type_reduction env lt, type_reduction env rt with
+  match type_pc env lt, type_pc env rt with
     | TVar n, TVar n' when n = n' -> env
     | TVar n, t | t, TVar n -> occurs_check n t ; IntMap.add n t env
     | TFun (t1l, t1r), TFun (t2l, t2r) ->
@@ -48,7 +48,7 @@ let rec solve (env : subst) ((lt, rt) : tconst) : subst =
 ;;
 
 let rec expand_type (env : subst) (t : ltype) : ltype =
-  match type_reduction env t with
+  match type_pc env t with
     | TVar n -> TVar n
     | TFun (tl, tr) -> TFun (expand_type env tl, expand_type env tr)
 ;;
