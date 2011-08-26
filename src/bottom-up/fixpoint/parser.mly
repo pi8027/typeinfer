@@ -1,5 +1,5 @@
 %token <string> IDENT
-%token REC
+%token FIX
 %token LPAREN RPAREN LAMBDA ARROW EQUAL EOF
 %start main
 %type <Def.lexpr> main
@@ -15,5 +15,5 @@ factor:
     IDENT                   { Def.EVar $1 }
   | LPAREN expr RPAREN      { $2 }
   | LAMBDA IDENT ARROW expr { Def.EAbs ($2, $4) }
-  | REC IDENT EQUAL expr    { Def.ERec ($2, $4) }
+  | FIX IDENT EQUAL expr    { Def.EFix ($2, $4) }
 

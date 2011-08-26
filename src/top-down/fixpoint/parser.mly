@@ -15,5 +15,5 @@ factor:
     IDENT                   { Def.EVar $1 }
   | LPAREN expr RPAREN      { $2 }
   | LAMBDA IDENT ARROW expr { Def.EAbs ($2, $4) }
-  | REC IDENT EQUAL expr    { Def.ERec ($2, $4) }
+  | REC IDENT EQUAL expr    { Def.EFix ($2, $4) }
 

@@ -11,25 +11,29 @@ module IntMap = Map.Make(
 module StrMap = Map.Make(String);;
 
 type tconst = ltype * ltype;;
-type assump = ltype StrMap.t;;
+type assump = (ltype list) StrMap.t;;
 type subst = ltype IntMap.t;;
 
 exception Occurs_check;;
 
-let rec infer (n : int) (env : assump) : lexpr -> int * tconst list * ltype =
+let rec infer (n : int) : lexpr -> int * assump * tconst list * ltype =
   let nt = TVar n in
+  let unopt = function None -> [] | Some l -> l in
+  let newvar assump ident t = if StrMap.mem ident assump
+    then List.map (fun t' -> (t, t')) (StrMap.find ident assump) else [] in
   function
-    | EVar str -> n, [], StrMap.find str env
+    | EVar str -> succ n, StrMap.singleton str [nt], [], nt
     | EApp (expr1, expr2) ->
-      let n1, c1, t1 = infer (succ n) env expr1 in
-      let n2, c2, t2 = infer n1 env expr2 in
-      n2, (t1, TFun (t2, nt)) :: c1 @ c2, nt
+      let n1, a1, c1, t1 = infer (succ n) expr1 in
+      let n2, a2, c2, t2 = infer n1 expr2 in
+      n2, StrMap.merge (fun _ a1 a2 -> Some (unopt a1 @ unopt a2)) a1 a2,
+        (t1, TFun (t2, nt)) :: c1 @ c2, nt
     | EAbs (ident, expr) ->
-      let n', c, t = infer (succ n) (StrMap.add ident nt env) expr in
-      n', c, TFun (nt, t)
-    | ERec (ident, expr) ->
-      let n', c, t = infer (succ n) (StrMap.add ident nt env) expr in
-      n', (nt, t) :: c, t
+      let n', a, c, t = infer (succ n) expr in
+      n', StrMap.remove ident a, newvar a ident nt @ c, TFun (nt, t)
+    | EFix (ident, expr) ->
+      let n', a, c, t = infer n expr in
+      n', StrMap.remove ident a, newvar a ident t @ c, t
 ;;
 
 let rec type_pc (env : subst) : ltype -> ltype = function

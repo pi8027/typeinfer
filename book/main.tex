@@ -8,7 +8,7 @@
 \newcommand{\bnfvert}{\settowidth{\lengthwithlength}{::=}\mathrel{\makebox[\lengthwithlength][c]{$|$}}}
 \newcommand{\bnfcce}{\mathrel{::=}}
 
-\title{Typing $\lambda^\to$ (C80 版)}
+\title{Typing $\lambda^\to$}
 \author{坂口和彦}
 
 \begin{document}
@@ -16,36 +16,21 @@
 \maketitle
 
 \pagenumbering{roman}
-\tableofcontents
-\newpage
-\pagenumbering{arabic}
 
-\chapter{序論}
-
-\section{まえがき}
+\section*{前書き}
 
 この本は、単純型付きラムダ計算からパラメトリック多相入りの型システム程度の範囲での型推論について、
 体系的かつ理論と実装に一対一の対応が現れる形でまとめた本です。
+最後まで読めば Hindley-Milner 型推論アルゴリズムの現実的な実装を理解できるということを目標としています。
 
 型推論の実装は関数型プログラミング言語 Objective Caml (OCaml) 3.12.0
 とその標準ライブラリによって記述されています。
-読者は関数型プログラミングや OCaml のエキスパートである必要はありませんが、ある程度 Haskell や OCaml
-でのプログラムの書き方を理解している事を前提としています。
+読者は関数型プログラミングや OCaml のエキスパートである必要はありませんが、
+ある程度 Haskell や OCaml での関数型言語らしいプログラムの書き方を理解していることを前提としています。
 
-\section{この本が書かれた背景}
-
-著者は、この本を書く前にもラムダプラス+という型推論をテーマにした本を書いています。
-しかし、ラムダプラス+で出した型推論の例は対象としている言語が大きく、
-入門には適さないなどの問題がありました。
-
-その問題を解決しよう。というのがこの本を書く上での目標です。
-より明確な目標としては、以下の3つが挙げられます。
-
-\begin{itemize}
-  \item 理論が先、実装が後になるように内容を構築する。理由が後付けではいけない。
-  \item 段階的に理論を拡張していくように書く。
-  \item 実装は理論に忠実に。実装の差分も理論上の拡張に対応するように書く。
-\end{itemize}
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
 
 \chapter{$\lambda$ 計算入門}
 
@@ -81,18 +66,143 @@ $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定�
 \end{figure}
 
 このように、変数、巻数適用、$\lambda$ 抽象からなる物だけが $\lambda$ 計算の\textbf{項}と呼ばれます。
-項の事を\textbf{式}という場合もあります。
+項のことを\textbf{式}という場合もあります。
 
-項の構造を明確にしつつ表記を簡単にするため、幾つかのルールがあります。
+また、図\ref{fig:lambda-term}の定義を見て分かる通り、
+純粋な $\lambda$ 計算には整数値やブール値などの定数が存在しません。
+しかし、整数値やブール値などを関数を使ってエンコードできることが知られています。
+ここでは分かりやすいように適宜整数などを使うことがあります。
 
+適切に構造を表現するために括弧を使って項を表記しますが、
+表記を簡単にするために幾つかの省略のルールがあります。
 
+$(e_1 e_2) e_3$ のような関数適用は $e_1 ~ e_2 ~ e_3$ と省略できます。
+すなわち、関数適用の構文は左結合です。
 
-\section{$\beta$ 簡約}
+$\lambda x. (e_1 e_2)$ のような $\lambda$ 抽象は $\lambda x. e_1 e_2$ と省略できます。
+すなわち、関数適用の方が $\lambda$ 抽象に比べて優先されます。
 
+\section{$\lambda$ 計算の実行}
 
+$\lambda$ 計算の実行について考えてみましょう。
+
+(まだ書いてない)
 
 \section{型付き $\lambda$ 計算}
+
+ここまでで説明した $\lambda$ 計算の上では、
+停止しない計算(無限長の $\beta$ 簡約列を持つ項)を作れることが知られています。
+
+例えば、$(\lambda x. x x) (\lambda x. x x)$ という項を簡約すると同じ形の項が出現するため、
+無限長の $\beta$ 簡約列を作ることができます。
+
+また、純粋な $\lambda$ 計算の範囲の話ではありませんが、
+特定の種類の定数のみに対する演算を含む計算体系では
+\[ (\lambda x . x + 1) { \it true } \]
+のように途中で失敗する計算というのも考えられます。
+
+このような、停止しない計算や失敗する計算を「正しくない計算」と見做し、正しくない計算を
+表している項を排除する仕組みが\textbf{型付き $\lambda$ 計算 (typed lambda calculus)}です。
+\footnote{
+ただし、型付き $\lambda$ 計算から派生したプログラミング言語のほとんどは
+プログラムが停止しないことや失敗することを許容しています。
+しかし、その多くは型によってプログラムの間違いのほとんどを検出し、排除することに成功しています。}
+
+型付き $\lambda$ 計算における\textbf{型 (type)} とは、とある項に対して適用可能な操作を表した物です。
+
+\subsection{単純型付き $\lambda$ 計算}
+
+\textbf{単純型付き $\lambda$ 計算 (simply typed lambda calculus, $\lambda^\to$)}は、
+型付きラムダ計算の体系の1つです。
+
+単純型付き $\lambda$ 計算の型は、図\ref{fig:stlc-type}のように帰納的に定義されます。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    t & \bnfcce  \alpha  && \text{(型変数)} \\
+      & \bnfvert t \to t && \text{(関数の型)}
+  \end{align*}
+  \caption{定義 : 単純型付き $\lambda$ 計算の型}
+  \label{fig:stlc-type}
+\end{figure}
+
+このように、型変数と関数の型だけからなるものを単純型付き $\lambda$ 計算の型とします。
+型は同じ型変数を使うことで同じ型であることを表し、
+$\alpha \to \beta$ は型 $\alpha$ の値から型 $\beta$ の値への関数を表します。
+
+例えば、$\lambda x. x$ (恒等関数)は $\alpha \to \alpha$ という型を持ちます。
+
+\subsection{型判定}
+
+単純型付き $\lambda$ 計算では、
+項に正しく型付けできるという事を\textgt{型判定 (type judgement)} で表します。
+
+型環境 $\Gamma$ の下で項 $e$ の型が $t$ である、ということを
+\[ \Gamma \vdash e : t \]
+と書きます。
+
+型環境 $\Gamma$ は、変数名と型のペアの集合($x_1 : t_1, x_2 : t_2, \dots, x_n : t_n$)です。
+これは型を決定する上での文脈であり、変数の型はここから引いてくる事になります。
+
+型環境 $\Gamma$ において変数 $x$ の型が $t$ である、という事を $x : t \in \Gamma$ と書きます。
+また、この型環境 $\Gamma$ に「変数 $y$ の型が $t$ である」という事を追加した環境を作るとき、
+$\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environment}のように定義されます。
+
+\begin{figure}[htbp]
+  \[
+    \infer[\textsc{[T-Env1]}]{
+      x : t_1 \in \Gamma , x : t_1
+    }{}
+  \]
+  \[
+    \infer[\textsc{[T-Env2]}]{
+      x : t_1 \in \Gamma , y : t_2
+    }{
+      x \neq y && x : t_1 \in \Gamma
+    }
+  \]
+  \caption{定義 : 型環境}
+  \label{fig:stlc-type-environment}
+\end{figure}
+
+\textsc{T-Env1} や \textsc{T-Env2} のような規則は、上が仮定で下が結論になっています。
+つまり、上に書いてある事が真であれば下に書いてある事も真である、と読みます。
+
+型判定の事を型環境、項、型の間の関係とみなし、
+\textgt{型付け関係 (typing relation)} と呼ぶ事もあります。
+
+単純型付き $\lambda$ 計算の型判定は、図\ref{fig:stlc-type-judgement}のようなルールで表せます。
+このルールは、$\lambda$ 計算の項の種類1つに対してルールが1つであるということに注意してください。
+
+\begin{figure}[htbp]
+  \[
+    \infer[\textsc{[T-Var]}]{
+      \Gamma \vdash x : t
+    }{
+      x : t \in \Gamma
+    }
+  \]
+  \[
+    \infer[\textsc{[T-App]}]{
+      \Gamma \vdash e_1 ~ e_2 : t_2
+    }{
+      \Gamma \vdash e_1 : t_1 \to t_2 &
+      \Gamma \vdash e_2 : t_1
+    }
+  \]
+  \[
+    \infer[\textsc{[T-Abs]}]{
+      \Gamma \vdash \lambda x . e : t_1 \to t_2
+    }
+    {
+      \Gamma, x : t_1 \vdash e : t_2
+    }
+  \]
+  \caption{定義 : 単純型付き $\lambda$ 計算の型判定}
+  \label{fig:stlc-type-judgement}
+\end{figure}
 
 
 
 \end{document}
+

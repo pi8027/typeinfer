@@ -3,7 +3,7 @@ type lexpr
   = EVar of string
   | EApp of (lexpr * lexpr)
   | EAbs of (string * lexpr)
-  | ERec of (string * lexpr)
+  | EFix of (string * lexpr)
 ;;
 
 type ltype
@@ -25,9 +25,9 @@ let rec print_lexpr (level : int) : lexpr -> unit = function
   | EAbs (ident, expr) ->
     print_bracket (level <= 1)
       (lazy (print_string ("\\" ^ ident ^ " -> ") ; print_lexpr 2 expr))
-  | ERec (ident, expr1) ->
+  | EFix (ident, expr1) ->
     print_bracket (level <= 1)
-      (lazy (print_string ("rec " ^ ident ^ " = ") ; print_lexpr 2 expr1))
+      (lazy (print_string ("fix " ^ ident ^ " = ") ; print_lexpr 2 expr1))
 ;;
 
 let rec print_ltype (level : int) : ltype -> unit = function
