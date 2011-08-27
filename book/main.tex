@@ -45,7 +45,9 @@ $\lambda$ 計算は計算体系の一つで、計算を\textbf{関数}と\textbf
 \section{$\lambda$ 計算}
 
 $\lambda$ 計算では、関数を記号 $\lambda$ を使って表記します。
-例えば、値を取ってその値をそのまま返す関数は、 \[ \lambda x. x+1 \] と表記します。
+例えば、数値を取って1を足して返す関数は、
+\[ \lambda x. x+1 \]
+と表記します。
 
 作った関数を値に適用する仕組みが必要です。
 関数適用は、関数の式と引数の式を順番に並べて表記します。
@@ -151,7 +153,7 @@ $\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environm
 \begin{figure}[htbp]
   \[
     \infer[\textsc{[T-Env1]}]{
-      x : t_1 \in \Gamma , x : t_1
+      x : t \in \Gamma , x : t
     }{}
   \]
   \[
@@ -166,7 +168,10 @@ $\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environm
 \end{figure}
 
 \textsc{T-Env1} や \textsc{T-Env2} のような規則は、上が仮定で下が結論になっています。
-つまり、上に書いてある事が真であれば下に書いてある事も真である、と読みます。
+
+規則 \textsc{T-Env1} は型環境 $\Gamma , x : t$ において変数 $x$ の型は $t$ である、と読みます。
+規則 \textsc{T-Env2} は型環境 $\Gamma$ において変数 $x$ の型が $t_1$ かつ $x \neq y$ であれば、
+型環境 $\Gamma , y : t_2$ において変数 $x$ の型が $t_1$ である、と読みます。
 
 型判定の事を型環境、項、型の間の関係とみなし、
 \textgt{型付け関係 (typing relation)} と呼ぶ事もあります。
@@ -201,6 +206,22 @@ $\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environm
   \caption{定義 : 単純型付き $\lambda$ 計算の型判定}
   \label{fig:stlc-type-judgement}
 \end{figure}
+
+これらは、図\ref{fig:stlc-type-environment}の定義と同様に、上が仮定で下が結論となっています。
+
+規則 \textsc{T-Var} は変数に関する規則です。
+型環境 $\Gamma$ において変数 $x$ の型が $t$ であれば、
+型環境 $\Gamma$ の下で式 $x$ の型は $t$ である、と読みます。
+
+規則 \textsc{T-App} は関数適用に関する規則です。
+型環境 $\Gamma$ の下で式 $e_1$ の型が $t_1 \to t_2$ かつ $e_2$ の型が $t_1$ であれば、
+型環境 $\Gamma$ の下で式 $e_1 ~ e_2$ の型は $t_2$ である、と読みます。
+
+規則 \textsc{T-Abs} は $\lambda$ 抽象に関する規則です。
+型環境 $\Gamma , x : t_1$ の下で式 $e$ の型が $t_2$ であれば、
+型環境 $\Gamma$ の下で式 $\lambda x . e$ の型は $t_1 \to t_2$ である、と読みます。
+
+最初は難しく感じるかもしれませんが、慣れるとこのように書いた方が分かりやすくなるでしょう。
 
 
 
