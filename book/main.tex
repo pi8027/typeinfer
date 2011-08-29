@@ -2,18 +2,22 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{theorem}
 \usepackage{proof}
 
 \newlength{\lengthwithlength}
 \newcommand{\bnfvert}{\settowidth{\lengthwithlength}{::=}\mathrel{\makebox[\lengthwithlength][c]{$|$}}}
 \newcommand{\bnfcce}{\mathrel{::=}}
 
+\newtheorem{exercise}{練習問題}[chapter]
+\newtheorem{answer}{回答}[chapter]
+
 \title{Typing $\lambda^\to$}
 \author{坂口和彦}
 
 \begin{document}
 
-\maketitle
+%\maketitle
 
 \pagenumbering{roman}
 
@@ -40,19 +44,20 @@ $\lambda$ 計算は計算体系の一つで、計算を\textbf{関数}と\textbf
 次章から書く型推論の対象となる言語も、
 最初は $\lambda$ 計算のシンプルな型システムとして知られる単純型付き $\lambda$ 計算です。
 
-この章では、前提知識として必要な $\lambda$ 計算について説明します。
+この章では、前提知識として必要な $\lambda$ 計算と単純型付き $\lambda$ 計算について説明します。
 
 \section{$\lambda$ 計算}
 
-$\lambda$ 計算では、関数を記号 $\lambda$ を使って表記します。
+$\lambda$ 計算では、関数を記号 $\lambda$ を使って
+$\lambda \text{パラメータ名} . \text{結果}$ と表記します。
 例えば、数値を取って1を足して返す関数は、
 \[ \lambda x. x+1 \]
 と表記します。
 
-作った関数を値に適用する仕組みが必要です。
-関数適用は、関数の式と引数の式を順番に並べて表記します。
+作った関数を値に適用する仕組みが必要です。関数適用は、関数と引数を順番に並べて表記します。
 例えば、引数をそのまま返す関数にその関数自身を適用するには、
-\[ (\lambda x. x) (\lambda y. y) \] と表記します。
+\[ (\lambda x. x) (\lambda y. y) \]
+と表記します。
 
 このような計算そのものを表現する物を項と呼びます。
 $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定義されます。
@@ -67,8 +72,8 @@ $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定�
   \label{fig:lambda-term}
 \end{figure}
 
-このように、変数、巻数適用、$\lambda$ 抽象からなる物だけが $\lambda$ 計算の\textbf{項}と呼ばれます。
-項のことを\textbf{式}という場合もあります。
+変数、巻数適用、$\lambda$ 抽象からなる物だけが $\lambda$ 計算の\textbf{項 (term)}と呼ばれます。
+項のことを\textbf{式 (expression)}という場合もあります。
 
 また、図\ref{fig:lambda-term}の定義を見て分かる通り、
 純粋な $\lambda$ 計算には整数値やブール値などの定数が存在しません。
@@ -83,6 +88,42 @@ $(e_1 e_2) e_3$ のような関数適用は $e_1 ~ e_2 ~ e_3$ と省略できま
 
 $\lambda x. (e_1 e_2)$ のような $\lambda$ 抽象は $\lambda x. e_1 e_2$ と省略できます。
 すなわち、関数適用の方が $\lambda$ 抽象に比べて優先されます。
+
+\begin{exercise}
+
+次のうち、$\lambda$ 計算の項として正しくない物はどれか。
+
+\begin{enumerate}
+  \item $\lambda x . x$
+  \item $\lambda f . f x$
+  \item $f (\lambda x)$
+\end{enumerate}
+
+1番目は、$x$ が変数として正しく、
+$\lambda x . x$ 全体も $\lambda$ 抽象として正しいので正しい項になっています。
+
+2番目は、$f$ と $x$ がそれぞれ変数として正しく、$f x$ が関数適用として正しく、
+$\lambda f . f x$ 全体も $\lambda$ 抽象として正しいので正しい項になっています。
+
+3番目は、$f$ と $x$ はそれぞれ変数として正しい形になっていますが、
+$\lambda x$ は正しい $\lambda$ 計算の項の形をしていません。
+よって、$f (\lambda x)$ 全体も正しい $\lambda$ 計算の項ではありません。
+
+$\lambda$ 計算の項として正しくない物は、三番目の $f (\lambda x)$ です。
+
+\end{exercise}
+
+\begin{exercise}
+
+以下の $\lambda$ 計算の項を実行した結果は何になるか、答えよ。
+
+\begin{enumerate}
+  \item $(\lambda x . x) (\lambda y . y)$
+  \item $(\lambda f . \lambda g . \lambda x . f x (g x))
+		(\lambda x . \lambda y . x) (\lambda x . \lambda y . x)$
+\end{enumerate}
+
+\end{exercise}
 
 \section{$\lambda$ 計算の実行}
 
@@ -137,7 +178,7 @@ $\alpha \to \beta$ は型 $\alpha$ の値から型 $\beta$ の値への関数を
 \subsection{型判定}
 
 単純型付き $\lambda$ 計算では、
-項に正しく型付けできるという事を\textgt{型判定 (type judgement)} で表します。
+項に正しく型付けできるという事を\textbf{型判定 (type judgement)} で表します。
 
 型環境 $\Gamma$ の下で項 $e$ の型が $t$ である、ということを
 \[ \Gamma \vdash e : t \]
@@ -174,7 +215,7 @@ $\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environm
 型環境 $\Gamma , y : t_2$ において変数 $x$ の型が $t_1$ である、と読みます。
 
 型判定の事を型環境、項、型の間の関係とみなし、
-\textgt{型付け関係 (typing relation)} と呼ぶ事もあります。
+\textbf{型付け関係 (typing relation)} と呼ぶ事もあります。
 
 単純型付き $\lambda$ 計算の型判定は、図\ref{fig:stlc-type-judgement}のようなルールで表せます。
 このルールは、$\lambda$ 計算の項の種類1つに対してルールが1つであるということに注意してください。
