@@ -33,7 +33,7 @@
 ある程度 Haskell や OCaml での関数型言語らしいプログラムの書き方を理解していることを前提としています。
 
 \tableofcontents
-\newpage
+
 \pagenumbering{arabic}
 
 \chapter{$\lambda$ 計算入門}
@@ -123,13 +123,52 @@ $\lambda$ 計算の項として正しくない物は、三番目の $f (\lambda 
 		(\lambda x . \lambda y . x) (\lambda x . \lambda y . x)$
 \end{enumerate}
 
+1番目は、外側の関数適用を実行すると $\lambda y . y$ となります。よって、実行結果は $\lambda y . y$
+となります。
+
+2番目は、まず項 $(\lambda f . \lambda g . \lambda x . f x (g x)) (\lambda x . \lambda y . x)$
+の関数適用を実行します。結果は、$\lambda g . \lambda x . (\lambda x . \lambda y . x) x (g x)$
+となり、これの内側の2つの関数適用を実行すると $\lambda g . \lambda x . x$ となります。
+よって、項全体は $(\lambda g . \lambda x . x) (\lambda x . \lambda y . x)$ となります。
+この項の外側の関数適用を実行すると、$\lambda x . x$ となります。
+実行結果は $x . x$ です。
+
 \end{exercise}
 
 \section{$\lambda$ 計算の実行}
 
 $\lambda$ 計算の実行について考えてみましょう。
 
-(まだ書いてない)
+前の練習問題で分かる通り、$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
+($(\lambda x . e_1) e_2$ の形をしている $\lambda$ 項)を解く操作です。
+この操作は、$(\lambda x . e_1) e_2$ から、$e_1$ の中の $x$ を $e_2$ に置き換える操作です。
+これを\textbf{代入}と呼び、$[e_2/x] e_1$ のように表記するとしましょう。
+
+図 \ref{fig:lambda-substitute} に代入の定義を示します。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    [y/x] e_1 & = \left \{
+      \begin{array}{ll}
+        e_1 & (x = y) \\
+        y & (x \neq y)
+      \end{array}
+      \right. \\
+    [e_2 e_3/x] e_1 & = ([e_2/x] e_1) ([e_3/x] e_1) \\
+    [\lambda y . e_2/x] e_1 & = \left \{
+      \begin{array}{ll}
+        \lambda y . [e_2/x] e_1 & (x \neq y) \\
+        \lambda y . e_2 & (x = y)
+      \end{array}
+      \right.
+  \end{align*}
+  \caption{定義 : 代入}
+  \label{fig:lambda-substitute}
+\end{figure}
+
+次に、代入を使って $\lambda$ 計算の項の関数適用を評価するを作りましょう。
+
+(まだかいてない)
 
 \section{型付き $\lambda$ 計算}
 
