@@ -9,6 +9,8 @@
 \newcommand{\bnfvert}{\settowidth{\lengthwithlength}{::=}\mathrel{\makebox[\lengthwithlength][c]{$|$}}}
 \newcommand{\bnfcce}{\mathrel{::=}}
 
+\newcommand{\betared}{\to_\beta}
+
 \newtheorem{exercise}{練習問題}[chapter]
 \newtheorem{answer}{回答}[chapter]
 
@@ -33,6 +35,8 @@
 ある程度 Haskell や OCaml での関数型言語らしいプログラムの書き方を理解していることを前提としています。
 
 \tableofcontents
+
+\newpage
 
 \pagenumbering{arabic}
 
@@ -141,8 +145,8 @@ $\lambda$ 計算の実行について考えてみましょう。
 
 前の練習問題で分かる通り、$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
 ($(\lambda x . e_1) e_2$ の形をしている $\lambda$ 項)を解く操作です。
-この操作は、$(\lambda x . e_1) e_2$ から、$e_1$ の中の $x$ を $e_2$ に置き換える操作です。
-これを\textbf{代入}と呼び、$[e_2/x] e_1$ のように表記するとしましょう。
+この操作は、項 $e_1$ の中の自由変数 $x$ を全て項 $e_2$ で置き換える操作です。
+この自由変数を全て置き換える操作を\textbf{代入}と呼び、$[e_2/x] e_1$ と表記します。
 
 図 \ref{fig:lambda-substitute} に代入の定義を示します。
 
@@ -154,7 +158,7 @@ $\lambda$ 計算の実行について考えてみましょう。
         y & (x \neq y)
       \end{array}
       \right. \\
-    [e_2 e_3/x] e_1 & = ([e_2/x] e_1) ([e_3/x] e_1) \\
+    [e_2 ~ e_3/x] e_1 & = ([e_2/x] e_1) ([e_3/x] e_1) \\
     [\lambda y . e_2/x] e_1 & = \left \{
       \begin{array}{ll}
         \lambda y . [e_2/x] e_1 & (x \neq y) \\
@@ -168,20 +172,124 @@ $\lambda$ 計算の実行について考えてみましょう。
 
 次に、代入を使って $\lambda$ 計算の項の関数適用を評価するを作りましょう。
 
-(まだかいてない)
+項の中の関数適用を一度実行する事を、\textbf{$\beta$簡約 ($\beta$-retuction)}と呼びます。
+$e_1$ を $\beta$ 簡約して $e_2$ にできるという事を、$e_1 \betared e_2$ と表記します。
+図 \ref{fig:beta-reduction} に $\beta$ 簡約の定義を示します。
+
+\begin{figure}[htbp]
+  \[
+    \infer[\textsc{[R-Beta]}]{
+      (\lambda x . e_1) e_2 \betared [e_2/x]e_1
+    }{}
+  \]
+  \[
+    \infer[\textsc{[R-App1]}]{
+      e_1 ~ e_2 \betared e_1' ~ e_2
+    }{
+      e_1 \betared e_1'
+    }
+  \]
+  \[
+    \infer[\textsc{[R-App2]}]{
+      e_1 ~ e_2 \betared e_1 ~ e_2'
+    }{
+      e_2 \betared e_2'
+    }
+  \]
+  \[
+    \infer[\textsc{R-Abs}]{
+      \lambda x . e \betared \lambda x . e'
+    }{
+      e \betared e'
+    }
+  \]
+  \caption{定義 : $\beta$ 簡約}
+  \label{fig:beta-reduction}
+\end{figure}
+
+この分数のような表記は、上が仮定で下が結論であるような規則を表しています。
+つまり、上に書いてある事が成り立てば、下に書いてある事を成り立つとして良いという事になります。
+
+規則の右側に書いてある \textsc{R-Beta}, \textsc{R-App1}, \textsc{R-App2}, \textsc{R-Abs}
+は規則の名前を表しています。
+
+また、\textsc{R-Beta} 規則のように上が空である場合は、
+無条件で下に書いてある事を認めて良いという事を表しています。
+
+$\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます。
+
+\begin{exercise}
+
+以下の $\beta$ 簡約ができる事を示せ。
+
+\[
+  (\lambda x . x) ~ f ~ y \betared f ~ y
+\]
+
+これは、$(\lambda x . x) ~ f$ の部分を簡約すれば良さそうです。$[f/x] x = f$ なので、
+\[
+  \infer[\textsc{[R-Beta]}]{
+    (\lambda x . x) ~ f \betared f
+  }{}
+\]
+とできます。この部分式は全体から見ると関数適用の左辺なので、
+\[
+  \infer[\textsc{[R-App1]}]{
+    (\lambda x . x) ~ f ~ y \betared f ~ y
+  }{
+    (\lambda x . x) ~ f \betared f
+  }
+\]
+とできます。
+このようにして、$(\lambda x . x) ~ f ~ y \betared f ~ y$ が正しい $\beta$ 簡約である事が示せます。
+
+また、実際はこの2つの証明の段階を繋げて、
+\[
+  \infer[\textsc{[R-App1]}]{
+    (\lambda x . x) ~ f ~ y \betared f ~ y
+  }{
+    \infer[\textsc{[R-Beta]}]{
+      (\lambda x . x) ~ f \betared f
+    }{}
+  }
+\]
+のように表記します。
+これによって、複雑な構造を持つ証明を分かりやすく記述する事ができます。
+
+\end{exercise}
+
+\begin{exercise}
+
+以下の $\lambda$ 項を簡約せよ。
+
+\[
+  (\lambda x . x ~ x) (\lambda x . x ~ x)
+\]
+
+外側の関数適用が簡約できます。
+$[(\lambda x . x ~ x)/x]x ~ x = (\lambda x . x ~ x) (\lambda x . x ~ x)$ なので、
+\[
+  \infer[\textsc{R-Beta}]{
+    (\lambda x . x ~ x) (\lambda x . x ~ x) \betared (\lambda x . x ~ x) (\lambda x . x ~ x)
+  }{}
+\]
+となります。
+
+しかし、簡約した結果として自分自身と同じ項が作れてしまいました。
+この事から、この項は無限長の $\beta$ 簡約列を作る事ができ、評価が停止しないと分かります。
+
+この例以外にも、無限長の $\beta$ 簡約列を作れる $\lambda$ 項は無数に存在しています。
+
+\end{exercise}
 
 \section{型付き $\lambda$ 計算}
 
-ここまでで説明した $\lambda$ 計算の上では、
-停止しない計算(無限長の $\beta$ 簡約列を持つ項)を作れることが知られています。
-
-例えば、$(\lambda x. x x) (\lambda x. x x)$ という項を簡約すると同じ形の項が出現するため、
-無限長の $\beta$ 簡約列を作ることができます。
+前の練習問題のように、無限長の $\beta$ 簡約列を作る事ができるような $\lambda$ 項を作る事ができます。
 
 また、純粋な $\lambda$ 計算の範囲の話ではありませんが、
 特定の種類の定数のみに対する演算を含む計算体系では
-\[ (\lambda x . x + 1) { \it true } \]
-のように途中で失敗する計算というのも考えられます。
+\[ { \it true } + 1 \]
+のように実行の過程で失敗する計算というのも考えられます。
 
 このような、停止しない計算や失敗する計算を「正しくない計算」と見做し、正しくない計算を
 表している項を排除する仕組みが\textbf{型付き $\lambda$ 計算 (typed lambda calculus)}です。
@@ -221,14 +329,14 @@ $\alpha \to \beta$ は型 $\alpha$ の値から型 $\beta$ の値への関数を
 
 型環境 $\Gamma$ の下で項 $e$ の型が $t$ である、ということを
 \[ \Gamma \vdash e : t \]
-と書きます。
+と表記します。
 
 型環境 $\Gamma$ は、変数名と型のペアの集合($x_1 : t_1, x_2 : t_2, \dots, x_n : t_n$)です。
 これは型を決定する上での文脈であり、変数の型はここから引いてくる事になります。
 
-型環境 $\Gamma$ において変数 $x$ の型が $t$ である、という事を $x : t \in \Gamma$ と書きます。
+型環境 $\Gamma$ において変数 $x$ の型が $t$ である、という事を $x : t \in \Gamma$ と表記します。
 また、この型環境 $\Gamma$ に「変数 $y$ の型が $t$ である」という事を追加した環境を作るとき、
-$\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environment}のように定義されます。
+$\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-environment}のように定義されます。
 
 \begin{figure}[htbp]
   \[
@@ -246,12 +354,6 @@ $\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environm
   \caption{定義 : 型環境}
   \label{fig:stlc-type-environment}
 \end{figure}
-
-\textsc{T-Env1} や \textsc{T-Env2} のような規則は、上が仮定で下が結論になっています。
-
-規則 \textsc{T-Env1} は型環境 $\Gamma , x : t$ において変数 $x$ の型は $t$ である、と読みます。
-規則 \textsc{T-Env2} は型環境 $\Gamma$ において変数 $x$ の型が $t_1$ かつ $x \neq y$ であれば、
-型環境 $\Gamma , y : t_2$ において変数 $x$ の型が $t_1$ である、と読みます。
 
 型判定の事を型環境、項、型の間の関係とみなし、
 \textbf{型付け関係 (typing relation)} と呼ぶ事もあります。
@@ -286,22 +388,6 @@ $\Gamma , y : t$ と書きます。これらは、図\ref{fig:stlc-type-environm
   \caption{定義 : 単純型付き $\lambda$ 計算の型判定}
   \label{fig:stlc-type-judgement}
 \end{figure}
-
-これらは、図\ref{fig:stlc-type-environment}の定義と同様に、上が仮定で下が結論となっています。
-
-規則 \textsc{T-Var} は変数に関する規則です。
-型環境 $\Gamma$ において変数 $x$ の型が $t$ であれば、
-型環境 $\Gamma$ の下で式 $x$ の型は $t$ である、と読みます。
-
-規則 \textsc{T-App} は関数適用に関する規則です。
-型環境 $\Gamma$ の下で式 $e_1$ の型が $t_1 \to t_2$ かつ $e_2$ の型が $t_1$ であれば、
-型環境 $\Gamma$ の下で式 $e_1 ~ e_2$ の型は $t_2$ である、と読みます。
-
-規則 \textsc{T-Abs} は $\lambda$ 抽象に関する規則です。
-型環境 $\Gamma , x : t_1$ の下で式 $e$ の型が $t_2$ であれば、
-型環境 $\Gamma$ の下で式 $\lambda x . e$ の型は $t_1 \to t_2$ である、と読みます。
-
-最初は難しく感じるかもしれませんが、慣れるとこのように書いた方が分かりやすくなるでしょう。
 
 
 
