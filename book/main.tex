@@ -11,6 +11,8 @@
 
 \newcommand{\betared}{\to_\beta}
 
+\newcommand{\infere}[3]{\infer[\textsc{[#1]}]{#2}{#3}}
+
 \newtheorem{exercise}{練習問題}[chapter]
 \newtheorem{answer}{回答}[chapter]
 
@@ -73,7 +75,7 @@ $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定�
       & \bnfvert e ~ e         && \text{(関数適用)} \\
       & \bnfvert \lambda x . e && \text{($\lambda$ 抽象)}
   \end{align*}
-  \caption{定義 : $\lambda$ 計算の項}
+  \caption{$\lambda$ 計算の項}
   \label{fig:lambda-term}
 \end{figure}
 
@@ -171,7 +173,7 @@ $\lambda$ 計算の実行について考えてみましょう。
       \end{array}
       \right.
   \end{align*}
-  \caption{定義 : 代入}
+  \caption{代入}
   \label{fig:lambda-substitute}
 \end{figure}
 
@@ -183,32 +185,32 @@ $e_1$ を $\beta$ 簡約して $e_2$ にできるという事を、$e_1 \betared
 
 \begin{figure}[htbp]
   \[
-    \infer[\textsc{[R-Beta]}]{
+    \infere{R-Beta}{
       (\lambda x . e_1) e_2 \betared [e_2/x]e_1
     }{}
   \]
   \[
-    \infer[\textsc{[R-App1]}]{
+    \infere{R-App1}{
       e_1 ~ e_2 \betared e_1' ~ e_2
     }{
       e_1 \betared e_1'
     }
   \]
   \[
-    \infer[\textsc{[R-App2]}]{
+    \infere{R-App2}{
       e_1 ~ e_2 \betared e_1 ~ e_2'
     }{
       e_2 \betared e_2'
     }
   \]
   \[
-    \infer[\textsc{[R-Abs]}]{
+    \infere{R-Abs}{
       \lambda x . e \betared \lambda x . e'
     }{
       e \betared e'
     }
   \]
-  \caption{定義 : $\beta$ 簡約}
+  \caption{$\beta$ 簡約}
   \label{fig:beta-reduction}
 \end{figure}
 
@@ -235,13 +237,13 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
 
 これは、$(\lambda x . x) ~ f$ の部分を簡約すれば良さそうです。$[f/x] x = f$ なので、
 \[
-  \infer[\textsc{[R-Beta]}]{
+  \infere{R-Beta}{
     (\lambda x . x) ~ f \betared f
   }{}
 \]
 とできます。この部分式は全体から見ると関数適用の左辺なので、
 \[
-  \infer[\textsc{[R-App1]}]{
+  \infere{R-App1}{
     (\lambda x . x) ~ f ~ y \betared f ~ y
   }{
     (\lambda x . x) ~ f \betared f
@@ -252,10 +254,10 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
 
 また、実際はこの2つの証明の段階を繋げて、
 \[
-  \infer[\textsc{[R-App1]}]{
+  \infere{R-App1}{
     (\lambda x . x) ~ f ~ y \betared f ~ y
   }{
-    \infer[\textsc{[R-Beta]}]{
+    \infere{R-Beta}{
       (\lambda x . x) ~ f \betared f
     }{}
   }
@@ -278,7 +280,7 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
 外側の関数適用が簡約できます。
 $[(\lambda x . x ~ x)/x](x ~ x) = (\lambda x . x ~ x) (\lambda x . x ~ x)$ なので、
 \[
-  \infer[\textsc{[R-Beta]}]{
+  \infere{R-Beta}{
     (\lambda x . x ~ x) (\lambda x . x ~ x) \betared (\lambda x . x ~ x) (\lambda x . x ~ x)
   }{}
 \]
@@ -324,7 +326,7 @@ $[(\lambda x . x ~ x)/x](x ~ x) = (\lambda x . x ~ x) (\lambda x . x ~ x)$ な�
     t & \bnfcce  \alpha  && \text{(型変数)} \\
       & \bnfvert t \to t && \text{(関数の型)}
   \end{align*}
-  \caption{定義 : 単純型付き $\lambda$ 計算の型}
+  \caption{単純型付き $\lambda$ 計算の型}
   \label{fig:stlc-type}
 \end{figure}
 
@@ -352,18 +354,18 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 
 \begin{figure}[htbp]
   \[
-    \infer[\textsc{[T-Env1]}]{
+    \infere{T-Env1}{
       x : t \in \Gamma , x : t
     }{}
   \]
   \[
-    \infer[\textsc{[T-Env2]}]{
+    \infere{T-Env2}{
       x : t_1 \in \Gamma , y : t_2
     }{
       x \neq y && x : t_1 \in \Gamma
     }
   \]
-  \caption{定義 : 型環境}
+  \caption{型環境}
   \label{fig:stlc-type-environment}
 \end{figure}
 
@@ -375,14 +377,14 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 
 \begin{figure}[htbp]
   \[
-    \infer[\textsc{[T-Var]}]{
+    \infere{T-Var}{
       \Gamma \vdash x : t
     }{
       x : t \in \Gamma
     }
   \]
   \[
-    \infer[\textsc{[T-App]}]{
+    \infere{T-App}{
       \Gamma \vdash e_1 ~ e_2 : t_2
     }{
       \Gamma \vdash e_1 : t_1 \to t_2 &
@@ -390,14 +392,14 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
     }
   \]
   \[
-    \infer[\textsc{[T-Abs]}]{
+    \infere{T-Abs}{
       \Gamma \vdash \lambda x . e : t_1 \to t_2
     }
     {
       \Gamma, x : t_1 \vdash e : t_2
     }
   \]
-  \caption{定義 : 単純型付き $\lambda$ 計算の型判定}
+  \caption{単純型付き $\lambda$ 計算の型判定}
   \label{fig:stlc-type-judgement}
 \end{figure}
 
@@ -420,28 +422,28 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 
 \begin{figure}[htbp]
   \[
-    \infer[\textsc{[T-Bool]}]{
+    \infere{T-Bool}{
       \Gamma \vdash c : \text{bool}
     }{
       c \text{はブール値}
     }
   \]
   \[
-    \infer[\textsc{[T-Int]}]{
+    \infere{T-Int}{
       \Gamma \vdash c : \text{int}
     }{
       c \text{は整数値}
     }
   \]
   \[
-    \infer[\textsc{[T-Plus]}]{
-      \Gamma \vdash e_1 + e_2 : int
+    \infere{T-Plus}{
+      \Gamma \vdash e_1 + e_2 : \text{int}
     }{
-      \Gamma \vdash e_1 : int &
-      \Gamma \vdash e_2 : int
+      \Gamma \vdash e_1 : \text{int} &
+      \Gamma \vdash e_2 : \text{int}
     }
   \]
-  \caption{定義 : 定数に関する追加の型判定規則}
+  \caption{定数に関する追加の型判定規則}
   \label{fig:stlc-type-judgement-constants}
 \end{figure}
 
@@ -451,6 +453,83 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 
 ここまでに出てきた規則を利用して、実際に $\lambda$ 項に型を付けてみましょう。
 
+例として、項 $\lambda x . x + 1$ に型を付けてみます。
+項の外側から、即ち型判定木の下の方から構築していきましょう。一番外側は $\lambda$ 抽象なので、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda x . x + 1 : ?_1 \to ?_2
+  }{
+    \emptyset , x : ?_1 \vdash x + 1 : ?_2
+  }
+\]
+と書けます。
+
+ただし、ここでの記号 $?$ はまだ確定していない型を表現している物とします。
+同じ番号を振る事で同じ型である事を表現しています。
+
+次に出てきたのは加算なので、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda x . x + 1 : ?_1 \to \text{int}
+  }{
+    \infere{T-Plus}{
+      \emptyset , x : ?_1 \vdash x + 1 : \text{int}
+    }{
+      \emptyset , x : ?_1 \vdash x : \text{int} &
+      \emptyset , x : ?_1 \vdash 1 : \text{int}
+    }
+  }
+\]
+と書けます。規則 \textsc{T-Plus} によって $?_2$ が int 型に置き換えられた事に注意してください。
+
+次に、左側の項 $x$ の型判定を埋めましょう。規則 \textsc{T-Var} と規則 \textsc{T-Env1} を使うと、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda x . x + 1 : \text{int} \to \text{int}
+  }{
+    \infere{T-Plus}{
+      \emptyset , x : \text{int} \vdash x + 1 : \text{int}
+    }{
+      \infere{T-Var}{
+        \emptyset , x : \text{int} \vdash x : \text{int}
+      }{
+        \infere{T-Env1}{
+          x : int \in \emptyset , x : \text{int}
+   		}{}
+      } &
+      \emptyset , x : \text{int} \vdash 1 : \text{int}
+    }
+  }
+\]
+と書けます。ここでも、$?_1$ が int 型に置き換わりました。
+
+最後に、定数1の型判定を埋めます。規則 \textsc{T-Int} を使って、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda x . x + 1 : \text{int} \to \text{int}
+  }{
+    \infere{T-Plus}{
+      \emptyset , x : \text{int} \vdash x + 1 : \text{int}
+    }{
+      \infere{T-Var}{
+        \emptyset , x : \text{int} \vdash x : \text{int}
+      }{
+        \infere{T-Env1}{
+          x : int \in \emptyset , x : \text{int}
+   		}{}
+      } &
+      \infere{T-Int}{
+        \emptyset , x : \text{int} \vdash 1 : \text{int}
+      }{
+        1 \text{は整数値}
+	  }
+    }
+  }
+\]
+と書けます。これで型判定全体が作れました。
+
+このようにして、
+$\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ である事の理由付けができます。
 
 
 \end{document}
