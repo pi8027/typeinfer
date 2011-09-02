@@ -298,10 +298,10 @@ $[(\lambda x . x ~ x)/x](x ~ x) = (\lambda x . x ~ x) (\lambda x . x ~ x)$ な�
 また、純粋な $\lambda$ 計算の範囲の話ではありませんが、定数値や定数値に対する演算を含む計算体系では、
 特定の種類の定数値のみを対象とできる演算を考えたい場合があります。例えば、
 \[
-  { \it true } + 1
+  \text{true} + 1
 \]
 は加算が数値に対する二項演算であって欲しいとすると、
-真偽値 $\it true$ と整数値 $1$ に対して適用されているため意図に反した計算であると言えます。
+真偽値 true と整数値 $1$ に対して適用されているため意図に反した計算であると言えます。
 
 このような、停止しない計算や意図に反する計算を「正しくない計算」と見做し、正しくない計算を
 表している項を排除する仕組みが\textbf{型付き $\lambda$ 計算 (typed lambda calculus)}です。
@@ -412,17 +412,44 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 型環境 $\Gamma , x : t_1$ の下で式 $e$ の型が $t_2$ であれば、
 型環境 $\Gamma$ の下で式 $\lambda x . e$ の型が $t_1 \to t_2$ である、と読みます。
 
-%また、定数などを含む $\lambda$ 項に型を付ける場合には、
-%それらの定数や関連する演算に関しての規則を追加する必要があります。
-%例えば、ブール値(bool 型)と整数値(int 型)と整数値の加算を加えた定義は、
-%項にブール値と整数値を加え、型に bool 型と int 型を加えた上で、
-%図\ref{fig:stlc-type-judgement-constants}の型判定規則を追加します。
+また、定数などを含む $\lambda$ 項に型を付ける場合には、
+それらの定数や関連する演算に関しての規則を追加する必要があります。
+例えば、ブール値(bool 型)と整数値(int 型)と整数値の加算を加えた定義は、
+項にブール値と整数値を加え、型に bool 型と int 型を加えた上で、
+図\ref{fig:stlc-type-judgement-constants}の型判定規則を追加します。
 
-%\begin{figure}[htbp]
-%
-%  \caption{定義 : 定数に関する追加の型判定規則}
-%  \label{fig:stlc-type-judgement-constants}
-%\end{figure}
+\begin{figure}[htbp]
+  \[
+    \infer[\textsc{[T-Bool]}]{
+      \Gamma \vdash c : \text{bool}
+    }{
+      c \text{はブール値}
+    }
+  \]
+  \[
+    \infer[\textsc{[T-Int]}]{
+      \Gamma \vdash c : \text{int}
+    }{
+      c \text{は整数値}
+    }
+  \]
+  \[
+    \infer[\textsc{[T-Plus]}]{
+      \Gamma \vdash e_1 + e_2 : int
+    }{
+      \Gamma \vdash e_1 : int &
+      \Gamma \vdash e_2 : int
+    }
+  \]
+  \caption{定義 : 定数に関する追加の型判定規則}
+  \label{fig:stlc-type-judgement-constants}
+\end{figure}
+
+これらの規則は簡単なので、練習も兼ねて自分で読んでみてください。
+
+\subsection{型を付ける}
+
+ここまでに出てきた規則を利用して、実際に $\lambda$ 項に型を付けてみましょう。
 
 
 
