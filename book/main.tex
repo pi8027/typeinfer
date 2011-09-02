@@ -336,6 +336,10 @@ $\alpha \to \beta$ は型 $\alpha$ の値から型 $\beta$ の値への関数を
 
 例えば、$\lambda x. x$ (恒等関数)は $\alpha \to \alpha$ という型を持ちます。
 
+これまでと同様、型の構造を表すために適宜括弧を使う事があります。
+ただし、関数の型は右結合であり、
+$t_1 \to (t_2 \to t_3)$ は $t_1 \to t_2 \to t_3$ のように省略できます。
+
 \subsection{型判定}
 
 単純型付き $\lambda$ 計算では、
@@ -453,6 +457,8 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 
 ここまでに出てきた規則を利用して、実際に $\lambda$ 項に型を付けてみましょう。
 
+\subsubsection{例1 : $\lambda x . x + x$}
+
 例として、項 $\lambda x . x + 1$ に型を付けてみます。
 項の外側から、即ち型判定木の下の方から構築していきましょう。一番外側は $\lambda$ 抽象なので、
 \[
@@ -494,14 +500,14 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
         \emptyset , x : \text{int} \vdash x : \text{int}
       }{
         \infere{T-Env1}{
-          x : int \in \emptyset , x : \text{int}
+          x : \text{int} \in \emptyset , x : \text{int}
    		}{}
       } &
       \emptyset , x : \text{int} \vdash 1 : \text{int}
     }
   }
 \]
-と書けます。ここでも、$?_1$ が int 型に置き換わりました。
+と書けます。ここでも、規則 \textsc{T-Env1} の制約により $?_1$ が int 型に置き換わりました。
 
 最後に、定数1の型判定を埋めます。規則 \textsc{T-Int} を使って、
 \[
@@ -515,7 +521,7 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
         \emptyset , x : \text{int} \vdash x : \text{int}
       }{
         \infere{T-Env1}{
-          x : int \in \emptyset , x : \text{int}
+          x : \text{int} \in \emptyset , x : \text{int}
    		}{}
       } &
       \infere{T-Int}{
@@ -530,6 +536,89 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 
 このようにして、
 $\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ である事の理由付けができます。
+
+\subsubsection{例2 : $\lambda x . \lambda y . x$}
+
+もう1つの例として、項 $\lambda x . \lambda y . x$ に型を付けてみます。
+まず、項全体は $\lambda$ 抽象なので、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda x . \lambda y . x : ?_0 \to ?_1
+  }{
+    \emptyset , x : ?_0 \vdash \lambda y . x : ?_1
+  }
+\]
+と書けます。
+
+次に現れているのも $\lambda$ 抽象なので、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda x . \lambda y . x : ?_0 \to ?_2 \to ?_3
+  }{
+    \infere{T-Abs}{
+      \emptyset , x : ?_0 \vdash \lambda y . x : ?_2 \to ?_3
+	}{
+	  \emptyset , x : ?_0 , y : ?_2 \vdash x : ?_3
+	}
+  }
+\]
+と書けます。規則 \textsc{T-Abs} の制約により、$?_1$ が $?_2 \to ?_3$ に置き換わりました。
+
+次に現れているのは変数なので、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda x . \lambda y . x : ?_0 \to ?_2 \to ?_0
+  }{
+    \infere{T-Abs}{
+      \emptyset , x : ?_0 \vdash \lambda y . x : ?_2 \to ?_0
+	}{
+	  \infere{T-Var}{
+  	    \emptyset , x : ?_0 , y : ?_2 \vdash x : ?_0
+      }{
+	    \infere{T-Env2}{
+          x : ?_0 \in \emptyset , x : ?_0 , y : ?_2
+ 		}{
+		  x \neq y &
+          \infere{T-Env1}{
+		    x : ?_0 \in \emptyset , x : ?_0
+		  }{}
+		}
+      }
+	}
+  }
+\]
+と書けます。規則 \textsc{T-Env} の制約により $?_0$ と $?_3$ が同一であると分かったため、
+$?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$ で置き換えても構いません。
+
+これで一応型は付けられたように見えますが、記号 $?$ がそのまま残ってしまいました。
+これらは、とりあえず型変数で表現する事にします。
+今の例であれば、$\alpha \to \beta \to \alpha$ のように書きます。
+
+この推論後に残ってしまう $?$ については、また3章で別の形で出てきます。
+
+\begin{exercise}
+
+項 $\text{true} + 1$ は意図に反する計算となっている項である。この項がが型付け不可能である事を示せ。
+
+
+
+\end{exercise}
+
+\begin{exercise}
+
+項 $(\lambda x . x x) (\lambda x . x x)$ は無限長の $\beta$ 簡約列を作れる項となっている。
+この項が型付け不可能である事を示せ。
+
+
+
+\end{exercise}
+
+\chapter{単純型付き $\lambda$ 計算の型推論}
+
+
+
+\chapter{多相型の型推論}
+
 
 
 \end{document}
