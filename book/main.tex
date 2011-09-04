@@ -180,8 +180,9 @@ $\lambda$ 計算の実行について考えてみましょう。
 次に、代入を使って $\lambda$ 計算の項の関数適用を評価するを作りましょう。
 
 項の中の関数適用を一度実行する事を、\textbf{$\beta$簡約 ($\beta$-retuction)}と呼びます。
-$e_1$ を $\beta$ 簡約して $e_2$ にできるという事を、$e_1 \betared e_2$ と表記します。
-図 \ref{fig:beta-reduction} に $\beta$ 簡約の定義を示します。
+$e_1$ を $\beta$ 簡約して $e_2$ にできるという事を、
+記号 $\betared$ を用いて $e_1 \betared e_2$ と表記します。
+$\beta$ 簡約を図 \ref{fig:beta-reduction} のように定義します。
 
 \begin{figure}[htbp]
   \[
@@ -463,9 +464,9 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 項の外側から、即ち型判定木の下の方から構築していきましょう。一番外側は $\lambda$ 抽象なので、
 \[
   \infere{T-Abs}{
-    \emptyset \vdash \lambda x . x + 1 : ?_1 \to ?_2
+    \emptyset \vdash \lambda x . x + 1 : ?_0 \to ?_1
   }{
-    \emptyset , x : ?_1 \vdash x + 1 : ?_2
+    \emptyset , x : ?_0 \vdash x + 1 : ?_1
   }
 \]
 と書けます。
@@ -476,17 +477,17 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
 次に出てきたのは加算なので、
 \[
   \infere{T-Abs}{
-    \emptyset \vdash \lambda x . x + 1 : ?_1 \to \text{int}
+    \emptyset \vdash \lambda x . x + 1 : ?_0 \to \text{int}
   }{
     \infere{T-Plus}{
-      \emptyset , x : ?_1 \vdash x + 1 : \text{int}
+      \emptyset , x : ?_0 \vdash x + 1 : \text{int}
     }{
-      \emptyset , x : ?_1 \vdash x : \text{int} &
-      \emptyset , x : ?_1 \vdash 1 : \text{int}
+      \emptyset , x : ?_0 \vdash x : \text{int} &
+      \emptyset , x : ?_0 \vdash 1 : \text{int}
     }
   }
 \]
-と書けます。規則 \textsc{T-Plus} によって $?_2$ が int 型に置き換えられた事に注意してください。
+と書けます。規則 \textsc{T-Plus} によって $?_1$ が int 型に置き換えられた事に注意してください。
 
 次に、左側の項 $x$ の型判定を埋めましょう。規則 \textsc{T-Var} と規則 \textsc{T-Env1} を使うと、
 \[
@@ -507,7 +508,7 @@ $\Gamma , y : t$ と表記します。これらは、図\ref{fig:stlc-type-envir
     }
   }
 \]
-と書けます。ここでも、規則 \textsc{T-Env1} の制約により $?_1$ が int 型に置き換わりました。
+と書けます。ここでも、規則 \textsc{T-Env1} の制約により $?_0$ が int 型に置き換わりました。
 
 最後に、定数1の型判定を埋めます。規則 \textsc{T-Int} を使って、
 \[
@@ -598,16 +599,35 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 
 \begin{exercise}
 
-項 $\text{true} + 1$ は意図に反する計算となっている項である。この項がが型付け不可能である事を示せ。
+以下の項が単純型付き $\lambda$ 計算において型付け不可能である事を示せ。
 
+\begin{enumerate}
+  \item $\text{true} + 1$
+  \item $(\lambda x . x x) (\lambda x . x x)$
+\end{enumerate}
 
+\subparagraph{解答}
 
-\end{exercise}
+まず1番目の項ですが、これは節の最初に出てきた意図に反する項の例です。
+このような項は型システムによって排除されるはずです。本当に型付け不可能なのか確かめてみましょう。
 
-\begin{exercise}
+まず、項全体は加算になっているので、
+\[
+  \infere{T-Plus}{
+    \emptyset \vdash \text{true} + 1 : \text{int}
+  }{
+    \emptyset \vdash \text{true} : \text{int} &
+    \emptyset \vdash 1 : \text{int}
+  }
+\]
+と書けます。
 
-項 $(\lambda x . x x) (\lambda x . x x)$ は無限長の $\beta$ 簡約列を作れる項となっている。
-この項が型付け不可能である事を示せ。
+しかし、ここで $\emptyset \vdash \text{true} : \text{int}$ の部分に注目すると、
+このような型判定を作れる規則は存在しません。
+
+次に2番目の項ですが、
+これは節の最初に出てきた無限長の $\beta$ 簡約列を作る事ができるような $\lambda$ 項の例です。
+本当に型付け不可能なのか確かめてみましょう。
 
 
 
