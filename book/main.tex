@@ -10,13 +10,15 @@
 \newcommand{\bnfcce}{\mathrel{::=}}
 
 \newcommand{\betared}{\to_\beta}
-
 \newcommand{\infere}[3]{\infer[\textsc{[#1]}]{#2}{#3}}
 
+{
+\theorembodyfont{\upshape}
 \newtheorem{exercise}{練習問題}[chapter]
 \newtheorem{answer}{回答}[chapter]
+}
 
-\title{Algorithm $W$ 入門}
+\title{Algorithm $\mathcal W$ 入門}
 \author{坂口和彦}
 
 \begin{document}
@@ -29,7 +31,8 @@
 
 この本は、単純型付きラムダ計算からパラメトリック多相入りの型システム程度の範囲での型推論について、
 体系的かつ理論と実装に一対一の対応が現れる形でまとめた本です。
-最後まで読めば Hindley-Milner 型推論アルゴリズム(Algorithm W)の現実的な実装を理解できるということを目標としています。
+最後まで読めば Hindley-Milner 型推論アルゴリズム(Algorithm $\mathcal W$)
+の現実的な実装を理解できるということを目標としています。
 
 型推論の実装は関数型プログラミング言語 Objective Caml (OCaml) 3.12.0
 とその標準ライブラリによって記述されています。
@@ -630,7 +633,7 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 これは節の最初に出てきた無限長の $\beta$ 簡約列を作る事ができるような $\lambda$ 項の例です。
 本当に型付け不可能なのか確かめてみましょう。
 
-test
+
 
 \end{exercise}
 
