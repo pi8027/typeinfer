@@ -607,7 +607,7 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 
 \begin{enumerate}
   \item $\text{true} + 1$
-  \item $(\lambda x . x x) (\lambda x . x x)$
+  \item $(\lambda x . x ~ x) (\lambda x . x ~ x)$
 \end{enumerate}
 
 \subparagraph{解答}
@@ -633,7 +633,91 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 これは節の最初に出てきた無限長の $\beta$ 簡約列を作る事ができるような $\lambda$ 項の例です。
 本当に型付け不可能なのか確かめてみましょう。
 
+まず、項全体が関数適用になっているので、
+\[
+  \infere{T-App}{
+    \emptyset \vdash (\lambda x . x ~ x) (\lambda x . x ~ x) : ?_1
+  }{
+    \emptyset \vdash \lambda x . x ~ x : ?_0 \to ?_1 &
+    \emptyset \vdash \lambda x . x ~ x : ?_0
+  }
+\]
+と書けます。
 
+次に、右側の $\lambda$ 抽象に注目すると、
+\[
+  \infere{T-App}{
+    \emptyset \vdash (\lambda x . x ~ x) (\lambda x . x ~ x) : ?_1
+  }{
+    \infere{T-Abs}{
+      \emptyset \vdash \lambda x . x ~ x : ?_0 \to ?_1
+	}{
+      \{x : ?_0\} \vdash x ~ x : ?_1
+	} &
+    \emptyset \vdash \lambda x . x ~ x : ?_0
+  }
+\]
+と書けます。ここで、$\{x : ?_0\}$ というのは $\emptyset, x : ?_0$ の簡略表記です。
+これ以降も、$\emptyset, x_1 : t_1, \dots, x_n : t_n$ を $\{x_1 : t_1, \dots, x_n : t_n\}$
+と表記する事があります。
+
+次に、$x ~ x$ の関数適用に注目すると、
+\[
+  \infere{T-App}{
+    \emptyset \vdash (\lambda x . x ~ x) (\lambda x . x ~ x) : ?_1
+  }{
+    \infere{T-Abs}{
+      \emptyset \vdash \lambda x . x ~ x : ?_0 \to ?_1
+	}{
+      \infere{T-App}{
+	    \{x : ?_0\} \vdash x ~ x : ?_1
+      }{
+	    \{x : ?_0\} \vdash x : ?_2 \to ?_1 &
+		\{x : ?_0\} \vdash x : ?_2
+	  }
+	} &
+    \emptyset \vdash \lambda x . x ~ x : ?_0
+  }
+\]
+と書けます。
+
+次に、2つの変数 $x$ に注目すると、
+\[
+  \infere{T-App}{
+    \emptyset \vdash (\lambda x . x ~ x) (\lambda x . x ~ x) : ?_1
+  }{
+    \infere{T-Abs}{
+      \emptyset \vdash \lambda x . x ~ x : ?_0 \to ?_1
+	}{
+      \infere{T-App}{
+	    \{x : ?_0\} \vdash x ~ x : ?_1
+      }{
+  	    \infere{T-Var}{
+		  \{x : ?_0\} \vdash x : ?_0 \to ?_1
+ 		}{
+		  x : ?_0 \to ?_1 \in \{x : ?_0\}
+		} &
+ 		\infere{T-Var}{
+		  \{x : ?_0\} \vdash x : ?_0
+		}{
+		  \infere{T-Env1}{
+            x : ?_0 \in \{x : ?_0\}
+		  }{}
+		}
+	  }
+	} &
+    \emptyset \vdash \lambda x . x ~ x : ?_0
+  }
+\]
+と書けます。規則 \textsc{T-Var} 内の制約により $?_2$ が $?_0$ に置き換わりました。
+
+しかし、ここで $x : ?_0 \to ?_1 \in \{x : ?_0\}$ の部分がまだ書かれていません。
+この形を見る限りでは規則 \textsc{T-Env1} が適用されるように見えますが、
+もしそうだとすると $?_0 = ?_0 \to ?_1$ であるような型 $?_0$ が無くてはいけません。
+しかしそれは $((\dots \to ?_1) \to ?_1) \to ?_1$ のような無限長の型になってしまいます。
+
+型の定義は帰納的であるため、このような無限長の型を作る事はできません。
+この事から、項 $(\lambda x . x ~ x) (\lambda x . x ~ x)$ が型付けできない事が分かります。
 
 \end{exercise}
 
