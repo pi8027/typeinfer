@@ -21,11 +21,11 @@ $\lambda \text{パラメータ名} . \text{結果}$ と表記します。
 作った関数を値に適用する仕組みが必要です。関数適用は、関数と引数を順番に並べて表記します。
 例えば、引数をそのまま返す関数にその関数自身を適用するには、
 \[
-  (\lambda x. x) \, (\lambda y. y)
+  (\lambda x. x) \, (\lambda x. x)
 \]
-と表記します。
+と表記します。左が関数、右が引数を表しています。
 
-このような計算そのものの表現を項と呼びます。
+このような計算そのものの表現を\textbf{項 (term)}と呼びます。
 $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定義されます。
 
 \begin{figure}[htbp]
@@ -38,8 +38,8 @@ $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定�
   \label{fig:lambda-term}
 \end{figure}
 
-変数、関数適用、$\lambda$ 抽象からなる物だけが $\lambda$ 計算の\textbf{項 (term)}と呼ばれます。
-項のことを\textbf{式 (expression)}という場合もあります。
+変数、関数適用、$\lambda$ 抽象からなる表現だけが $\lambda$ 計算の項と呼ばれます。
+項のことを\textbf{式}という場合もあります。
 
 また、図\ref{fig:lambda-term}の定義を見て分かる通り、
 純粋な $\lambda$ 計算には整数値やブール値などの定数が存在しません。
@@ -57,7 +57,7 @@ $\lambda x. (e_1 \, e_2)$ のような $\lambda$ 抽象は $\lambda x. e_1 \, e_
 
 \begin{exercise}
 
-次のうち、$\lambda$ 計算の項として正しくない物はどれか。
+次のうち、$\lambda$ 計算の項として正しくない表現はどれか。
 
 \begin{enumerate}
   \item $\lambda x . x$
@@ -77,7 +77,7 @@ $\lambda f . f \, x$ 全体も $\lambda$ 抽象として正しいので正しい
 $\lambda x$ は正しい $\lambda$ 計算の項の形をしていません。
 よって、$f \, (\lambda x)$ 全体も正しい $\lambda$ 計算の項ではありません。
 
-$\lambda$ 計算の項として正しくない物は、三番目の $f \, (\lambda x)$ です。
+$\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\lambda x)$ です。
 
 \end{exercise}
 
@@ -102,7 +102,7 @@ $(\lambda f . \lambda g . \lambda x . f \, x \, (g \, x)) \, (\lambda x . \lambd
 となり、これの内側の2つの関数適用を実行すると $\lambda g . \lambda x . x$ となります。
 よって、項全体は $(\lambda g . \lambda x . x) \, (\lambda x . \lambda y . x)$ となります。
 この項の外側の関数適用を実行すると、$\lambda x . x$ となります。
-実行結果は $x . x$ です。
+実行結果は $\lambda x . x$ です。
 
 \end{exercise}
 
@@ -275,7 +275,7 @@ $[(\lambda x . x \, x)/x](x \, x) = (\lambda x . x \, x) \, (\lambda x . x \, x)
 プログラムが停止しないことや失敗することを許容しています。
 しかし、その多くは型によってプログラムの間違いのほとんどを検出し、排除することに成功しています。}
 
-型付き $\lambda$ 計算における\textbf{型 (type)} とは、とある項に対して適用可能な操作を表した物です。
+型付き $\lambda$ 計算における\textbf{型 (type)} とは、とある項に対して適用可能な操作の表現です。
 
 \subsection{単純型付き $\lambda$ 計算}
 
@@ -434,7 +434,7 @@ $t_1 \to (t_2 \to t_3)$ は $t_1 \to t_2 \to t_3$ のように省略できます
 \]
 と書けます。
 
-ただし、ここでの記号 $?$ はまだ確定していない型を表現している物とします。
+ただし、ここでの記号 $?$ はまだ確定していない型を表現しています。
 同じ番号を振る事で同じ型である事を表現しています。
 
 次に出てきたのは加算なので、
