@@ -50,15 +50,32 @@ $\Gamma \vdash e : t$ であるような型 $t$ が存在するかを計算す�
 型環境 $\emptyset$ の下で $\lambda f . \lambda g . \lambda x . f \, x \, (g \, x)$
 という $\lambda$ 項がどのような型を持つか、という例で型の等式集合を作ってみましょう。
 
-まず、外側の $\lambda$ 抽象を解くと、
+まず、外側は $\lambda$ 抽象なので、
 \[
   \infere{T-Abs}{
     \emptyset \vdash \lambda f . \lambda g . \lambda x . f \, x \, (g \, x) : ?_0 \to ?_1
   }{
-    \{ f : ?_0 \} \vdash \lambda g . \lambda x . f \, x \, (g \, x) : ?_1
+    \{f : ?_0\} \vdash \lambda g . \lambda x . f \, x \, (g \, x) : ?_1
   }
 \]
 と書けます。この時点での等式集合は空です。
+
+次も $\lambda$ 抽象なので、
+\[
+  \infere{T-Abs}{
+    \emptyset \vdash \lambda f . \lambda g . \lambda x . f \, x \, (g \, x) : ?_0 \to ?_1
+  }{
+    \infere{T-Abs}{
+	  \{f : ?_0\} \vdash \lambda g . \lambda x . f \, x \, (g \, x) : ?_1
+	}{
+	  \{f : ?_0 ,g : ?_2\} \vdash \lambda x . f \, x \, (g \, x) : ?_3
+	}
+  }
+\]
+となります。ここで、上の \textsc{T-Abs} 規則の制約により、
+$?_1 = ?_2 \to ?_3$ という制約が追加されます。
+
+
 
 \subsection{方程式の生成}
 
