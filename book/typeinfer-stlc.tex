@@ -18,8 +18,8 @@
 \begin{enumerate}
   \item 型が付けられない $\lambda$ 項に関しては、解が存在しません。
   \item 無数の解が存在するケースがあります。例えば、型環境 $\emptyset$ の下で項 $\lambda x . x$ は
-		$\alpha \to \alpha$ や $(\alpha \to \beta) \to \alpha \to \beta$ など、
-		$?_0 \to ?_0$ の形を持つ型全てで型付けできます。
+        $\alpha \to \alpha$ や $(\alpha \to \beta) \to \alpha \to \beta$ など、
+        $?_0 \to ?_0$ の形を持つ型全てで型付けできます。
 \end{enumerate}
 
 まず、1番目は解があるか無いかを判定し、解がある場合のみ型を計算する物としましょう。
@@ -69,7 +69,7 @@ $\Gamma \vdash e : t$ であるような型 $t$ が存在するかを計算す�
     \{f : ?_1\} \vdash f \, (f \, (\lambda x . x)) : ?_2
   }{
     \{f : ?_1\} \vdash f : ?_3 \to ?_2 &
-	\{f : ?_1\} \vdash f \, (\lambda x . x) : ?_3
+    \{f : ?_1\} \vdash f \, (\lambda x . x) : ?_3
   }
 \]
 となります。
@@ -102,8 +102,8 @@ $\Gamma \vdash e : t$ であるような型 $t$ が存在するかを計算す�
     \{f : ?_1\} \vdash f : ?_3 \to ?_2
   }{
     \infere{T-Env1}{
-	  f : ?_3 \to ?_2 \in \{f : ?_1\}
-	}{}
+      f : ?_3 \to ?_2 \in \{f : ?_1\}
+    }{}
   }
 \]
 となります。規則 \textsc{T-Env1} により、$?_3 \to ?_2 = ?_1$ という制約が追加されます。
@@ -201,10 +201,40 @@ $e_1 : t_1$ は $e_2 : t_2$ を引数に取り $e_1 \, e_2 : t_3$ を返すの�
 次に、$\mathcal C$ が型環境 $\Gamma$ と $\lambda$ 抽象の項 $\lambda x . e$ を取る場合を考えます。
 この場合はまず、フレッシュな型変数 $t_1$ を作り、
 型環境 $\Gamma, x : t_1$ と項 $e$ に計算 $\mathcal C$ を適用します。
-適用した結果が $(c, t_2) = {\mathcal C}(\Gamma, x : t_1, e)$ のようになるとします。
+適用した結果が $(c, t_2) = \mathcal{C}(\Gamma, x : t_1, e)$ のようになるとします。
 とくに追加する制約は無いので、結果の方程式は $c$、$\lambda x . e$ の型は $t_1 \to t_2$ となります。
 
+以上をまとめると、方程式の生成アルゴリズム $\mathcal C$ は図\ref{fig:algorithm-c}のようになります。
 
+\begin{figure}[htbp]
+ \begin{align*}
+  \mathcal{C}(\Gamma, x) &=
+  \mathrm{if} ~ x \notin \mathit{dom}(\Gamma) ~
+  \mathrm{then} ~ \mathit{failure}() ~
+  \mathrm{else} ~ (\emptyset, \Gamma(x)) \\
+  \mathcal{C}(\Gamma, e_1 \, e_2) &=
+  \begin{array}[t]{l}
+   \mathrm{let}
+    \begin{array}[t]{l}
+     (c_1, t_1) = \mathcal{C}(\Gamma, e_1) \\
+     (t_2, t_2) = \mathcal{C}{\Gamma, e_2} \\
+     t_3 = \mathrm{flesh}
+    \end{array} \\
+   \mathrm{in} (c_1 \cup c_2 \cup \{t_1 = t_2 \to t_3\}, t_3)
+  \end{array} \\
+  \mathcal{C}(\Gamma, \lambda x . e) &=
+  \begin{array}[t]{l}
+   \mathrm{let}
+    \begin{array}[t]{l}
+     t_1 = \mathrm{flesh} \\
+     (c, t_2) = \mathcal{C}((\Gamma, x : t_1), e)
+    \end{array} \\
+   \mathrm{in} (c, t_1 \to t_2)
+  \end{array}
+ \end{align*}
+ \caption{方程式の生成アルゴリズム $\mathcal C$}
+ \label{fig:algorithm-c}
+\end{figure}
 
 \subsection{制約解消系}
 

@@ -27,7 +27,6 @@ $\lambda \text{パラメータ名} . \text{結果}$ と表記します。
 
 このような計算そのものの表現を\textbf{項 (term)}と呼びます。
 $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定義されます。
-
 \begin{figure}[htbp]
   \begin{align*}
     e & \bnfcce  x             && \text{(変数)} \\
@@ -88,7 +87,7 @@ $\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\l
 \begin{enumerate}
   \item $(\lambda x . x) \, (\lambda y . y)$
   \item $(\lambda f . \lambda g . \lambda x . f \, x \, (g \, x)) \,
-		(\lambda x . \lambda y . x) \, (\lambda x . \lambda y . x)$
+        (\lambda x . \lambda y . x) \, (\lambda x . \lambda y . x)$
 \end{enumerate}
 
 \subparagraph{解答}
@@ -244,7 +243,7 @@ $[(\lambda x . x \, x)/x](x \, x) = (\lambda x . x \, x) \, (\lambda x . x \, x)
 \[
   \infere{R-Beta}{
     (\lambda x . x \, x) \, (\lambda x . x \, x) \betared
-	(\lambda x . x \, x) \, (\lambda x . x \, x)
+    (\lambda x . x \, x) \, (\lambda x . x \, x)
   }{}
 \]
 となります。
@@ -475,7 +474,7 @@ $t_1 \to (t_2 \to t_3)$ は $t_1 \to t_2 \to t_3$ のように省略できます
       }{
         \infere{T-Env1}{
           x : \text{int} \in \emptyset , x : \text{int}
-   		}{}
+           }{}
       } &
       \emptyset , x : \text{int} \vdash 1 : \text{int}
     }
@@ -496,13 +495,13 @@ $t_1 \to (t_2 \to t_3)$ は $t_1 \to t_2 \to t_3$ のように省略できます
       }{
         \infere{T-Env1}{
           x : \text{int} \in \emptyset , x : \text{int}
-   		}{}
+           }{}
       } &
       \infere{T-Int}{
         \emptyset , x : \text{int} \vdash 1 : \text{int}
       }{
         1 \text{は整数値}
-	  }
+      }
     }
   }
 \]
@@ -531,9 +530,9 @@ $\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ であることの理�
   }{
     \infere{T-Abs}{
       \emptyset , x : ?_0 \vdash \lambda y . x : ?_2 \to ?_3
-	}{
-	  \emptyset , x : ?_0 , y : ?_2 \vdash x : ?_3
-	}
+    }{
+      \emptyset , x : ?_0 , y : ?_2 \vdash x : ?_3
+    }
   }
 \]
 と書けます。規則 \textsc{T-Abs} の制約により、$?_1$ が $?_2 \to ?_3$ に置き換わりました。
@@ -545,20 +544,20 @@ $\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ であることの理�
   }{
     \infere{T-Abs}{
       \emptyset , x : ?_0 \vdash \lambda y . x : ?_2 \to ?_0
-	}{
-	  \infere{T-Var}{
-  	    \emptyset , x : ?_0 , y : ?_2 \vdash x : ?_0
+    }{
+      \infere{T-Var}{
+          \emptyset , x : ?_0 , y : ?_2 \vdash x : ?_0
       }{
-	    \infere{T-Env2}{
+        \infere{T-Env2}{
           x : ?_0 \in \emptyset , x : ?_0 , y : ?_2
- 		}{
-		  x \neq y &
+         }{
+          x \neq y &
           \infere{T-Env1}{
-		    x : ?_0 \in \emptyset , x : ?_0
-		  }{}
-		}
+            x : ?_0 \in \emptyset , x : ?_0
+          }{}
+        }
       }
-	}
+    }
   }
 \]
 と書けます。規則 \textsc{T-Env} の制約により $?_0$ と $?_3$ が同一であると分かったため、
@@ -620,9 +619,9 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
   }{
     \infere{T-Abs}{
       \emptyset \vdash \lambda x . x \, x : ?_0 \to ?_1
-	}{
+    }{
       \{x : ?_0\} \vdash x \, x : ?_1
-	} &
+    } &
     \emptyset \vdash \lambda x . x \, x : ?_0
   }
 \]
@@ -637,14 +636,14 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
   }{
     \infere{T-Abs}{
       \emptyset \vdash \lambda x . x \, x : ?_0 \to ?_1
-	}{
+    }{
       \infere{T-App}{
-	    \{x : ?_0\} \vdash x \, x : ?_1
+        \{x : ?_0\} \vdash x \, x : ?_1
       }{
-	    \{x : ?_0\} \vdash x : ?_2 \to ?_1 &
-		\{x : ?_0\} \vdash x : ?_2
-	  }
-	} &
+        \{x : ?_0\} \vdash x : ?_2 \to ?_1 &
+        \{x : ?_0\} \vdash x : ?_2
+      }
+    } &
     \emptyset \vdash \lambda x . x \, x : ?_0
   }
 \]
@@ -657,24 +656,24 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
   }{
     \infere{T-Abs}{
       \emptyset \vdash \lambda x . x \, x : ?_0 \to ?_1
-	}{
+    }{
       \infere{T-App}{
-	    \{x : ?_0\} \vdash x \, x : ?_1
+        \{x : ?_0\} \vdash x \, x : ?_1
       }{
-  	    \infere{T-Var}{
-		  \{x : ?_0\} \vdash x : ?_0 \to ?_1
- 		}{
-		  x : ?_0 \to ?_1 \in \{x : ?_0\}
-		} &
- 		\infere{T-Var}{
-		  \{x : ?_0\} \vdash x : ?_0
-		}{
-		  \infere{T-Env1}{
+          \infere{T-Var}{
+          \{x : ?_0\} \vdash x : ?_0 \to ?_1
+         }{
+          x : ?_0 \to ?_1 \in \{x : ?_0\}
+        } &
+         \infere{T-Var}{
+          \{x : ?_0\} \vdash x : ?_0
+        }{
+          \infere{T-Env1}{
             x : ?_0 \in \{x : ?_0\}
-		  }{}
-		}
-	  }
-	} &
+          }{}
+        }
+      }
+    } &
     \emptyset \vdash \lambda x . x \, x : ?_0
   }
 \]
