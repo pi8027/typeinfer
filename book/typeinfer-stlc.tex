@@ -189,7 +189,7 @@ $(\alpha \to \alpha) \to \alpha \to \alpha$ で型付けできるということ
 
 次に、$\mathcal C$ が型環境 $\Gamma$ と関数適用の項 $e_1 \, e_2$ を取る場合を考えます。
 この場合はまず、$e_1$ と $e_2$ それぞれに関して計算 $\mathcal C$ に適用します。
-適用した結果が $(c_1, t_1) = {\mathcal C}(\Gamma, e_1)$ と $(c_2, t_2) = {\mathcal C}(\Gamma, e_2)$
+適用した結果が $(c_1, t_1) = \mathcal{C}(\Gamma, e_1)$ と $(c_2, t_2) = \mathcal{C}(\Gamma, e_2)$
 のようになるとします。
 
 さて、$e_1 \, e_2$ の型は何になるでしょうか。
@@ -217,7 +217,7 @@ $e_1 : t_1$ は $e_2 : t_2$ を引数に取り $e_1 \, e_2 : t_3$ を返すの�
    \mathrm{let}
     \begin{array}[t]{l}
      (c_1, t_1) = \mathcal{C}(\Gamma, e_1) \\
-     (t_2, t_2) = \mathcal{C}{\Gamma, e_2} \\
+     (t_2, t_2) = \mathcal{C}(\Gamma, e_2) \\
      t_3 = \mathrm{flesh}
     \end{array} \\
    \mathrm{in} (c_1 \cup c_2 \cup \{t_1 = t_2 \to t_3\}, t_3)
