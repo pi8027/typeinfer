@@ -206,11 +206,16 @@ $e_1 : t_1$ は $e_2 : t_2$ を引数に取り $e_1 \, e_2 : t_3$ を返すの�
 
 以上をまとめると、方程式の生成アルゴリズム $\mathcal C$ は図\ref{fig:algorithm-c}のようになります。
 
+これは、自由変数とその型は全て型環境に含まれていることの検査を含んでいるという事に注意してください。
+もしこの点が守られていなければ、$\mathit{failure}$ が返ります。
+また、$\mathit{dom}(\Gamma)$ は型環境 $\Gamma$ の中の変数全ての集合を表し、
+$\Gamma(x)$ というのは型環境 $\Gamma$ から $x$ の型を取ってくることを表します。
+
 \begin{figure}[htbp]
  \begin{align*}
   \mathcal{C}(\Gamma, x) &=
   \mathrm{if} ~ x \notin \mathit{dom}(\Gamma) ~
-  \mathrm{then} ~ \mathit{failure}() ~
+  \mathrm{then} ~ \mathit{failure} ~
   \mathrm{else} ~ (\emptyset, \Gamma(x)) \\
   \mathcal{C}(\Gamma, e_1 \, e_2) &=
   \begin{array}[t]{l}
