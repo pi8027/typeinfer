@@ -25,7 +25,7 @@ $\lambda \text{パラメータ名} . \text{結果}$ と表記します。
 \]
 と表記します。左が関数、右が引数を表しています。
 
-このような計算そのものの表現を\textbf{項 (term)}と呼びます。
+このような計算そのものの表現を\textbf{項 (term)} と呼びます。
 $\lambda$ 計算の項は、図\ref{fig:lambda-term}のように帰納的に定義されます。
 \begin{figure}[htbp]
   \begin{align*}
@@ -112,7 +112,7 @@ $\lambda$ 計算の実行について考えてみましょう。
 前の練習問題で分かる通り、$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
 ($(\lambda x . e_1) \, e_2$ の形をしている $\lambda$ 項)を解く操作です。
 この操作は、項 $e_1$ の中の自由変数 $x$ を全て項 $e_2$ で置き換える操作です。
-この自由変数を全て置き換える操作を\textbf{代入}と呼び、$[e_2/x] e_1$ と表記します。
+この自由変数を全て置き換える操作を\textbf{代入 (substitute)} と呼び、$[e_2/x] e_1$ と表記します。
 
 図 \ref{fig:lambda-substitute} に代入の定義を示します。
 
@@ -138,7 +138,7 @@ $\lambda$ 計算の実行について考えてみましょう。
 
 次に、代入を使って $\lambda$ 計算の項の関数適用を評価する規則を作りましょう。
 
-項の中の関数適用を一度実行することを、\textbf{$\beta$簡約 ($\beta$-retuction)}と呼びます。
+項の中の関数適用を一度実行することを、\textbf{$\beta$簡約 ($\beta$-retuction)} と呼びます。
 $e_1$ を $\beta$ 簡約して $e_2$ にできるということを、
 記号 $\betared$ を用いて $e_1 \betared e_2$ と表記します。
 $\beta$ 簡約を図 \ref{fig:beta-reduction} のように定義します。
@@ -268,7 +268,7 @@ $[(\lambda x . x \, x)/x](x \, x) = (\lambda x . x \, x) \, (\lambda x . x \, x)
 真偽値 true と整数値 $1$ に対して適用されているため意図に反した計算であると言えます。
 
 このような、停止しない計算や意図に反する計算を「正しくない計算」と見做し、正しくない計算を
-表している項を排除する仕組みが\textbf{型付き $\lambda$ 計算 (typed lambda calculus)}です。
+表している項を排除する仕組みが\textbf{型付き $\lambda$ 計算 (typed lambda calculus)} です。
 \footnote{
 ただし、型付き $\lambda$ 計算から派生したプログラミング言語のほとんどは
 プログラムが停止しないことや失敗することを許容しています。
@@ -278,7 +278,7 @@ $[(\lambda x . x \, x)/x](x \, x) = (\lambda x . x \, x) \, (\lambda x . x \, x)
 
 \subsection{単純型付き $\lambda$ 計算}
 
-\textbf{単純型付き $\lambda$ 計算 (simply typed lambda calculus, $\lambda^\to$)}は、
+\textbf{単純型付き $\lambda$ 計算 (simply typed lambda calculus, $\lambda^\to$)} は、
 型付きラムダ計算の体系の1つです。
 
 単純型付き $\lambda$ 計算の型は、図\ref{fig:stlc-type}のように帰納的に定義されます。
