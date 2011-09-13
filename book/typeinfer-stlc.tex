@@ -209,9 +209,9 @@ $e_1 : t_1$ は $e_2 : t_2$ を引数に取り $e_1 \, e_2 : t_3$ を返すの�
 \begin{figure}[htbp]
  \begin{align*}
   \mathcal{C}(\Gamma, x) &=
-  \mathrm{if} ~ x \notin \mathit{dom}(\Gamma) ~
-  \mathrm{then} ~ \mathit{failure} ~
-  \mathrm{else} ~ (\emptyset, \Gamma(x)) \\
+   \mathrm{if} ~ x \notin \mathit{dom}(\Gamma) ~
+   \mathrm{then} ~ \mathit{failure} ~
+   \mathrm{else} ~ (\emptyset, \Gamma(x)) \\
   \mathcal{C}(\Gamma, e_1 \, e_2) &=
   \begin{array}[t]{l}
    \mathrm{let}
@@ -296,6 +296,29 @@ $t_1$ が $\alpha$ である場合を考えます。
 もし含まれていなければ、代入 $s \cup \{\alpha = t_1\}$ が結果となります。
 
 以上をまとめると、方程式を解くアルゴリズム $\mathcal S$ は図\ref{fig:algorithm-s}のようになります。
+
+\begin{figure}[htbp]
+ \begin{align*}
+  \mathcal{S'}(s, t_1 \to t_2 = t_1' \to t_2') &=
+   \mathcal{S'}(\mathcal{S'}(s, t_1 = t_1'), t_2 = t_2') \\
+  \mathcal{S'}(s, \alpha = t_1) &=
+   \left \{
+    \begin{array}{ll}
+     \mathcal{S'}(s, s(\alpha) = t_1) & (\alpha \in \mathit{dom}(s)) \\
+     s                                & (t_1 = \alpha) \\
+     \textit{failure}                 & (\alpha \in \mathit{FTV}(t_1)) \\
+     s \cup \{\alpha = t_1\}          & (\text{otherwise}) \\
+    \end{array}
+   \right .
+%   \mathrm{if} ~ \alpha \in \mathit{dom}(s) ~
+%   \mathrm{then} ~ \mathcal{S'}(s, s(\alpha) = t_1) ~
+%   \mathrm{else} ~
+   \\
+  \mathcal{S'}(s, t_1 = \alpha) &= \mathcal{S'}(s, \alpha = t_1)
+ \end{align*}
+ \caption{方程式を解くアルゴリズム $\mathcal S$}
+ \label{fig:algorithm-s}
+\end{figure}
 
 
 
