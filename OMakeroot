@@ -4,5 +4,5 @@ open build/LaTeX
 
 DefineCommandVars()
 
-.SUBDIRS: . src book
+.SUBDIRS: . src book slide
 

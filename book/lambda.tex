@@ -82,6 +82,8 @@ $\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\l
 
 \begin{exercise}
 
+\label{exc:execute-lambda-calculus}
+
 以下の $\lambda$ 計算の項を実行した結果は何になるか、答えよ。
 
 \begin{enumerate}
@@ -109,7 +111,7 @@ $(\lambda f . \lambda g . \lambda x . f \, x \, (g \, x)) \, (\lambda x . \lambd
 
 $\lambda$ 計算の実行について考えてみましょう。
 
-前の練習問題で分かる通り、$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
+練習問題\ref{exc:ececute-lambda-calculus}で分かる通り、$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
 ($(\lambda x . e_1) \, e_2$ の形をしている $\lambda$ 項)を解く操作です。
 この操作は、項 $e_1$ の中の自由変数 $x$ を全て項 $e_2$ で置き換える操作です。
 この自由変数を全て置き換える操作を\textbf{代入 (substitute)} と呼び、$[e_2/x] e_1$ と表記します。
@@ -138,7 +140,7 @@ $\lambda$ 計算の実行について考えてみましょう。
 
 次に、代入を使って $\lambda$ 計算の項の関数適用を評価する規則を作りましょう。
 
-項の中の関数適用を一度実行することを、\textbf{$\beta$簡約 ($\beta$-retuction)} と呼びます。
+項の中の関数適用を一度実行することを、\textbf{$\beta$簡約 ($\beta$-reduction)} と呼びます。
 $e_1$ を $\beta$ 簡約して $e_2$ にできるということを、
 記号 $\betared$ を用いて $e_1 \betared e_2$ と表記します。
 $\beta$ 簡約を図 \ref{fig:beta-reduction} のように定義します。
