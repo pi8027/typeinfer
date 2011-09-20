@@ -166,10 +166,11 @@ $\{?_0 \mapsto ?_1 \to ?_2, ?_1 \mapsto ?_3 \to ?_2, ?_2 \mapsto ?_3,
 
 元々計算したかった型は $\emptyset \vdash \lambda f . f \, (f \, (\lambda x . x)) : ?_0$
 となっているので、方程式の解の上で $?_0$ が何であるかを辿っていけば良いはずです。
-これをやってみると、$(?_6 \to ?_6) \to ?_6 \to ?_6$ という型が得られます。
+これをやってみると、$((?_6 \to ?_6) \to ?_6 \to ?_6) \to ?_6 \to ?_6$ という型が得られます。
 
 よって、型環境 $\emptyset$ の下で $\lambda f . f \, (f \, (\lambda x . x))$ は
-$(\alpha \to \alpha) \to \alpha \to \alpha$ で型付けできるということが分かります。
+$((\alpha \to \alpha) \to \alpha \to \alpha) \to \alpha \to \alpha$
+で型付けできるということが分かります。
 また、他の型で型付け可能だとしても、それはこの型の $\alpha$ に対して別の型を代入した形を持ちます。
 
 単純型付き $\lambda$ 計算の型推論は、このような方法で実現できます。
@@ -255,7 +256,7 @@ $\mathrm{flesh}$ はフレッシュな型変数を表します。
 
 次に、アルゴリズム $\mathcal C$ で生成した方程式を解くアルゴリズムについて考えます。
 
-方程式を解く計算の名前を $\mathcal S$ としましょう\footnote{solve の s から取りました。}。
+方程式を解く計算の名前を $\mathcal U$ としましょう\footnote{unification の u から取りました。}。
 この計算は、制約集合を取り、型変数から実体への対応の集合を返すとしましょう。
 また、今後はこの型変数から実体への対応の集合のことを、\textbf{代入 (substitution)} と呼びます。
 
@@ -263,20 +264,20 @@ $\mathrm{flesh}$ はフレッシュな型変数を表します。
 つまり、この構造に関する帰納法が使えます。
 また、そのような性質を破壊するような代入を作ってはいけません。
 
-計算 $\mathcal S$ は、とある時点での代入と1つの制約を取り、
-制約を適用した新しい代入を返す計算 $\mathcal{S'}$ による畳み込みによって実現できます。
-そのような計算 $\mathcal{S'}$ のアルゴリズムについて考えていきましょう。
+計算 $\mathcal U$ は、とある時点での代入と1つの制約を取り、
+制約を適用した新しい代入を返す計算 $\mathcal{U'}$ による畳み込みによって実現できます。
+そのような計算 $\mathcal{U'}$ のアルゴリズムについて考えていきましょう。
 
-まず、$\mathcal{S'}$ が代入 $s$、等式 $t_1 \to t_2 = t_1' \to t_2'$ を取る場合を考えます。
+まず、$\mathcal{U'}$ が代入 $s$、等式 $t_1 \to t_2 = t_1' \to t_2'$ を取る場合を考えます。
 これは、制約を $t_1 = t_1'$ と $t_2 = t_2'$ に分解して解きます。
-つまり、$\mathcal{S'}(\mathcal{S'}(s, t_1 = t_1'), t_2 = t_2')$ が結果となります。
+つまり、$\mathcal{U'}(\mathcal{U'}(s, t_1 = t_1'), t_2 = t_2')$ が結果となります。
 
 この $\to$ を分解するというのは、型を取って新しい型を構築する物全般に適用できます。
 これは、Haskell の型コンストラクタのような物に対する規則であると考えられます。
 型を構築しているものが一致しなければ、解が存在しないということになります。
 例えば、$\mathrm{string} = \mathrm{int}$ のような等式はこれによって排除されます。
 
-次に、$\mathcal{S'}$ が代入 $s$、等式 $\alpha = t_1$ もしくは $t_1 = \alpha$ を取る場合を考えます。
+次に、$\mathcal{U'}$ が代入 $s$、等式 $\alpha = t_1$ もしくは $t_1 = \alpha$ を取る場合を考えます。
 ただし、$\alpha$ は型変数を表します。
 この場合は、もう少し詳細な場合分けをしなくてはいけません。
 
@@ -298,34 +299,43 @@ $t_1$ が $\alpha$ である場合を考えます。
 もし含まれていれば解無しという結果が返ります。
 もし含まれていなければ、代入 $s \cup \{\alpha \mapsto t_1\}$ が結果となります。
 
-以上をまとめると、方程式を解くアルゴリズム $\mathcal S$ は図\ref{fig:algorithm-s}のようになります。
+以上をまとめると、方程式を解くアルゴリズム $\mathcal U$ は図\ref{fig:algorithm-s}のようになります。
 
 \begin{figure}[htbp]
  \begin{align*}
-  \mathcal{S'}(s, t_1 \to t_2 = t_1' \to t_2') &=
-   \mathcal{S'}(\mathcal{S'}(s, t_1 = t_1'), t_2 = t_2') \\
-  \mathcal{S'}(s, \alpha = t_1) &=
+  \mathcal{U'}(s, t_1 \to t_2 = t_1' \to t_2') &=
+   \mathcal{U'}(\mathcal{U'}(s, t_1 = t_1'), t_2 = t_2') \\
+  \mathcal{U'}(s, \alpha = t_1) &=
    \left \{
     \begin{array}{ll}
-     \mathcal{S'}(s, s(\alpha) = t_1) & (\alpha \in \mathit{dom}(s)) \\
+     \mathcal{U'}(s, s(\alpha) = t_1) & (\alpha \in \mathit{dom}(s)) \\
      s                                & (t_1 = \alpha) \\
      \textit{failure}                 & (\alpha \in \mathit{FTV}(t_1)) \\
      s \cup \{\alpha \mapsto t_1\}    & (\text{otherwise}) \\
     \end{array}
    \right . \\
-  \mathcal{S'}(s, t_1 = \alpha) &= \mathcal{S'}(s, \alpha = t_1) \\
-  \mathcal{S}(\emptyset) &= \emptyset \\
-  \mathcal{S}(c \cup \{e\}) &= \mathcal{S'}(\mathcal{S}(c), e)
+  \mathcal{U'}(s, t_1 = \alpha) &= \mathcal{U'}(s, \alpha = t_1) \\
+  \mathcal{U}(\emptyset) &= \emptyset \\
+  \mathcal{U}(c \cup \{e\}) &= \mathcal{U'}(\mathcal{U}(c), e)
  \end{align*}
- \caption{方程式を解くアルゴリズム $\mathcal S$}
+ \caption{方程式を解くアルゴリズム $\mathcal U$}
  \label{fig:algorithm-s}
 \end{figure}
 
-アルゴリズム $\mathcal S$ は \textbf{mgu (most general unifier)} と呼ばれます。
-
-
+アルゴリズム $\mathcal U$ は
+\textbf{ユニフィケーション (unification)} のアルゴリズムと呼ばれるものです。
 
 \section{実装}
+
+ここまでで説明したアルゴリズムを実装して、動かしてみましょう。
+
+
+
+\subsection{方程式の生成}
+
+
+
+\subsection{制約解消系}
 
 
 
