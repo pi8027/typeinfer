@@ -10,26 +10,21 @@ type ltype
   | TVar of int
 ;;
 
-let print_bracket (flag : bool) (printer : unit lazy_t) : unit =
-  if flag
-    then (print_string "(" ; Lazy.force printer ; print_string ")")
-    else Lazy.force printer
+let bracket (flag : bool) (str : string) : string =
+  if flag then "(" ^ str ^ ")" else str
 ;;
 
-let rec print_lexpr (level : int) : lexpr -> unit = function
-  | EVar str -> print_string str
+let rec str_lexpr (level : int) : lexpr -> string = function
+  | EVar str -> str
   | EApp (e1, e2) ->
-    print_bracket (level <= 0)
-      (lazy (print_lexpr 1 e1 ; print_string " " ; print_lexpr 0 e2))
+    bracket (level <= 0) (str_lexpr 1 e1 ^ " " ^ str_lexpr 0 e2)
   | EAbs (ident, expr) ->
-    print_bracket (level <= 1)
-      (lazy (print_string ("\\" ^ ident ^ " -> ") ; print_lexpr 2 expr))
+    bracket (level <= 1) ("\\" ^ ident ^ " -> " ^ str_lexpr 2 expr)
 ;;
 
-let rec print_ltype (level : int) : ltype -> unit = function
+let rec str_ltype (level : int) : ltype -> string = function
   | TFun (t1, t2) ->
-    print_bracket (level = 0)
-      (lazy (print_ltype 0 t1 ; print_string " -> " ; print_ltype 1 t2))
-  | TVar n -> print_int n
+    bracket (level = 0) (str_ltype 0 t1 ^ " -> " ^ str_ltype 1 t2)
+  | TVar n -> string_of_int n
 ;;
 
