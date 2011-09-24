@@ -4,30 +4,30 @@ open Def
 module IntMap = Core.Std.Int.Map;;
 module StrMap = Core.Std.String.Map;;
 
-type tconst = ltype * ltype;;
-type assump = ltype StrMap.t;;
-type subst = ltype IntMap.t;;
+type tconst = ty * ty;;
+type assump = ty StrMap.t;;
+type subst = ty IntMap.t;;
 
 let rec infer (n : int) (env : assump) :
-    lexpr -> (int * tconst list * ltype) option =
+    term -> (int * tconst list * ty) option =
   function
     | EVar str ->
       begin match StrMap.find env str with
         | Some v -> Some (n, [], v)
         | None -> None
       end
-    | EApp (expr1, expr2) ->
-      begin match infer (succ n) env expr1 with
+    | EApp (term1, term2) ->
+      begin match infer (succ n) env term1 with
         | Some (n1, c1, t1) ->
-          begin match infer n1 env expr2 with
+          begin match infer n1 env term2 with
             | Some (n2, c2, t2) ->
               Some (n2, (t1, TFun (t2, TVar n)) :: c1 @ c2, TVar n)
             | None -> None
           end
         | None -> None
       end
-    | EAbs (ident, expr) ->
-      begin match infer (succ n) (StrMap.add ident (TVar n) env) expr with
+    | EAbs (ident, term) ->
+      begin match infer (succ n) (StrMap.add ident (TVar n) env) term with
         | Some (n', c, t) -> Some (n', c, TFun (TVar n, t))
         | None -> None
       end
@@ -58,7 +58,7 @@ let rec solve (env : subst) : tconst -> subst option =
       end
 ;;
 
-let rec expand_type (env : subst) : ltype -> ltype =
+let rec expand_type (env : subst) : ty -> ty =
   function
     | TVar n ->
       begin match IntMap.find env n with
