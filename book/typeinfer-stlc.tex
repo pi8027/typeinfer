@@ -329,7 +329,40 @@ $t_1$ が $\alpha$ である場合を考えます。
 
 ここまでで説明したアルゴリズムを実装して、動かしてみましょう。
 
+\subsection{データ型定義}
 
+型推論を書く前に、その対象となる項と型を表現するデータ型を定義しましょう。
+
+まずは、項のデータ型を定義します。項の定義は図\ref{fig:lambda-term}の通りです。
+これを OCaml で記述すると図\ref{fig:ocaml-def-term}のようになります。
+
+\begin{figure}[htbp]
+\begin{lstlisting}
+type term
+  = EVar of string
+  | EApp of (term * term)
+  | EAbs of (string * term)
+;;
+\end{lstlisting}
+ \caption{OCaml による項の定義}
+ \label{fig:ocaml-def-term}
+\end{figure}
+
+% データ型定義の説明が欲しい
+
+型のデータ型を定義しましょう。型の定義は図\ref{fig:stlc-type}の通りです。
+これを OCaml で記述すると図\ref{fig:ocaml-def-type}のようになります。
+
+\begin{figure}[htbp]
+\begin{lstlisting}
+type ty
+  = TFun of (ty * ty)
+  | TVar of int
+;;
+\end{lstlisting}
+ \caption{OCaml による型の定義}
+ \label{fig:ocaml-def-type}
+\end{figure}
 
 \subsection{方程式の生成}
 

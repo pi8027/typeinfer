@@ -2,6 +2,7 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{listings}
 \usepackage{theorem}
 \usepackage{proof}
 \usepackage[dvips]{hyperref}
@@ -19,6 +20,18 @@
 \newtheorem{answer}{回答}[chapter]
 \theoremstyle{break}
 \newtheorem{definition}{定義}[chapter]
+}
+
+\lstset{
+  basicstyle=\small\tt,
+  keywordstyle=\bf,
+  identifierstyle=,
+  commentstyle=,
+  stringstyle=,
+  numberstyle=,
+  emphstyle=,
+  language=caml,
+  frame=single
 }
 
 \setcounter{tocdepth}{2}
