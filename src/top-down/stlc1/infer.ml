@@ -21,15 +21,18 @@ let rec infer (n : int) (env : assump) :
         | Some (n1, c1, t1) ->
           begin match infer n1 env term2 with
             | Some (n2, c2, t2) ->
-              Some (n2, (t1, TFun (t2, TVar n)) :: c1 @ c2, TVar n)
+              let tn = TVar n in
+              Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
             | None -> None
           end
         | None -> None
       end
     | EAbs (ident, term) ->
-      begin match infer (succ n) (StrMap.add ident (TVar n) env) term with
-        | Some (n', c, t) -> Some (n', c, TFun (TVar n, t))
-        | None -> None
+      begin
+        let tn = TVar n in
+        match infer (succ n) (StrMap.add ident tn env) term with
+          | Some (n', c, t) -> Some (n', c, TFun (tn, t))
+          | None -> None
       end
 ;;
 
