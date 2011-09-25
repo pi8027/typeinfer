@@ -30,9 +30,11 @@
   stringstyle=,
   numberstyle=,
   emphstyle=,
-  language=caml,
-  frame=single
+  language=[Objective]caml,
+  frame=trbl
 }
+
+\renewcommand{\lstlistingname}{リスト}
 
 \setcounter{tocdepth}{2}
 
@@ -73,10 +75,13 @@ OCaml や Haskell、その他類似の言語を使っていて、
 このような理由から、静的型付けの関数型言語を使っているプログラマにとって、
 型推論を学ぶことはとても大きな意味を持つと考えられます。
 
+\section*{使用言語とライブラリ}
+
+型推論の実装は関数型プログラミング言語 OCaml 3.12.0、
+OCaml の標準ライブラリ、Jane Street's core によって記述されています。
+
 \section*{対象読者について}
 
-型推論の実装は関数型プログラミング言語 OCaml 3.12.0
-とその標準ライブラリによって記述されています。
 読者は関数型プログラミングや OCaml のエキスパートである必要はありませんが、
 ある程度 Haskell や OCaml での関数型言語らしいプログラムの書き方を理解していることを前提としています。
 

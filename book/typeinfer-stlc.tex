@@ -323,49 +323,100 @@ $t_1$ が $\alpha$ である場合を考えます。
  \label{fig:algorithm-s}
 \end{figure}
 
-アルゴリズム $\mathcal U$ は
-\textbf{ユニフィケーション (unification)} のアルゴリズムと呼ばれるものです。
+アルゴリズム $\mathcal U$ は\textbf{ユニフィケーション (unification)} のアルゴリズムと呼ばれます。
 
 $\mathit{FTV}(t)$ は型 $t$ 中の自由変数集合を表します。free type variables の頭文字を取っています。
 
 \section{実装}
 
-ここまでで説明したアルゴリズムを実装して、動かしてみましょう。
+ここまでで説明したアルゴリズムを OCaml で実装して、動かしてみましょう。
 
-\subsection{データ型定義}
+\subsection{データ型}
 
 型推論を書く前に、その対象となる項と型を表現するデータ型を定義しましょう。
 
 まずは、項のデータ型を定義します。項の定義は図\ref{fig:lambda-term}の通りです。
-これを OCaml で記述すると図\ref{fig:ocaml-def-term}のようになります。
+これを定義するとリスト\ref{list:ocaml-def-term}のようになります。
 
-\begin{figure}[htbp]
-\begin{lstlisting}
+\begin{lstlisting}[caption=項の定義, label=list:ocaml-def-term]
 type term
   = EVar of string
   | EApp of (term * term)
   | EAbs of (string * term)
 ;;
 \end{lstlisting}
- \caption{OCaml による項の定義}
- \label{fig:ocaml-def-term}
-\end{figure}
 
-% データ型定義の説明が欲しい
+OCaml のデータ型定義は、\texttt{type} キーワードによって行います。
+この定義では、\texttt{term} という型を定義しています。
+その型コンストラクタは3種類あり、\texttt{EVar} コンストラクタは \texttt{string} 型の値を取り、
+\texttt{EApp} コンストラクタは \texttt{term * term} 型の値を取り、
+\texttt{EAbs} コンストラクタは \texttt{string * term} 型の値を取ります。
+これらのコンストラクタは、それぞれ変数、関数適用、$\lambda$ 抽象に対応しています。
+変数は文字列(\texttt{string})型を使っています。
+
+型の中にある \texttt{*} はタプルの型です。\texttt{t1 * t2 * ... * tn} とすると
+\texttt{t1}, \texttt{t2}, \dots, \texttt{tn} という型のタプルが作れます。
 
 型のデータ型を定義しましょう。型の定義は図\ref{fig:stlc-type}の通りです。
-これを OCaml で記述すると図\ref{fig:ocaml-def-type}のようになります。
+これを定義するとリスト\ref{list:ocaml-def-type}のようになります。
 
-\begin{figure}[htbp]
-\begin{lstlisting}
+\begin{lstlisting}[caption=型の定義, label=list:ocaml-def-type]
 type ty
   = TFun of (ty * ty)
   | TVar of int
 ;;
 \end{lstlisting}
- \caption{OCaml による型の定義}
- \label{fig:ocaml-def-type}
-\end{figure}
+
+\texttt{type} は OCaml のキーワードなので、\texttt{ty} という名前で型を定義しました。
+\texttt{TFun} が関数の型のコンストラクタで、\texttt{TVar} が型変数の型のコンストラクタです。
+型変数の実体は \texttt{int} 型(整数型)です。
+
+次に、制約、型環境、代入集合の型を定義します。
+
+制約は型上の等式なので、2つの型のタプルで表現できます。
+制約を定義すると、リスト\ref{list:ocaml-def-tconst}のようになります。
+
+\begin{lstlisting}[caption=制約の定義, label=list:ocaml-def-tconst]
+type tconst = ty * ty;;
+\end{lstlisting}
+
+これは、\texttt{ty * ty} という型を、\texttt{tconst} という名前に紐付けています。
+型や項の定義と違い、単なる型のエイリアスになっています。
+
+型環境は変数と型のペアの並びのような形を持っていますが、
+元々ある変数が後から追加されれば、それを参照することはありません。
+つまり、変数から型へのマップ構造を使うことができます。
+
+変数は文字列型を持つので、文字列から型へのマップ構造が必要となります。
+文字列のマップは、core ライブラリの \texttt{Core.Std.String.Map} モジュールにあります。
+これを使って型環境を定義すると、リスト\ref{list:ocaml-def-type-environment}のようになります。
+
+\begin{lstlisting}[caption=型環境の定義, label=list:ocaml-def-type-environment]
+module StrMap = Core.Std.String.Map;;
+type assump = ty StrMap.t;;
+\end{lstlisting}
+
+\texttt{Core.Std.String.Map} というモジュール名は長いので、
+1行目で \texttt{StrMap} という別名を付けています。
+
+2行目で、\texttt{ty StrMap.t} 型を \texttt{assump} という名前に結び付けています。
+\texttt{StrMap.t} という型は、\texttt{StrMap} モジュール内の \texttt{t} という型を指していますが、
+これが文字列からのマップ型となっています。型引数として文字列に対応付ける型を取るので、
+\texttt{ty StrMap.t} と書くと文字列から型へのマップの型になります。
+
+代入集合は型変数から型へのマップ構造です。
+型変数は整数型を持つので、整数から型へのマップ構造が必要となります。
+整数のマップは、core ライブラリの \texttt{Core.Std.Int.Map} モジュールにあります。
+これを使って代入集合を定義すると、リスト\ref{list:ocaml-def-substitution}のようになります。
+
+\begin{lstlisting}[caption=代入集合の定義, label=list:ocaml-def-substitution]
+module IntMap = Core.Std.Int.Map;;
+type subst = ty IntMap.t;;
+\end{lstlisting}
+
+ここでも型環境の定義と同様に、
+\texttt{Core.Std.Int.Map} モジュールに \texttt{IntMap} という別名を付けています。
+\texttt{ty IntMap.t} 型に \texttt{subst} という別名を付けていますが、これが代入集合の型です。
 
 \subsection{方程式の生成}
 
