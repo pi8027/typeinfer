@@ -452,23 +452,27 @@ let rec infer (n : int) (env : assump) :
 
 \subsection{制約解消系}
 
+\begin{lstlisting}[caption=出現検査, label=list:ocaml-stlc-occurs-check]
+let rec occurs_check env n =
+  function
+    | TVar n' ->
+      begin match IntMap.find env n' with
+        | Some t -> occurs_check env n t
+        | None -> n = n'
+      end
+    | TFun (tl, tr) ->
+      occurs_check env n tl || occurs_check env n tr
+;;
+\end{lstlisting}
+
 \begin{lstlisting}[caption=方程式を解く関数, label=list:ocaml-stlc-solve]
 let rec solve (env : subst) : tconst -> subst option =
-  let rec occurs_check n t =
-    match t with
-      | TVar n' ->
-        begin match IntMap.find env n' with
-          | Some t' -> occurs_check n t'
-          | None -> n = n'
-        end
-      | TFun (tl, tr) -> occurs_check n tl || occurs_check n tr
-  in
   function
     | TVar n, TVar n' when n = n' -> Some env
     | TVar n, t | t, TVar n ->
       begin match IntMap.find env n with
         | Some t' -> solve env (t, t')
-        | None when occurs_check n t -> None
+        | None when occurs_check env n t -> None
         | None -> Some (IntMap.add n t env)
       end
     | TFun (t1l, t1r), TFun (t2l, t2r) ->

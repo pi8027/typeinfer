@@ -36,22 +36,24 @@ let rec infer (n : int) (env : assump) :
       end
 ;;
 
+let rec occurs_check env n =
+  function
+    | TVar n' ->
+      begin match IntMap.find env n' with
+        | Some t -> occurs_check env n t
+        | None -> n = n'
+      end
+    | TFun (tl, tr) ->
+      occurs_check env n tl || occurs_check env n tr
+;;
+
 let rec solve (env : subst) : tconst -> subst option =
-  let rec occurs_check n t =
-    match t with
-      | TVar n' ->
-        begin match IntMap.find env n' with
-          | Some t' -> occurs_check n t'
-          | None -> n = n'
-        end
-      | TFun (tl, tr) -> occurs_check n tl || occurs_check n tr
-  in
   function
     | TVar n, TVar n' when n = n' -> Some env
     | TVar n, t | t, TVar n ->
       begin match IntMap.find env n with
         | Some t' -> solve env (t, t')
-        | None when occurs_check n t -> None
+        | None when occurs_check env n t -> None
         | None -> Some (IntMap.add n t env)
       end
     | TFun (t1l, t1r), TFun (t2l, t2r) ->
