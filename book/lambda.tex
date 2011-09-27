@@ -56,6 +56,8 @@ $\lambda$ 計算の関数適用は、関数と引数を順番に並べて表記�
 \]
 と書けます。
 
+これらの計算そのものの表現を $\lambda$ 計算の\textbf{項 (term)} と呼びます。
+
 \section{$\lambda$ 計算}
 
 $\lambda$ 計算の項を、図\ref{fig:lambda-term}のように帰納的に定義します。
@@ -112,38 +114,17 @@ $\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\l
 
 \end{exercise}
 
-\begin{exercise}
+\section{$\alpha$ 変換}
 
-\label{exc:execute-lambda-calculus}
+$\alpha$ 変換は、$\lambda$ 項の項としての同値関係を規定する変換です。
 
-以下の $\lambda$ 計算の項を実行した結果は何になるか、答えよ。
+その基本的なアイディアは、$\lambda$ 項の中にある特定の束縛変数を別の名前で置き換えるというものです。
 
-\begin{enumerate}
-  \item $(\lambda x . x) \, (\lambda y . y)$
-  \item $(\lambda f . \lambda g . \lambda x . f \, x \, (g \, x)) \,
-        (\lambda x . \lambda y . x) \, (\lambda x . \lambda y . x)$
-\end{enumerate}
-
-\subparagraph{解答}
-
-1番目は、外側の関数適用を実行すると $\lambda y . y$ となります。よって、実行結果は $\lambda y . y$
-となります。
-
-2番目は、まず項
-$(\lambda f . \lambda g . \lambda x . f \, x \, (g \, x)) \, (\lambda x . \lambda y . x)$
-の関数適用を実行します。結果は、$\lambda g . \lambda x . (\lambda x . \lambda y . x) \, x \, (g \, x)$
-となり、これの内側の2つの関数適用を実行すると $\lambda g . \lambda x . x$ となります。
-よって、項全体は $(\lambda g . \lambda x . x) \, (\lambda x . \lambda y . x)$ となります。
-この項の外側の関数適用を実行すると、$\lambda x . x$ となります。
-実行結果は $\lambda x . x$ です。
-
-\end{exercise}
-
-\section{$\lambda$ 計算の実行}
+\section{$\beta$ 簡約}
 
 $\lambda$ 計算の実行について考えてみましょう。
 
-練習問題\ref{exc:ececute-lambda-calculus}で分かる通り、$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
+$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
 ($(\lambda x . e_1) \, e_2$ の形をしている $\lambda$ 項)を解く操作です。
 この操作は、項 $e_1$ の中の自由変数 $x$ を全て項 $e_2$ で置き換える操作です。
 この自由変数を全て置き換える操作を\textbf{代入 (substitute)} と呼び、$[e_2/x] e_1$ と表記します。
