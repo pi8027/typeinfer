@@ -42,7 +42,8 @@ $\lambda \text{変数} . \text{変数に依存する式}$ と表記します。
 と表記します。\footnote{本来の $\lambda$ 計算には数値や加算は含まれませんが、
 分かりやすいように適宜このような表記を使います。}。
 
-関数に値を与えることを、\textbf{関数適用 (function application)} といいます。
+関数に値を与えることを、\textbf{関数適用 (function application)}
+もしくは単に\textbf{適用 (application)} といいます。
 $\lambda$ 計算の関数適用は、関数と引数を順番に並べて表記します。
 引数部分を括弧で括る必要はありません。
 例えば、関数 $(\lambda x . x + 1)$ に値 $2$ を与えるには、
@@ -66,12 +67,12 @@ $\lambda$ 計算の関数適用は、関数と引数を順番に並べて表記�
 \textbf{カリー化された関数 (curried function)} といいます。
 カリー化によって、どのような多変数関数も複数の1引数関数で表現できます。
 
-これらの計算の表現を $\lambda$ 計算の\textbf{項 (term)}
-もしくは\textbf{$\lambda$ 項 ($\lambda$-term)} と呼びます。
+これらの記号 $\lambda$ で関数を表すような計算の表現を
+$\lambda$ 計算の\textbf{項 (term)} もしくは\textbf{$\lambda$ 項 ($\lambda$-term)} と呼びます。
 
 \section{$\lambda$ 計算}
 
-この節では、$\lambda$ 項の定義を説明します。
+この節では、$\lambda$ 項を定義します。
 
 変数の集合は、可算無限集合であるものとします。
 即ち、変数の集合は自然数と一対一の対応を持ちます。
@@ -94,13 +95,16 @@ $\lambda$ 計算の項を、図\ref{fig:lambda-term}のように帰納的に定�
 上の定義を分かりやすく書き直すと、以下のような意味になります。
 
 \begin{itemize}
-  \item 変数 $x$ は $\lambda$ 項である。ここで、$x$ は任意の変数である。
+  \item 変数 $x$ は $\lambda$ 項である。但し、$x$ は任意の変数である。
   \item 関数適用 $e \, e$ は $\lambda$ 項である。
-        ここで、2つの $e$ はどちらも任意の $\lambda$ 項である。
+        但し、2つの $e$ はどちらも任意の $\lambda$ 項である。
   \item $\lambda$ 抽象 $\lambda x . e$ は $\lambda$ 項である。
-        ここで、$x$ は任意の変数であり、$e$ は任意の $\lambda$ 項である。
+        但し、$x$ は任意の変数であり、$e$ は任意の $\lambda$ 項である。
   \item 以上の規則で作れる $\lambda$ 項のみが、正しい $\lambda$ 項である。
 \end{itemize}
+
+項の定義に $\lambda$ 抽象が含まれていますが、
+これは前節までの関数に対応するものであると考えてください。
 
 項のことを\textbf{式}という場合もあります。
 
