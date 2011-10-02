@@ -185,7 +185,8 @@ $\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\l
 \section{$\alpha$ 同値}
 
 \textbf{$\alpha$ 同値 ($\alpha$-equivalent)}は、$\lambda$ 項の構文上の同値関係です。
-項 $e_1$ と項 $e_2$ が $\alpha$ 同値であるということを $e_1 \alphaeq e_2$ と表記します。
+項 $e_1$ と項 $e_2$ が $\alpha$ 同値であるということを記号 $\alphaeq$ を用いて
+$e_1 \alphaeq e_2$ と表記します。
 
 $\alpha$ 同値の基本は、とある項の束縛変数の名前を置き換えても、
 それは同じ項であるということです。例えば、$\lambda x . x$ は $\lambda y . y$ と $\alpha$ 同値です。
@@ -278,6 +279,12 @@ $\alpha$ 同値の関係を、図\ref{fig:alpha-equivalent}のように定義し
   \label{fig:alpha-equivalent}
 \end{figure}
 
+この分数のような表記は、上が仮定で下が結論であるような規則を表しています。
+つまり、上に書いてあることが成り立てば、下に書いてあることを成り立つとして良いということになります。
+
+規則の右側に書かれている \textsc{Eq-Subst}, \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans},
+\textsc{Eq-App}, \textsc{Eq-Abs} は、規則の名前を表しています。
+
 
 
 \section{$\beta$ 簡約}
@@ -324,13 +331,7 @@ $\lambda$ 計算の $\beta$ 簡約を、図 \ref{fig:beta-reduction} のよう�
   \label{fig:beta-reduction}
 \end{figure}
 
-この分数のような表記は、上が仮定で下が結論であるような規則を表しています。
-つまり、上に書いてあることが成り立てば、下に書いてあることを成り立つとして良いということになります。
-
-規則の右側に書いてある \textsc{R-Beta}, \textsc{R-App1}, \textsc{R-App2}, \textsc{R-Abs}
-は規則の名前を表しています。
-
-また、\textsc{R-Beta} 規則のように上が空である場合は、
+\textsc{R-Beta} 規則のように上が空になっている規則は、
 無条件で下に書いてあることを認めて良いということを表しています。
 
 $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます。
