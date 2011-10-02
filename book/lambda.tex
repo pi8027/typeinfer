@@ -89,9 +89,9 @@ $\lambda$ 計算の項を、図\ref{fig:lambda-term}のように帰納的に定�
   \label{fig:lambda-term}
 \end{figure}
 
-このような表現の形式を、\textbf{BNF 記法 (Backus-Naur form)} といいます。
+このような表現の形式を、\textbf{BNF (Backus-Naur form)} といいます。
 この表記では、構造の名前、$::=$、中身として取り得る表現の列を $|$ で区切った物を並べて書きます。
-この記法は良く構文の表現に利用されますが、本書では主に構造の表現に利用しています。
+BNF は良く構文の表現に利用されますが、本書では主に構造の表現に利用しています。
 
 図\ref{fig:lambda-term}の定義を分かりやすく書き直すと、以下のような意味になります。
 
@@ -148,15 +148,15 @@ $\lambda$ 項において、変数 $x$ の出現とは、項の上で変数 $x$ 
 
 \subparagraph{解答}
 
-1番目は、$x$ が変数として正しく、
-$\lambda x . x$ 全体も $\lambda$ 抽象として正しいので正しい項になっています。
-
-2番目は、$f$ と $x$ がそれぞれ変数として正しく、$f \, x$ が関数適用として正しく、
-$\lambda f . f \, x$ 全体も $\lambda$ 抽象として正しいので正しい項になっています。
-
-3番目は、$f$ と $x$ はそれぞれ変数として正しい形になっていますが、
-$\lambda x$ は正しい $\lambda$ 計算の項の形をしていません。
-よって、$f \, (\lambda x)$ 全体も正しい $\lambda$ 計算の項ではありません。
+\begin{enumerate}
+  \item $x$ が変数として正しく、$\lambda x . x$ 全体も $\lambda$ 抽象として正しいので
+        正しい項になっています。
+  \item $f$ と $x$ がそれぞれ変数として正しく、$f \, x$ が関数適用として正しく、
+        $\lambda f . f \, x$ 全体も $\lambda$ 抽象として正しいので正しい項になっています。
+  \item $f$ と $x$ はそれぞれ変数として正しい形になっていますが、
+        $\lambda x$ は正しい $\lambda$ 計算の項の形をしていません。
+        よって、$f \, (\lambda x)$ 全体も正しい $\lambda$ 計算の項ではありません。
+\end{enumerate}
 
 $\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\lambda x)$ です。
 
@@ -173,20 +173,110 @@ $\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\l
 
 \subparagraph{解答}
 
-1番目は、下線部の変数 $x$ の出現が $\lambda x . \lambda y . x$ の部分項となっているので、
-束縛変数です。
-
-2番目は、下線部の変数 $f$ の出現は $\lambda f . e$ の形の項の部分項となっていないので、
-自由変数です。$\lambda f . f \, x$ という部分項がありますが、
-下線分の変数 $f$ の出現がこの項の部分項になっていないことに注意してください。
+\begin{enumerate}
+  \item 下線部の変数 $x$ の出現が $\lambda x . \lambda y . x$ の部分項となっているので、束縛変数です。
+  \item 下線部の変数 $f$ の出現は $\lambda f . e$ の形の項の部分項となっていないので、自由変数です。
+        $\lambda f . f \, x$ という部分項がありますが、
+        下線分の変数 $f$ の出現がこの項の部分項になっていないことに注意してください。
+\end{enumerate}
 
 \end{exercise}
 
-\section{$\alpha$ 変換}
+\section{$\alpha$ 同値}
 
-$\alpha$ 変換は、$\lambda$ 項の項としての同値関係を規定する変換です。
+\textbf{$\alpha$ 同値 ($\alpha$-equivalent)}は、$\lambda$ 項の構文上の同値関係です。
+項 $e_1$ と項 $e_2$ が $\alpha$ 同値であるということを $e_1 \alphaeq e_2$ と表記します。
 
-その基本的なアイディアは、$\lambda$ 項の中にある特定の束縛変数を別の名前で置き換えるというものです。
+$\alpha$ 同値の基本は、とある項の束縛変数の名前を置き換えても、
+それは同じ項であるということです。例えば、$\lambda x . x$ は $\lambda y . y$ と $\alpha$ 同値です。
+
+この関係を定義するためには、置き換える対象の束縛変数を束縛している $\lambda$ 抽象
+$\lambda x . e$ に関して、項 $e$ に自由出現する変数 $x$ を全て置き換えるた項を考える必要があります。
+
+まず、この置き換えについて考えましょう。項に自由出現する特定の変数を別の項で置き換える操作を
+\textbf{代入 (substitution)} と呼びます。
+
+自由変数 $x$ を全て項 $e$ に置き換える代入を
+\[
+  [x := e]
+\]
+と表記します。
+
+項 $e_1$ に代入 $[x := e_2]$ を適用した項、即ち項 $e_1$ 中の自由変数 $x$ を全て項 $e_2$ に置き換える
+ことによって得られる項を
+\[
+  e_1 [x := e_2]
+\]
+と表記します。
+
+代入の適用は、図 \ref{fig:lambda-substitute} のようにも定義できます。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    y [x := e_1] & = \left \{
+      \begin{array}{ll}
+        e_1 & (x = y) \\
+        y & (x \neq y)
+      \end{array}
+      \right. \\
+    e_2 \, e_3 [x := e_1] & = (e_2 [x := e_1]) \, (e_3 [x := e_1]) \\
+    (\lambda y . e_2) [x := e_1] & = \left \{
+      \begin{array}{ll}
+        \lambda y . (e_2 [x := e_1]) & (x \neq y) \\
+        \lambda y . e_2 & (x = y)
+      \end{array}
+      \right.
+  \end{align*}
+  \caption{代入}
+  \label{fig:lambda-substitute}
+\end{figure}
+
+$\alpha$ 同値の関係を、図\ref{fig:alpha-equivalent}のように定義します。
+
+\begin{figure}[htbp]
+  \[
+    \infere{Eq-Subst}{
+      (\lambda x . e) \alphaeq (\lambda y . e [x := y])
+    }{
+      \text{項 $e$ に変数 $y$ が自由出現しない}
+    }
+  \]
+  \[
+    \infere{Eq-Refl}{
+      e \alphaeq e
+    }{}
+  \]
+  \[
+    \infere{Eq-Sym}{
+      e' \alphaeq e
+    }{
+      e \alphaeq e'
+    }
+  \]
+  \[
+    \infere{Eq-Trans}{
+      e_1 \alphaeq e_3
+    }{
+      e_1 \alphaeq e_2 & e_2 \alphaeq e_3
+    }
+  \]
+  \[
+    \infere{Eq-App}{
+      e_1 \, e_2 \alphaeq e_1' \, e_2'
+    }{
+      e_1 \alphaeq e_1' & e_2 \alphaeq e_2'
+    }
+  \]
+  \[
+    \infere{Eq-Abs}{
+      \lambda x . e \alphaeq \lambda x . e'
+    }{
+      e \alphaeq e'
+    }
+  \]
+  \caption{$\alpha$ 同値}
+  \label{fig:alpha-equivalent}
+\end{figure}
 
 
 
@@ -196,42 +286,17 @@ $\lambda$ 計算の実行について考えてみましょう。
 
 $\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
 ($(\lambda x . e_1) \, e_2$ の形をしている $\lambda$ 項)を解く操作です。
-この操作は、項 $e_1$ の中の自由変数 $x$ を全て項 $e_2$ で置き換える操作です。
-この自由変数を全て置き換える操作を\textbf{代入 (substitute)} と呼び、$[e_2/x] e_1$ と表記します。
+この操作によって得られる項は、項 $e_1$ 中の自由変数 $x$ に項 $e_2$ を代入した項です。
 
-代入の操作を、図 \ref{fig:lambda-substitute} のように定義します。
-
-\begin{figure}[htbp]
-  \begin{align*}
-    [e_1/x] y & = \left \{
-      \begin{array}{ll}
-        e_1 & (x = y) \\
-        y & (x \neq y)
-      \end{array}
-      \right. \\
-    [e_1/x] e_2 \, e_3 & = ([e_1/x] e_2) \, ([e_1/x] e_3) \\
-    [e_1/x] \lambda y . e_2 & = \left \{
-      \begin{array}{ll}
-        \lambda y . [e_1/x] e_2 & (x \neq y) \\
-        \lambda y . e_2 & (x = y)
-      \end{array}
-      \right.
-  \end{align*}
-  \caption{代入}
-  \label{fig:lambda-substitute}
-\end{figure}
-
-次に、代入を使って $\lambda$ 計算の項の関数適用を評価する規則を作りましょう。
-
-項の中の関数適用を一度実行することを、\textbf{$\beta$簡約 ($\beta$-reduction)} と呼びます。
-$e_1$ を $\beta$ 簡約して $e_2$ にできるということを、
+項の中の関数適用を一箇所解く操作を、\textbf{$\beta$簡約 ($\beta$-reduction)} と呼びます。
+$e_1$ を $\beta$ 簡約して $e_2$ にできるという二項関係を、
 記号 $\betared$ を用いて $e_1 \betared e_2$ と表記します。
 $\lambda$ 計算の $\beta$ 簡約を、図 \ref{fig:beta-reduction} のように定義します。
 
 \begin{figure}[htbp]
   \[
     \infere{R-Beta}{
-      (\lambda x . e_1) \, e_2 \betared [e_2/x]e_1
+      (\lambda x . e_1) \, e_2 \betared e_1 [x := e_2]
     }{}
   \]
   \[
@@ -272,7 +337,7 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
 
 \begin{exercise}
 
-以下の $\beta$ 簡約ができることを示せ。
+以下の $\beta$ 簡約が正しいことを示せ。
 
 \[
   (\lambda x . x) \, f \, y \betared f \, y
@@ -280,7 +345,7 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
 
 \subparagraph{解答}
 
-これは、$(\lambda x . x) \, f$ の部分を簡約すれば良さそうです。$[f/x] x = f$ なので、
+これは、$(\lambda x . x) \, f$ の部分を簡約すれば良さそうです。$x [x := f] = f$ なので、
 \[
   \infere{R-Beta}{
     (\lambda x . x) \, f \betared f
@@ -324,7 +389,7 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
 \subparagraph{解答}
 
 外側の関数適用が簡約できます。
-$[(\lambda x . x \, x)/x](x \, x) = (\lambda x . x \, x) \, (\lambda x . x \, x)$ なので、
+$x \, x [x := \lambda x . x \, x] = (\lambda x . x \, x) \, (\lambda x . x \, x)$ なので、
 \[
   \infere{R-Beta}{
     (\lambda x . x \, x) \, (\lambda x . x \, x) \betared
@@ -665,15 +730,14 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 
 以下の項が単純型付き $\lambda$ 計算において型付け不可能であることを示せ。
 
-\begin{enumerate}
-  \item $\text{true} + 1$
-  \item $(\lambda x . x \, x) \, (\lambda x . x \, x)$
-\end{enumerate}
+\[
+  \text{true} + 1
+\]
 
 \subparagraph{解答}
 
-まず1番目の項ですが、これは節の最初に出てきた意図に反する項の例です。
-このような項は型システムによって排除されるはずです。本当に型付け不可能なのか確かめてみましょう。
+これは節の最初に出てきた意図に反する項の例です。このような項は型システムによって排除されるはずです。
+本当に型付け不可能なのか確かめてみましょう。
 
 まず、項全体は加算になっているので、
 \[
@@ -689,8 +753,19 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 しかし、ここで $\emptyset \vdash \text{true} : \text{int}$ の部分に注目すると、
 このような型判定を作れる規則は存在しません。
 
-次に2番目の項ですが、
-これは節の最初に出てきた無限長の $\beta$ 簡約列を作ることができるような $\lambda$ 項の例です。
+\end{exercise}
+
+\begin{exercise}
+
+以下の項が単純型付き $\lambda$ 計算において型付け不可能であることを示せ。
+
+\[
+  (\lambda x . x \, x) \, (\lambda x . x \, x)
+\]
+
+\subparagraph{解答}
+
+これは無限長の $\beta$ 簡約列を作ることができるような $\lambda$ 項の例です。
 本当に型付け不可能なのか確かめてみましょう。
 
 まず、項全体が関数適用になっているので、
