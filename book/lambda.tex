@@ -236,7 +236,7 @@ $\alpha$ 同値の関係を、図\ref{fig:alpha-equivalent}のように定義し
 
 \begin{figure}[htbp]
   \[
-    \infere{Eq-Subst}{
+    \infere{Eq-Alpha}{
       (\lambda x . e) \alphaeq (\lambda y . e [x := y])
     }{
       \text{項 $e$ に変数 $y$ が自由出現しない}
@@ -282,8 +282,27 @@ $\alpha$ 同値の関係を、図\ref{fig:alpha-equivalent}のように定義し
 この分数のような表記は、上が仮定で下が結論であるような規則を表しています。
 つまり、上に書いてあることが成り立てば、下に書いてあることを成り立つとして良いということになります。
 
-規則の右側に書かれている \textsc{Eq-Subst}, \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans},
+規則の右側に書かれている \textsc{Eq-Alpha}, \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans},
 \textsc{Eq-App}, \textsc{Eq-Abs} は、規則の名前を表しています。
+
+規則を1つずつ見てみましょう。
+
+規則 \textsc{Eq-Alpha} は、束縛変数の置き換えの規則です。
+中身は、項 $e$ に変数 $y$ が自由出現しないなら、項 $\lambda x . e$ と $\lambda x . e [x := y]$ は
+$\alpha$ 同値であるということを表しています。
+項 $e$ に変数 $y$ が自由出現してはいけないのは、そのような変数に置き換えてしまうと
+自由出現していた変数がその $\lambda$ 抽象で束縛されてしまい、意味が変わってしまうからです。
+
+規則 \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans} は同値関係としての性質、
+それぞれ反射性、対象性、推移性を表しています。
+
+規則 \textsc{Eq-App} は、関数適用の左辺と右辺をそれぞれ $\alpha$ 同値な項に置き換えても、
+全体として $\alpha$ 同値であるという規則です。
+
+規則 \textsc{Eq-Abs} は、$\lambda$ 抽象の内側の項を $\alpha$ 同値な項に置き換えても、
+全体として $\alpha$ 同値であるという規則です。
+
+\section{変数規約}
 
 
 
