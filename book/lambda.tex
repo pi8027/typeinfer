@@ -305,6 +305,72 @@ $\alpha$ 同値であるということを表しています。
 本書ではこれ以降 $\alpha$ 同値性を構文的な等しさとして扱い、
 $=_\alpha$ も紛らわしさなどの問題がなければ単に $=$ と表記します。
 
+\begin{exercise}
+
+以下の $\alpha$ 同値関係が成り立つことを示せ。
+
+\[
+  \lambda f . \lambda x . f \, (f \, x) \alphaeq
+  \lambda f . \lambda y . f \, (f \, y)
+\]
+
+\subparagraph{解答}
+
+この $\alpha$ 同値関係では、左辺の束縛変数 $x$ を $y$ に置き換えています。
+この変数 $x$ を束縛している $\lambda$ 抽象のみに着目すると、
+\[
+  \lambda x . f \, (f \, x) \alphaeq \lambda y . f \, (f \, y)
+\]
+という $\alpha$ 同値関係が成立しているはずです。
+項 $f \, (f \, x)$ に変数 $y$ は自由出現しておらず、
+$f \, (f \, x) [x := y] = f \, (f \, y)$ が成立するので、規則 \textsc{Eq-Alpha} を使うと
+\[
+  \infere{Eq-Alpha}{
+    \lambda x . f \, (f \, x) \alphaeq
+    \lambda y . f \, (f \, y)
+  }{
+    \text{項 $f \, (f \, x)$ に変数 $y$ が自由出現しない}
+  }
+\]
+と書けます。
+
+上で作れた $\alpha$ 同値関係は、
+全体から見れば同じ形をした $\lambda$ 抽象の内側の項に関する関係です。
+よって、規則 \textsc{Eq-Abs} を使うと
+\[
+  \infere{Eq-Abs}{
+    \lambda f . \lambda x . f \, (f \, x) \alphaeq
+    \lambda f . \lambda y . f \, (f \, y)
+  }{
+    \lambda x . f \, (f \, x) \alphaeq
+    \lambda y . f \, (f \, y)
+  }
+\]
+と書けます。
+
+このようにして、
+$\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f \, y)$
+が正しい $\alpha$ 同値関係であることを示せます。
+
+実際には、実際はこの2つの証明の段階を繋げて、証明全体を
+\[
+  \infere{Eq-Abs}{
+    \lambda f . \lambda x . f \, (f \, x) \alphaeq
+    \lambda f . \lambda y . f \, (f \, y)
+  }{
+    \infere{Eq-Alpha}{
+      \lambda x . f \, (f \, x) \alphaeq
+      \lambda y . f \, (f \, y)
+    }{
+      \text{項 $f \, (f \, x)$ に変数 $y$ が自由出現しない}
+    }
+  }
+\]
+のように表記します。
+この表記によって、複雑な構造を持つ証明を分かりやすく記述することができます。
+
+\end{exercise}
+
 \section{変数の捕獲}
 
 以下のような代入の適用を考えてみましょう。
@@ -392,23 +458,13 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
 \subparagraph{解答}
 
 これは、$(\lambda x . x) \, f$ の部分を簡約すれば良さそうです。$x [x := f] = f$ なので、
+規則 \textsc{R-Beta} を使うと
 \[
   \infere{R-Beta}{
     (\lambda x . x) \, f \betared f
   }{}
 \]
-とできます。この部分式は全体から見ると関数適用の左辺なので、
-\[
-  \infere{R-App1}{
-    (\lambda x . x) \, f \, y \betared f \, y
-  }{
-    (\lambda x . x) \, f \betared f
-  }
-\]
-とできます。
-このようにして、$(\lambda x . x) \, f \, y \betared f \, y$ が正しい $\beta$ 簡約であることが示せます。
-
-また、実際はこの2つの証明の段階を繋げて、
+と書けます。この部分式は全体から見ると関数適用の左辺なので、規則 \textsc{R-App1} を使うと
 \[
   \infere{R-App1}{
     (\lambda x . x) \, f \, y \betared f \,
@@ -419,8 +475,8 @@ $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます�
     }{}
   }
 \]
-のように表記します。
-これによって、複雑な構造を持つ証明を分かりやすく記述することができます。
+と書けます。
+このようにして、$(\lambda x . x) \, f \, y \betared f \, y$ が正しい $\beta$ 簡約であることが示せます。
 
 \end{exercise}
 
