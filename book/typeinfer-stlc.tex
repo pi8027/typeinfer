@@ -336,12 +336,62 @@ $\mathrm{fresh}$ はフレッシュな型変数を表します。
 次に、アルゴリズム $\mathcal C$ で生成した方程式を解くアルゴリズムについて考えます。
 
 方程式を解く計算の名前を $\mathcal U$ としましょう\footnote{unification の u から取りました。}。
-この計算は、制約集合を取り、それを解いた結果として得られる型変数への代入を返すとしましょう。
+この計算は、等式集合を取り、それを解いた結果として得られる型変数への代入を返すとしましょう。
+
+また、$S = \mathcal{U}(E)$ であるなら、
+$E$ 中の任意の等式 $t_1 = t_2$ について $t_1 S = t_2 S$ が成り立つものとします。
 
 この節の頭で示した例での方針に従い、等式集合と代入の組の適切な変形規則を作り、
 その変形の繰り返しによって得られる代入を結果とします。
 
+まず、等式集合が $t = t$ と残りの等式集合に分割できる場合を考えます。
+任意の代入は $t = t$ を満たすと考えられるので、これは単に $t = t$ を取り除けば良いはずです。よって、
+\[
+  (E \cup \{t = t\}, S) \Longrightarrow (E, S)
+\]
+という変形ができます。
 
+次に、等式集合が $\alpha = t$ と残りの等式集合に分割できる場合を考えます。
+この場合は、残りの等式と代入に出現する $\alpha$ を全て $t$ に置き換え、
+代入に $\alpha := t$ を追加すれば良いはずです。よって、
+\[
+  (E \cup \{\alpha = t\}, S) \Longrightarrow (E[\alpha := t], S[\alpha := t] \cup [\alpha := t])
+\]
+という変形ができます。
+
+ただし、$t$ の中に $\alpha$ が出現している場合、
+置き換えの結果としてまた $\alpha$ が出てきてしまうので、$\alpha \notin \mathit{FTV}(t)$
+でなければなりません。$\mathit{FTV}(t)$ は型 $t$ 中の型変数の集合を意味します。
+これは free type variables の頭文字を取っています。
+
+もし仮に $\alpha \in \mathit{FTV}(t)$ かつ $t \neq \alpha$ であったとすると、
+$t$ は無限長の型になってしまうはずです。
+しかし、型は帰納的に定義されているので、このことからも解が存在しないと言えます。
+
+次に、等式集合が $t_1 \to t_2 = t_1' \to t_2'$ と残りの等式集合に分割できる場合を考えます。
+この等式は、$t_1 = t_1'$ と $t_2 = t_2'$ という2つの等式に分割できると考えられます。
+よって、
+\[
+  (E \cup \{t_1 \to t_2 = t_1' \to t_2'\}, S) \Longrightarrow (E \cup \{t_1 = t_1', t_2 = t_2'\}, S)
+\]
+という変形ができます。
+
+以上で、変形規則は全てです。
+単一化アルゴリズムの変形規則を、図\ref{fig:unification-trans}のように定義します。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    (E \cup \{t = t\}, S)
+      &\Longrightarrow (E, S) \\
+    (E \cup \{\alpha = t\}, S)
+      &\Longrightarrow (E[\alpha := t], S[\alpha := t] \cup [\alpha := t])
+      &\text{($\alpha \notin \mathit{FTV(t)}$)}\\
+    (E \cup \{t_1 \to t_2 = t_1' \to t_2'\}, S)
+      &\Longrightarrow (E \cup \{t_1 = t_1', t_2 = t_2'\}, S)
+  \end{align*}
+  \caption{単一化アルゴリズムの変形規則}
+  \label{fig:unification-trans}
+\end{figure}
 
 \section{実装}
 
