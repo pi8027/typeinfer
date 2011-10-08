@@ -8,7 +8,7 @@ type tconst = ty * ty;;
 type assump = ty StrMap.t;;
 type subst = ty IntMap.t;;
 
-let rec infer (n : int) (env : assump) :
+let rec constraints (n : int) (env : assump) :
     term -> (int * tconst list * ty) option =
   function
     | EVar str ->
@@ -17,9 +17,9 @@ let rec infer (n : int) (env : assump) :
         | None -> None
       end
     | EApp (term1, term2) ->
-      begin match infer (succ n) env term1 with
+      begin match constraints (succ n) env term1 with
         | Some (n1, c1, t1) ->
-          begin match infer n1 env term2 with
+          begin match constraints n1 env term2 with
             | Some (n2, c2, t2) ->
               let tn = TVar n in
               Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
@@ -30,45 +30,39 @@ let rec infer (n : int) (env : assump) :
     | EAbs (ident, term) ->
       begin
         let tn = TVar n in
-        match infer (succ n) (StrMap.add ident tn env) term with
+        match constraints (succ n) (StrMap.add ident tn env) term with
           | Some (n', c, t) -> Some (n', c, TFun (tn, t))
           | None -> None
       end
 ;;
 
-let rec occurs_check env n =
-  function
-    | TVar n' ->
-      begin match IntMap.find env n' with
-        | Some t -> occurs_check env n t
-        | None -> n = n'
-      end
-    | TFun (tl, tr) ->
-      occurs_check env n tl || occurs_check env n tr
-;;
-
-let rec solve (env : subst) : tconst -> subst option =
-  function
-    | TVar n, TVar n' when n = n' -> Some env
-    | TVar n, t | t, TVar n ->
-      begin match IntMap.find env n with
-        | Some t' -> solve env (t, t')
-        | None when occurs_check env n t -> None
-        | None -> Some (IntMap.add n t env)
-      end
-    | TFun (t1l, t1r), TFun (t2l, t2r) ->
-      begin match solve env (t1l, t2l) with
-        | Some env' -> solve env' (t1r, t2r)
-        | None -> None
-      end
-;;
-
-let rec expand_type (env : subst) : ty -> ty =
+let rec substitute (s : subst) : ty -> ty =
   function
     | TVar n ->
-      begin match IntMap.find env n with
-        | Some t -> expand_type env t
+      begin match IntMap.find s n with
+        | Some t -> t
         | None -> TVar n
       end
-    | TFun (tl, tr) -> TFun (expand_type env tl, expand_type env tr)
+    | TFun (tl, tr) -> TFun (substitute s tl, substitute s tr)
+;;
+
+let rec occurs_check (n : int) : ty -> bool =
+  function
+    | TVar n' -> n = n'
+    | TFun (tl, tr) -> occurs_check n tl || occurs_check n tr
+;;
+
+let rec unify (env : subst) : tconst list -> subst option =
+  function
+    | [] -> Some env
+    | (TVar n, TVar n') :: cs when n = n' -> unify env cs
+    | (TVar n, t) :: cs | (t, TVar n) :: cs ->
+      let sub = substitute (IntMap.singleton n t) in
+      if occurs_check n t
+        then None
+        else unify
+          (IntMap.add n t (IntMap.map sub env))
+          (List.map (fun (l, r) -> sub l, sub r) cs)
+    | (TFun (t1l, t1r), TFun (t2l, t2r)) :: cs ->
+      unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
 ;;

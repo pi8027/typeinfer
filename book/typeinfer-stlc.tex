@@ -448,7 +448,7 @@ $\mathit{sym}(E \cup \{t_1 \to t_2 = t_1' \to t_2'\}) =
   \item 解が存在する場合は正しい解を返す
   \item 解が存在する場合の結果は常に最も一般的な解である
 \end{itemize}
-の三点が保証されています。
+の三点を守ることが保証されています。
 
 単一化アルゴリズムが最も一般的な解を返すという性質から、
 型推論が最も一般的な型を推論することが説明できます。
@@ -546,8 +546,12 @@ type subst = ty IntMap.t;;
 
 \subsection{方程式の生成}
 
+方程式の生成を実装してみましょう。
+
+
+
 \begin{lstlisting}[caption=方程式を生成する関数, label=list:ocaml-stlc-infer]
-let rec infer (n : int) (env : assump) :
+let rec constraints (n : int) (env : assump) :
     term -> (int * tconst list * ty) option =
   function
     | EVar str ->
@@ -556,9 +560,9 @@ let rec infer (n : int) (env : assump) :
         | None -> None
       end
     | EApp (term1, term2) ->
-      begin match infer (succ n) env term1 with
+      begin match constraints (succ n) env term1 with
         | Some (n1, c1, t1) ->
-          begin match infer n1 env term2 with
+          begin match constraints n1 env term2 with
             | Some (n2, c2, t2) ->
               let tn = TVar n in
               Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
@@ -569,7 +573,7 @@ let rec infer (n : int) (env : assump) :
     | EAbs (ident, term) ->
       begin
         let tn = TVar n in
-        match infer (succ n) (StrMap.add ident tn env) term with
+        match constraints (succ n) (StrMap.add ident tn env) term with
           | Some (n', c, t) -> Some (n', c, TFun (tn, t))
           | None -> None
       end
@@ -578,34 +582,40 @@ let rec infer (n : int) (env : assump) :
 
 \subsection{制約解消系}
 
-\begin{lstlisting}[caption=出現検査, label=list:ocaml-stlc-occurs-check]
-let rec occurs_check env n =
+\begin{lstlisting}[caption=代入, label=list:ocaml-stlc-substitute]
+let rec substitute (s : subst) : ty -> ty =
   function
-    | TVar n' ->
-      begin match IntMap.find env n' with
-        | Some t -> occurs_check env n t
-        | None -> n = n'
+    | TVar n ->
+      begin match IntMap.find s n with
+        | Some t -> t
+        | None -> TVar n
       end
-    | TFun (tl, tr) ->
-      occurs_check env n tl || occurs_check env n tr
+    | TFun (tl, tr) -> TFun (substitute s tl, substitute s tr)
+;;
+\end{lstlisting}
+
+\begin{lstlisting}[caption=出現検査, label=list:ocaml-stlc-occurs-check]
+let rec occurs_check (n : int) : ty -> bool =
+  function
+    | TVar n' -> n = n'
+    | TFun (tl, tr) -> occurs_check n tl || occurs_check n tr
 ;;
 \end{lstlisting}
 
 \begin{lstlisting}[caption=方程式を解く関数, label=list:ocaml-stlc-solve]
-let rec solve (env : subst) : tconst -> subst option =
+let rec unify (env : subst) : tconst list -> subst option =
   function
-    | TVar n, TVar n' when n = n' -> Some env
-    | TVar n, t | t, TVar n ->
-      begin match IntMap.find env n with
-        | Some t' -> solve env (t, t')
-        | None when occurs_check env n t -> None
-        | None -> Some (IntMap.add n t env)
-      end
-    | TFun (t1l, t1r), TFun (t2l, t2r) ->
-      begin match solve env (t1l, t2l) with
-        | Some env' -> solve env' (t1r, t2r)
-        | None -> None
-      end
+    | [] -> Some env
+    | (TVar n, TVar n') :: cs when n = n' -> unify env cs
+    | (TVar n, t) :: cs | (t, TVar n) :: cs ->
+      let sub = substitute (IntMap.singleton n t) in
+      if occurs_check n t
+        then None
+        else unify
+          (IntMap.add n t (IntMap.map sub env))
+          (List.map (fun (l, r) -> sub l, sub r) cs)
+    | (TFun (t1l, t1r), TFun (t2l, t2r)) :: cs ->
+      unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
 ;;
 \end{lstlisting}
 

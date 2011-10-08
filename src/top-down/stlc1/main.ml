@@ -24,19 +24,17 @@ let parse (input : in_channel) : term =
 let term = parse stdin;;
 print_string ("term:\n" ^ strterm 2 term ^ "\n\n");;
 
-match Infer.infer 0 Infer.StrMap.empty term with
+match Infer.constraints 0 Infer.StrMap.empty term with
   | Some (_, cr, ty) ->
     print_string "constraints:\n";
     List.iter (fun (t1, t2) ->
       print_string (strtype 1 t1 ^ ", " ^ strtype 1 t2 ^ "\n")) cr;
     print_string "\n";
     print_string ("type:\n" ^ strtype 1 ty ^ "\n\n");
-    begin match List.fold_left
-        (function | Some s -> Infer.solve s | None -> fun _ -> None)
-        (Some Infer.IntMap.empty) cr with
+    begin match Infer.unify Infer.IntMap.empty cr with
       | Some tenv ->
         print_string
-          ("solve:\n" ^ strtype 1 (Infer.expand_type tenv ty) ^ "\n");
+          ("solve:\n" ^ strtype 1 (Infer.substitute tenv ty) ^ "\n");
       | None -> print_string "Error: occurs check\n"
     end
   | None -> print_string "Error: free variable\n"
