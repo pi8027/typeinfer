@@ -546,9 +546,23 @@ type subst = ty IntMap.t;;
 
 \subsection{方程式の生成}
 
-方程式の生成を実装してみましょう。
+方程式の生成を実装してみましょう。方程式を生成する関数の名前を、\texttt{constraints} とします。
+まずは、関数 \texttt{constraints} の型を考えます。
 
+アルゴリズム $\mathcal C$ を見る限りでは、この型は環境と項を取り、等式集合と型を返す型を持ちます。
+しかし、それではこの計算の型を十分に表せていません。
 
+まず、この計算の中にフレッシュな型変数を作り出す計算が含まれています。
+これは、どのような型変数がまだ使われていないのかという情報を状態として持ち回らなければ実現できません。
+型変数は \texttt{int} 型を持つので、0 から順に割り当てるものとして、
+どこから割り当て可能かを表す \texttt{int} 型の値を状態として持つことにします。
+
+次に、この計算の中には失敗し結果を返さない部分が含まれています。
+これも、値があるか無いかのどちらかであることを表す型を使わなければいけません。
+OCaml であれば \texttt{option} 型を使うべきでしょう。
+
+以上のことから、\texttt{constraints} は
+\texttt{int -> assump -> term -> (int * tconst list * ty) option} 型を持つのが妥当だと考えられます。
 
 \begin{lstlisting}[caption=方程式を生成する関数, label=list:ocaml-stlc-infer]
 let rec constraints (n : int) (env : assump) :

@@ -33,8 +33,7 @@ match Infer.constraints 0 Infer.StrMap.empty term with
     print_string ("type:\n" ^ strtype 1 ty ^ "\n\n");
     begin match Infer.unify Infer.IntMap.empty cr with
       | Some tenv ->
-        print_string
-          ("solve:\n" ^ strtype 1 (Infer.substitute tenv ty) ^ "\n");
+        print_string ("solve:\n" ^ strtype 1 (Infer.substitute tenv ty) ^ "\n");
       | None -> print_string "Error: occurs check\n"
     end
   | None -> print_string "Error: free variable\n"
