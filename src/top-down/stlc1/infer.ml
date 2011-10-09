@@ -13,7 +13,7 @@ let rec constraints (n : int) (env : assump) :
   function
     | EVar str ->
       begin match StrMap.find env str with
-        | Some v -> Some (n, [], v)
+        | Some t -> Some (n, [], t)
         | None -> None
       end
     | EApp (term1, term2) ->

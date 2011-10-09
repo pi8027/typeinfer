@@ -533,6 +533,11 @@ type assump = ty StrMap.t;;
 代入は型変数から型へのマップ構造です。
 型変数は整数型を持つので、整数から型へのマップ構造が必要となります。
 整数のマップは、core ライブラリの \texttt{Core.Std.Int.Map} モジュールにあります。
+
+\texttt{Core.Std.String.Map} モジュールと \texttt{Core.Std.Int.Map} モジュールは
+それぞれ文字列からのマップと整数値からのマップですが、
+その部分の型が違うことを除けば同じ構造、同じ型を持ちます。
+
 これを使って代入を定義すると、リスト\ref{list:ocaml-def-substitution}のようになります。
 
 \begin{lstlisting}[caption=代入の定義, label=list:ocaml-def-substitution]
@@ -554,8 +559,9 @@ type subst = ty IntMap.t;;
 
 まず、この計算の中にフレッシュな型変数を作り出す計算が含まれています。
 これは、どのような型変数がまだ使われていないのかという情報を状態として持ち回らなければ実現できません。
-型変数は \texttt{int} 型を持つので、0 から順に割り当てるものとして、
+型変数は \texttt{int} 型を持つので、0から順に割り当てるものとして、
 どこから割り当て可能かを表す \texttt{int} 型の値を状態として持つことにします。
+フレッシュな変数を作るごとに、この状態の値は1増えます。
 
 次に、この計算の中には失敗し結果を返さない部分が含まれています。
 これも、値があるか無いかのどちらかであることを表す型を使わなければいけません。
@@ -563,6 +569,49 @@ OCaml であれば \texttt{option} 型を使うべきでしょう。
 
 以上のことから、\texttt{constraints} は
 \texttt{int -> assump -> term -> (int * tconst list * ty) option} 型を持つのが妥当だと考えられます。
+引数は割り当て可能な型変数の番号(\texttt{int})、型環境(\texttt{assump})、項(\texttt{term})です。
+結果は、遷移後の割り当て可能な型変数(\texttt{int})と等式集合(\texttt{tconst list})と型(\texttt{ty})
+のタプルの \texttt{option} 型です。
+
+全体の書き方の方針ですが、
+アルゴリズム $\mathcal C$ の定義は項の構造でパターンマッチして書かれています。
+\texttt{constraints} も同様に、3番目の引数でパターンマッチして書くことになります。
+OCaml では、パターンマッチ分岐のできる無名関数は \texttt{function} キーワードを使って書きます。
+
+\texttt{function} キーワードを使うと \texttt{constraints} 関数全体は、
+\begin{lstlisting}
+let rec constraints (n : int) (env : assump) :
+    term -> (int * tconst list * ty) option =
+  function
+    | EVar str ->
+      ...
+    | EApp (term1, term2) ->
+      ...
+    | EAbs (ident, term) ->
+      ...
+;;
+\end{lstlisting}
+のように記述できます。1、2番目の引数はそれぞれ \texttt{n}、\texttt{env} という名前で束縛されています。
+\texttt{...} の部分に、それぞれの項の種類に対する方程式生成の計算が入ります。
+
+残りの \texttt{...} の部分を埋めていきましょう。
+
+まず一番上の、項が変数である場合を書きます。この部分はほぼアルゴリズム $\mathcal C$ の定義通りに、
+\begin{lstlisting}
+match StrMap.find env str with
+  | Some t -> Some (n, [], t)
+  | None -> None
+\end{lstlisting}
+と書けます。
+
+\texttt{StrMap.find} 関数は、文字列のマップとキーとなる文字列から値を取り出す関数です。
+結果は \texttt{option} 型を持ち、指定したキーが存在していれば値を返し、
+そうでなければ \texttt{None} を返します。
+
+項が変数である場合の方程式生成の計算は、型環境から目的の変数の型を取り出し、
+型 \texttt{v} があれば \texttt{Some (n, [], t)} を返し、型が無ければ \texttt{None} を返します。
+
+
 
 \begin{lstlisting}[caption=方程式を生成する関数, label=list:ocaml-stlc-infer]
 let rec constraints (n : int) (env : assump) :
@@ -570,7 +619,7 @@ let rec constraints (n : int) (env : assump) :
   function
     | EVar str ->
       begin match StrMap.find env str with
-        | Some v -> Some (n, [], v)
+        | Some t -> Some (n, [], t)
         | None -> None
       end
     | EApp (term1, term2) ->
