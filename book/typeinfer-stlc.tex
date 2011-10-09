@@ -591,27 +591,12 @@ let rec constraints (n : int) (env : assump) :
       ...
 ;;
 \end{lstlisting}
-のように記述できます。1、2番目の引数はそれぞれ \texttt{n}、\texttt{env} という名前で束縛されています。
+のように記述できます。\texttt{let rec} は再帰関数を束縛するためのキーワードです。
+1、2番目の引数はそれぞれ \texttt{n}、\texttt{env} という名前で束縛されています。
 \texttt{...} の部分に、それぞれの項の種類に対する方程式生成の計算が入ります。
 
-残りの \texttt{...} の部分を埋めていきましょう。
-
-まず一番上の、項が変数である場合を書きます。この部分はほぼアルゴリズム $\mathcal C$ の定義通りに、
-\begin{lstlisting}
-match StrMap.find env str with
-  | Some t -> Some (n, [], t)
-  | None -> None
-\end{lstlisting}
-と書けます。
-
-\texttt{StrMap.find} 関数は、文字列のマップとキーとなる文字列から値を取り出す関数です。
-結果は \texttt{option} 型を持ち、指定したキーが存在していれば値を返し、
-そうでなければ \texttt{None} を返します。
-
-項が変数である場合の方程式生成の計算は、型環境から目的の変数の型を取り出し、
-型 \texttt{v} があれば \texttt{Some (n, [], t)} を返し、型が無ければ \texttt{None} を返します。
-
-
+残りの \texttt{...} の部分を全て埋めた完全な \texttt{constraints} 関数の定義は、
+リスト\ref{list:ocaml-stlc-infer}の通りです。
 
 \begin{lstlisting}[caption=方程式を生成する関数, label=list:ocaml-stlc-infer]
 let rec constraints (n : int) (env : assump) :
@@ -642,6 +627,21 @@ let rec constraints (n : int) (env : assump) :
       end
 ;;
 \end{lstlisting}
+
+\texttt{option} 型を使っていることと、
+フレッシュな型変数の生成のために明示的に状態を持ち回っていることを除けば、
+ほとんどアルゴリズム $\mathcal C$ と同等のことをしています。
+
+\texttt{match \dots with \dots} は、\texttt{match} の後の式の値でパターンマッチ分岐する式です。
+
+\texttt{begin} と \texttt{end} は、括弧と同等の意味を持ちます。
+\texttt{match} などを括弧で括ると不恰好になってしまうため、
+そのような場合に \texttt{begin} と \texttt{end} を使用します。
+
+マップのモジュールの \texttt{find} 関数はマップの値とキーの値を取り、
+そのキーに対応する値を取り出す関数です。
+ただし、結果は \texttt{option} 型であり、目的の値が無ければ \texttt{None} を返します。
+\texttt{add} 関数はマップとキーと値を取り、マップにキーと値を追加してできたマップを返す関数です。
 
 \subsection{制約解消系}
 
