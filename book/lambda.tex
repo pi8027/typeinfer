@@ -298,7 +298,7 @@ $\alpha$ 同値の関係を、図\ref{fig:alpha-equivalent}のように定義し
 規則の右側に書かれている \textsc{Eq-Alpha}, \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans},
 \textsc{Eq-App}, \textsc{Eq-Abs} は、規則の名前を表しています。
 
-規則を1つずつ見てみましょう。
+規則を一つずつ見てみましょう。
 
 規則 \textsc{Eq-Alpha} は、束縛変数の置き換えの規則です。
 中身は、項 $e$ に変数 $y$ が自由出現しないなら、項 $\lambda x . e$ と $\lambda x . e [x := y]$ は
@@ -365,7 +365,7 @@ $f \, (f \, x) [x := y] = f \, (f \, y)$ が成立するので、規則 \textsc{
 $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f \, y)$
 が正しい $\alpha$ 同値関係であることを示せます。
 
-実際には、実際はこの2つの証明の段階を繋げて、証明全体を
+実際には、実際はこの二つの証明の段階を繋げて、証明全体を
 \[
   \infere{Eq-Abs}{
     \lambda f . \lambda x . f \, (f \, x) \alphaeq
@@ -629,7 +629,7 @@ $x : t_2 \in \emptyset, x : t_1, x : t_2$ は成立しません。
 最後に追加された同じ名前の変数のみを取れるような規則となっています。
 
 単純型付き $\lambda$ 計算の型判定を、図\ref{fig:stlc-type-judgement}のように定義します。
-このルールは、$\lambda$ 計算の項の種類1つに対してルールが1つであるということに注意してください。
+このルールは、$\lambda$ 計算の項の種類一つに対してルールが一つであるということに注意してください。
 
 \begin{figure}[htbp]
   \[
@@ -791,7 +791,7 @@ $\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ であることの理�
 
 \subsubsection{例2 : $\lambda x . \lambda y . x$}
 
-もう1つの例として、項 $\lambda x . \lambda y . x$ に型を付けてみます。
+もう一つの例として、項 $\lambda x . \lambda y . x$ に型を付けてみます。
 まず、項全体は $\lambda$ 抽象なので、
 \[
   \infere{T-Abs}{
@@ -938,7 +938,7 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 \]
 と書けます。
 
-次に、2つの変数 $x$ に注目すると、
+次に、二つの変数 $x$ に注目すると、
 \[
   \infere{T-App}{
     \emptyset \vdash (\lambda x . x \, x) \, (\lambda x . x \, x) : ?_1
@@ -984,7 +984,7 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 帰納法により、「項が型付けできればその項の任意の部分は型付け可能」、
 また、その対偶「とある項の部分が型付け不可能であれば全体も型付け不可能」が証明できます。
 
-$\lambda x . x \, x$ 自体が型付け不可能なので、この2つの事実から
+$\lambda x . x \, x$ 自体が型付け不可能なので、この二つの事実から
 $(\lambda x . x \, x) \, (\lambda x . x \, x)$ が型付け不可能であると言えます。
 
 \end{exercise}
@@ -992,4 +992,6 @@ $(\lambda x . x \, x) \, (\lambda x . x \, x)$ が型付け不可能であると
 \section{型検査}
 
 
+
+\section{まとめ}
 
