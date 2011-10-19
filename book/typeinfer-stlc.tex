@@ -647,15 +647,14 @@ let rec constraints (n : int) (env : assump) :
 
 次に、制約解消系を実装しましょう。
 
-まず、二番目の書き換え規則で使われている型の代入の計算を実装しましょう。
-この関数の名前を \texttt{substitute} とします。
+二番目の変形規則で使われている型の代入の計算を実装します。
 
 広い範囲に適用できるようにするため、代入(\texttt{subst} 型の値)を取って、
 それに対応する型から型への関数を作る形にしましょう。
 代入と型を取って、型に代入を適用した型を返すと言っても同じことになります。
-以上のことから、\texttt{substitute} 関数は \texttt{subst -> ty -> ty} 型を持ちます。
+以上のことから、代入の関数 \texttt{substitute} は \texttt{subst -> ty -> ty} 型を持ちます。
 
-この方針に基き代入を実装すると、リスト\ref{list:ocaml-stlc-substitute}のようになります。
+この方針に基き、\texttt{substitute} 関数をリスト\ref{list:ocaml-stlc-substitute}のように定義します。
 
 \begin{lstlisting}[caption=代入, label=list:ocaml-stlc-substitute]
 let rec substitute (s : subst) : ty -> ty =
@@ -675,7 +674,13 @@ let rec substitute (s : subst) : ty -> ty =
 代入を適用する型が関数の型であれば、その下にある二つの型それぞれに対して代入を適用し、
 それらに関しての関数の型を結果とします。
 
+二番目の変形規則では、変数に代入される型がその代入先の変数を含まないことを条件としています。
+この条件を満たしているか調べる計算を、\textgt{出現検査 (occurs check)} といいます。
 
+出現検査の関数 \texttt{occurs\_check} は、型変数と型を取って型変数が型に含まれているかを調べるので、
+\texttt{int -> ty -> bool} 型を持ちます。
+
+\texttt{occurs\_check} 関数をリスト\ref{list:ocaml-stlc-occurs-check}のように定義します。
 
 \begin{lstlisting}[caption=出現検査, label=list:ocaml-stlc-occurs-check]
 let rec occurs_check (n : int) : ty -> bool =
@@ -685,7 +690,15 @@ let rec occurs_check (n : int) : ty -> bool =
 ;;
 \end{lstlisting}
 
+この関数は、型の構造に対して帰納的に目的の型変数が含まれていないか探索を行います。
 
+上で定義した二つの関数を使って、単一化の関数を実装します。
+
+単一化の計算をする \texttt{unify} 関数は、
+制約集合と代入のペアを徐々に変形させて最終的に代入が得られるかもしくは失敗する計算なので、
+\texttt{subst -> tconst list -> subst option} 型を持ちます。
+
+\texttt{unify} 関数をリスト\ref{list:ocaml-stlc-solve}のように定義します。
 
 \begin{lstlisting}[caption=方程式を解く関数, label=list:ocaml-stlc-solve]
 let rec unify (env : subst) : tconst list -> subst option =
@@ -704,7 +717,23 @@ let rec unify (env : subst) : tconst list -> subst option =
 ;;
 \end{lstlisting}
 
+最初のパターンマッチ分岐は、等式集合が空の場合です。
+これは一度も書き換えをしなくて良いので、代入をそのまま結果とします。
 
+二番目の分岐は、一番目の変形規則に対応します。
+
+三番目の分岐は、二番目の変形規則に対応します。
+ただし、出現検査にひっかかる場合は解が存在しないため計算が失敗します。
+
+6行目で使っている \texttt{singleton} 関数は、一つのキーと値のペアしか持たないマップを作ります。
+これによって、一つの型変数のみに対する代入を作れます。
+
+四番目の分岐は、三番目の変形規則に対応します。
+型の構造を分解し、等式を二つの等価な等式に分割しています。
+
+元々の一番目の変形規則は同一の型同士の等式に関する規則ですが、
+実装としては型変数が同一かどうかしか見ていません。
+ただし、同一の型であれば構造も一致するので、全体としては同じ計算になっています。
 
 \section{まとめ}
 
