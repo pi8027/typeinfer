@@ -66,3 +66,13 @@ let rec unify (env : subst) : tconst list -> subst option =
     | (TFun (t1l, t1r), TFun (t2l, t2r)) :: cs ->
       unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
 ;;
+
+let type_inference (e : term) : ty option =
+  match constraints 0 StrMap.empty e with
+    | Some (_, c, t) ->
+      begin match unify IntMap.empty c with
+        | Some s -> Some (substitute s t)
+        | None -> None
+      end
+    | None -> None
+;;

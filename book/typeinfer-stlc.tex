@@ -596,9 +596,9 @@ let rec constraints (n : int) (env : assump) :
 \texttt{...} の部分に、それぞれの項の種類に対する方程式生成の計算が入ります。
 
 残りの \texttt{...} の部分を全て埋めた完全な \texttt{constraints} 関数の定義は、
-リスト\ref{list:ocaml-stlc-infer}の通りです。
+リスト\ref{list:ocaml-stlc-constraints}の通りです。
 
-\begin{lstlisting}[caption=方程式を生成する関数, label=list:ocaml-stlc-infer]
+\begin{lstlisting}[caption=方程式の生成, label=list:ocaml-stlc-constraints]
 let rec constraints (n : int) (env : assump) :
     term -> (int * tconst list * ty) option =
   function
@@ -698,9 +698,9 @@ let rec occurs_check (n : int) : ty -> bool =
 制約集合と代入のペアを徐々に変形させて最終的に代入が得られるかもしくは失敗する計算なので、
 \texttt{subst -> tconst list -> subst option} 型を持ちます。
 
-\texttt{unify} 関数をリスト\ref{list:ocaml-stlc-solve}のように定義します。
+\texttt{unify} 関数をリスト\ref{list:ocaml-stlc-unify}のように定義します。
 
-\begin{lstlisting}[caption=方程式を解く関数, label=list:ocaml-stlc-solve]
+\begin{lstlisting}[caption=単一化, label=list:ocaml-stlc-unify]
 let rec unify (env : subst) : tconst list -> subst option =
   function
     | [] -> Some env
@@ -734,6 +734,23 @@ let rec unify (env : subst) : tconst list -> subst option =
 元々の一番目の変形規則は同一の型同士の等式に関する規則ですが、
 実装としては型変数が同一かどうかしか見ていません。
 ただし、同一の型であれば構造も一致するので、全体としては同じ計算になっています。
+
+\subsection{型推論}
+
+ここまでで定義したものを使い、
+型推論の関数 \texttt{type\_inference} をリスト\ref{list:ocaml-stlc-type-infer}のように定義できます。
+
+\begin{lstlisting}[caption=型推論, label=list:ocaml-stlc-type-infer]
+let type_inference (e : term) : ty option =
+  match constraints 0 StrMap.empty e with
+    | Some (_, c, t) ->
+      begin match unify IntMap.empty c with
+        | Some s -> Some (substitute s t)
+        | None -> None
+      end
+    | None -> None
+;;
+\end{lstlisting}
 
 \section{まとめ}
 
