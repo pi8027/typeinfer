@@ -1,11 +1,44 @@
 
+この章では、単純型付き $\lambda$ 計算に一階の多相型を追加した体系の型推論について論じます。
 
+\section{多相の必要性}
 
-\section{多相型とは}
+単純型付き $\lambda$ 計算に整数値と整数型とタプル(組)を追加した体系では、
+$((\lambda x. x) \, 12, (\lambda x . x) \, (\lambda x . x))$
+という項は $(\mathrm{int} \times (\alpha \to \alpha))$ という型で型付けできます。
 
+しかし、この項の中の恒等関数を括り出して $(\lambda f .(f \, 12, f \, f)) \, (\lambda x . x)$
+のように書き換えてやると、型付けできなくなってしまいます。
+これは、恒等関数の型が元々
+$\mathrm{int} \to \mathrm{int}$ と $(\alpha \to \alpha) \to \alpha$ と $\alpha \to \alpha$
+のように全て一致しないことによる問題です。
 
+このままでは、型ごとに同じ関数を何度も書かなければいけなくなってしまうので、とても不便です。
+これを解決するためにある種の多相性を追加した $\lambda$ 計算を考えてみましょう。
 
 \section{let 項}
+
+前節で説明したような多相性を導入することを明示するための新しい項の要素を、
+$\lambda$ 項の定義に追加します。
+
+この新しい項の要素を \textbf{let 項 (let term)} と呼び、
+$\letterm{x}{e_1}{e_2}$のように表記します。
+
+この項の簡約の上での意味は $(\lambda x . e_2) \, e_1$ と同一であり、
+$e_1$ が多相的に変数 $x$ に束縛されるものとします。
+
+let 項を追加した項を、図\ref{fig:poly-lambda-term}のように定義します。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    e & \bnfcce  x                   && \text{(変数)} \\
+      & \bnfvert (e \, e)            && \text{(関数適用)} \\
+      & \bnfvert (\lambda x . e)     && \text{($\lambda$ 抽象)} \\
+      & \bnfvert (\letterm{x}{e}{e}) && \text{(let 項)}
+  \end{align*}
+  \caption{$\lambda$ 計算の項}
+  \label{fig:poly-lambda-term}
+\end{figure}
 
 
 
