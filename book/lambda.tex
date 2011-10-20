@@ -128,10 +128,8 @@ $\lambda$ 項の表記を簡単にするための省略の規則を以下に示�
 \begin{enumerate}
   \item 項 $e$ の部分項 $((e_1 \, e_2) \, e_3)$ は $(e_1 \, e_2 \, e_3)$ と省略できます。
         すなわち、関数適用の構文は左結合です。
-  \item 項 $e$ の部分項 $(\lambda x. (e_1 \, e_2))$ は $(\lambda x. e_1 \, e_2)$ と省略できます。
-        すなわち、関数適用の方が $\lambda$ 抽象に比べて優先されます。
-  \item 項 $e$ の部分項 $(\lambda x . (\lambda y . e_1))$ は $(\lambda x . \lambda y . e_1)$
-        と省略できます。
+  \item 項 $e$ の部分項 $(\lambda x . e_1)$ は、$e_1$ の左右に対応する括弧があれば、
+        その括弧を省略できます。
   \item 項 $e$ が $(\dots)$ のように左右を括弧で囲まれているとき、その左右の括弧を取り除けます。
         これは、一番外側の括弧を省略するための規則なので、
         部分項に対する規則ではないということに注意してください。
@@ -140,15 +138,15 @@ $\lambda$ 項の表記を簡単にするための省略の規則を以下に示�
 1番目の規則を繰り返し適用することで、カリー化された多変数関数の適用の形をしている部分項
 $(\dots((f \, x_1) \, x_2) \dots x_n)$ は $(f \, x_1 \, x_2 \dots x_n)$ のように省略できます。
 
-また、通常は3番目の規則の代わりに以下の規則を採用します。
+また、通常は以下の追加の規則も使います。
 
 \begin{enumerate}
-  \setcounter{enumi}{4}
+  \setcounter{enumi}{3}
   \item 項 $e$ の部分項 $(\lambda x_1. (\dots (\lambda x_n . e_1) \dots))$ は
         $(\lambda x_1 \dots x_n . e_1)$ と省略できます。
 \end{enumerate}
 
-本書では、この5番目の規則による省略は行いません。
+本書では、この4番目の規則による省略は行いません。
 
 \begin{exercise}
 
@@ -411,6 +409,45 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 束縛変数の名前は他のどの変数とも重複しないようにします。
 
 本書のこれ以降の内容では、このような適切な項の選択を暗黙的に行うものとします。
+
+\begin{exercise}
+
+以下の $\lambda$ 項の変数名を適切に付け替えよ。
+
+\[
+  (\lambda f . \lambda x . f \, x) \, x
+\]
+
+\subparagraph{解答}
+
+この項は、変数 $x$ が重複しています。束縛されている変数 $x$ を変数 $y$ に置き換えると、
+\[
+  (\lambda f . \lambda y . f \, y) \, x
+\]
+となります。
+
+この項は、同じ名前の自由変数と束縛変数や、別々に束縛されている同じ名前の束縛変数を含みません。
+
+この書き換えが $\alpha$ 同値関係として正しいことは、以下の証明木によって説明できます。
+
+\[
+  \infere{Eq-App}{
+    (\lambda f . \lambda x . f \, x) \, x \alphaeq (\lambda f . \lambda y . f \, y) \, x
+  }{
+    \infere{Eq-Abs}{
+      \lambda f . \lambda x . f \, x \alphaeq \lambda f . \lambda y . f \, y
+    }{
+      \infere{Eq-Alpha}{
+        \lambda x . f \, x \alphaeq \lambda y . f \, y
+      }{
+        \text{項 $f \, x$ に変数 $y$ が自由出現しない}
+      }
+    } &
+    \infere{Eq-Refl}{x \alphaeq x}{}
+  }
+\]
+
+\end{exercise}
 
 \section{$\beta$ 簡約}
 
