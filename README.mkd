@@ -21,7 +21,12 @@ C81 で出る予定の本のレビュアーを募集しています。レビュ�
 
 参加して下さる方は、何らかの方法で坂口(執筆者)に連絡を取ってください。レビューの期間は2011年の12月中旬までの予定です。
 
-書いている途中の原稿の PDF は、現時点では http://stlc.info/gitosis/typeinfer.pdf からダウンロードできます。これは git push 時に自動的に更新されます。
+書いている途中の原稿の PDF は、現時点では以下の URI からダウンロードできます。これは git push 時に自動的に更新されます。
+
+- http://stlc.info/gitosis/typeinfer\_draft.pdf
+- http://stlc.info/gitosis/typeinfer\_final.pdf
+
+前者は、レビュアー向けのコメント(青字)が含まれています。後者は含まれていません。
 
 また、git push した時に Twitter (@pi8027) に情報を流すようにしています。最新情報を追いたい方は利用してください。
 
