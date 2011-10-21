@@ -4,10 +4,14 @@ DVIPDFM = dvipdfmx
 DVIPSFLAGS = -t b5 -P pdf
 DVIPDFMFLAGS = -p b5
 
-main.pdf : main.ps
-	ps2pdf main.ps
+main_draft.pdf : main_draft.ps
+	ps2pdf main_draft.ps
 
-LaTeXDocument(main, main)
+main_final.pdf : main_final.ps
+	ps2pdf main_final.ps
 
-.DEFAULT : main.pdf
+LaTeXDocument(main_draft, main_draft)
+LaTeXDocument(main_final, main_final)
+
+.DEFAULT : main_draft.pdf main_final.pdf
 

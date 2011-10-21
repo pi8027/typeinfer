@@ -2,10 +2,18 @@
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{color}
 \usepackage{listings}
 \usepackage{theorem}
 \usepackage{proof}
 \usepackage[dvips]{hyperref}
+\usepackage{version}
+
+\ifodd\notemode
+\newcommand{\note}{\color{blue}}{}
+\else
+\excludeversion{note}
+\fi
 
 \newlength{\lengthwithlength}
 \newcommand{\bnfvert}{\settowidth{\lengthwithlength}{::=}\mathrel{\makebox[\lengthwithlength][c]{$|$}}}
