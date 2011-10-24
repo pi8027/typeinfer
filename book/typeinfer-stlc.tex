@@ -457,6 +457,15 @@ $\mathit{sym}(E \cup \{t_1 \to t_2 = t_1' \to t_2'\}) =
 
 ここまでで説明したアルゴリズムを OCaml で実装して、動かしてみましょう。
 
+まず、core ライブラリを使うために、\texttt{Core.Std} モジュールを開きます。
+
+\begin{lstlisting}
+open Core.Std
+\end{lstlisting}
+
+このようにすることで、
+core ライブラリのモジュール名が標準ライブラリの拡張のように見えるようになります。
+
 \subsection{データ型}
 
 型推論を書く前に、その対象となる項と型を表現するデータ型を定義しましょう。
@@ -469,7 +478,6 @@ type term
   = EVar of string
   | EApp of (term * term)
   | EAbs of (string * term)
-;;
 \end{lstlisting}
 
 OCaml のデータ型定義は、\texttt{type} キーワードによって行います。
@@ -490,7 +498,6 @@ OCaml のデータ型定義は、\texttt{type} キーワードによって行い
 type ty
   = TFun of (ty * ty)
   | TVar of int
-;;
 \end{lstlisting}
 
 \texttt{type} は OCaml のキーワードなので、\texttt{ty} という名前で型を定義しました。
@@ -503,7 +510,7 @@ type ty
 制約を定義すると、リスト\ref{list:ocaml-def-tconst}のようになります。
 
 \begin{lstlisting}[caption=制約の定義, label=list:ocaml-def-tconst]
-type tconst = ty * ty;;
+type tconst = ty * ty
 \end{lstlisting}
 
 これは、\texttt{ty * ty} という型を、\texttt{tconst} という名前に紐付けています。
@@ -518,17 +525,14 @@ type tconst = ty * ty;;
 これを使って型環境を定義すると、リスト\ref{list:ocaml-def-type-environment}のようになります。
 
 \begin{lstlisting}[caption=型環境の定義, label=list:ocaml-def-type-environment]
-module StrMap = Core.Std.String.Map;;
-type assump = ty StrMap.t;;
+type assump = ty String.Map.t
 \end{lstlisting}
 
-\texttt{Core.Std.String.Map} というモジュール名は長いので、
-1行目で \texttt{StrMap} という別名を付けています。
-
-2行目で、\texttt{ty StrMap.t} 型を \texttt{assump} という名前に結び付けています。
-\texttt{StrMap.t} という型は、\texttt{StrMap} モジュール内の \texttt{t} という型を指していますが、
-これが文字列からのマップ型となっています。型引数として文字列に対応付ける型を取るので、
-\texttt{ty StrMap.t} と書くと文字列から型へのマップの型になります。
+\texttt{ty String.Map.t} 型を \texttt{assump} という名前に結び付けています。
+\texttt{String.Map.t} という型は、\texttt{String.Map} モジュール内の \texttt{t}
+という型を指していますが、これが文字列からのマップの型となっています。
+型引数として文字列に対応付ける型を取るので、
+\texttt{ty String.Map.t} と書くと文字列から型へのマップの型になります。
 
 代入は型変数から型へのマップ構造です。
 型変数は整数型を持つので、整数から型へのマップ構造が必要となります。
@@ -541,13 +545,11 @@ type assump = ty StrMap.t;;
 これを使って代入を定義すると、リスト\ref{list:ocaml-def-substitution}のようになります。
 
 \begin{lstlisting}[caption=代入の定義, label=list:ocaml-def-substitution]
-module IntMap = Core.Std.Int.Map;;
-type subst = ty IntMap.t;;
+type subst = ty Int.Map.t
 \end{lstlisting}
 
-ここでも型環境の定義と同様に、
-\texttt{Core.Std.Int.Map} モジュールに \texttt{IntMap} という別名を付けています。
-\texttt{ty IntMap.t} 型に \texttt{subst} という別名を付けていますが、これが代入の型です。
+型環境の定義と同様に、\texttt{ty Int.Map.t} 型を \texttt{subst} という名前に結び付けています。
+この型は、整数値から型へのマップ型です。
 
 \subsection{方程式の生成}
 
@@ -589,7 +591,6 @@ let rec constraints (n : int) (env : assump) :
       ...
     | EAbs (ident, term) ->
       ...
-;;
 \end{lstlisting}
 のように記述できます。\texttt{let rec} は再帰関数を束縛するためのキーワードです。
 一番目、二番目の引数はそれぞれ \texttt{n}、\texttt{env} という名前で束縛されています。
@@ -603,7 +604,7 @@ let rec constraints (n : int) (env : assump) :
     term -> (int * tconst list * ty) option =
   function
     | EVar str ->
-      begin match StrMap.find env str with
+      begin match String.Map.find env str with
         | Some t -> Some (n, [], t)
         | None -> None
       end
@@ -621,11 +622,10 @@ let rec constraints (n : int) (env : assump) :
     | EAbs (ident, term) ->
       begin
         let tn = TVar n in
-        match constraints (succ n) (StrMap.add ident tn env) term with
+        match constraints (succ n) (String.Map.add ident tn env) term with
           | Some (n', c, t) -> Some (n', c, TFun (tn, t))
           | None -> None
       end
-;;
 \end{lstlisting}
 
 \texttt{option} 型を使っていることと、
@@ -660,12 +660,11 @@ let rec constraints (n : int) (env : assump) :
 let rec substitute (s : subst) : ty -> ty =
   function
     | TVar n ->
-      begin match IntMap.find s n with
+      begin match Int.Map.find s n with
         | Some t -> t
         | None -> TVar n
       end
     | TFun (tl, tr) -> TFun (substitute s tl, substitute s tr)
-;;
 \end{lstlisting}
 
 代入を適用する型が型変数であれば、その型変数と型の紐付けが代入に含まれるかを調べます。
@@ -687,7 +686,6 @@ let rec occurs_check (n : int) : ty -> bool =
   function
     | TVar n' -> n = n'
     | TFun (tl, tr) -> occurs_check n tl || occurs_check n tr
-;;
 \end{lstlisting}
 
 この関数は、型の構造に対して帰納的に目的の型変数が含まれていないか探索を行います。
@@ -706,15 +704,14 @@ let rec unify (env : subst) : tconst list -> subst option =
     | [] -> Some env
     | (TVar n, TVar n') :: cs when n = n' -> unify env cs
     | (TVar n, t) :: cs | (t, TVar n) :: cs ->
-      let sub = substitute (IntMap.singleton n t) in
+      let sub = substitute (Int.Map.singleton n t) in
       if occurs_check n t
         then None
         else unify
-          (IntMap.add n t (IntMap.map sub env))
-          (List.map (fun (l, r) -> sub l, sub r) cs)
+          (Int.Map.add n t (Int.Map.map sub env))
+          (List.map cs (fun (l, r) -> sub l, sub r))
     | (TFun (t1l, t1r), TFun (t2l, t2r)) :: cs ->
       unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
-;;
 \end{lstlisting}
 
 最初のパターンマッチ分岐は、等式集合が空の場合です。
@@ -742,14 +739,13 @@ let rec unify (env : subst) : tconst list -> subst option =
 
 \begin{lstlisting}[caption=型推論, label=list:ocaml-stlc-type-infer]
 let type_inference (e : term) : ty option =
-  match constraints 0 StrMap.empty e with
+  match constraints 0 String.Map.empty e with
     | Some (_, c, t) ->
-      begin match unify IntMap.empty c with
+      begin match unify Int.Map.empty c with
         | Some s -> Some (substitute s t)
         | None -> None
       end
     | None -> None
-;;
 \end{lstlisting}
 
 \section{まとめ}
