@@ -466,6 +466,9 @@ open Core.Std
 このようにすることで、
 core ライブラリのモジュール名が標準ライブラリの拡張のように見えるようになります。
 
+例えば、core ライブラリに含まれる \texttt{Core.Std.List} モジュールが、
+これによって \texttt{List} という名前で参照できるようになります。
+
 \subsection{データ型}
 
 型推論を書く前に、その対象となる項と型を表現するデータ型を定義しましょう。
@@ -540,7 +543,7 @@ type assump = ty String.Map.t
 
 \texttt{Core.Std.String.Map} モジュールと \texttt{Core.Std.Int.Map} モジュールは
 それぞれ文字列からのマップと整数値からのマップですが、
-その部分の型が違うことを除けば同じ構造、同じ型を持ちます。
+その部分の型が違うことを除けば同じ構造、同じ型を持ち、同じように扱えます。
 
 これを使って代入を定義すると、リスト\ref{list:ocaml-def-substitution}のようになります。
 
@@ -622,7 +625,8 @@ let rec constraints (n : int) (env : assump) :
     | EAbs (ident, term) ->
       begin
         let tn = TVar n in
-        match constraints (succ n) (String.Map.add ident tn env) term with
+        let newenv = String.Map.add ident tn env in
+        match constraints (succ n) newenv term with
           | Some (n', c, t) -> Some (n', c, TFun (tn, t))
           | None -> None
       end

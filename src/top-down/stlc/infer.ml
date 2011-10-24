@@ -28,7 +28,8 @@ let rec constraints (n : int) (env : assump) :
     | EAbs (ident, term) ->
       begin
         let tn = TVar n in
-        match constraints (succ n) (String.Map.add ident tn env) term with
+        let newenv = String.Map.add ident tn env in
+        match constraints (succ n) newenv term with
           | Some (n', c, t) -> Some (n', c, TFun (tn, t))
           | None -> None
       end
