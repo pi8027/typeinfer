@@ -1,33 +1,43 @@
 
-let parse (input : in_channel) : Def.lexpr =
-  Parser.main Lexer.token (Lexing.from_channel input);;
+open Core.Std
+open Def
 
-let expr = parse stdin;;
+let bracket (flag : bool) (str : string) : string =
+  if flag then "(" ^ str ^ ")" else str
+;;
 
-let _, cr, ty = Infer.infer 0 Infer.StrMap.empty expr;;
+let rec strterm (level : int) : term -> string = function
+  | EVar str -> str
+  | EApp (e1, e2) ->
+    bracket (level <= 0) (strterm 1 e1 ^ " " ^ strterm 0 e2)
+  | EAbs (ident, term) ->
+    bracket (level <= 1) ("\\" ^ ident ^ " -> " ^ strterm 2 term)
+  | ELet (ident, term1, term2) ->
+    bracket (level <=1)
+        ("let " ^ ident ^ " = " ^ strterm 2 term1 ^ " in " ^ strterm 2 term2)
+;;
 
-print_string "expression :\n";;
-Def.print_lexpr 2 expr;;
-print_string "\n\n";;
+let rec strtype (level : int) : ty -> string = function
+  | TFun (t1, t2) ->
+    bracket (level = 0) (strtype 0 t1 ^ " -> " ^ strtype 1 t2)
+  | TVar n -> string_of_int n
+;;
 
-print_string "constraints :\n";;
+let term = Parser.main Lexer.token (Lexing.from_channel stdin);;
+print_string ("term:\n" ^ strterm 2 term ^ "\n\n");;
 
-List.iter
-  (fun (t1, t2) ->
-    Def.print_ltype 1 t1 ;
-    print_string ", " ;
-    Def.print_ltype 1 t2 ;
-    print_string "\n")
-  cr;;
-
-print_string "\n";;
-Def.print_ltype 1 ty;;
-print_string "\n\n";;
-
-print_string "solve :\n";;
-
-let tenv = List.fold_left Infer.solve Infer.IntMap.empty cr;;
-
-Def.print_ltype 1 (Infer.expand_type tenv ty);;
-print_string "\n";;
+match Infer.constraints 0 String.Map.empty term with
+  | Some (_, cr, ty) ->
+    print_string "constraints:\n";
+    List.iter cr (fun (t1, t2) ->
+      print_string (strtype 1 t1 ^ ", " ^ strtype 1 t2 ^ "\n"));
+    print_string "\n";
+    print_string ("type:\n" ^ strtype 1 ty ^ "\n\n");
+    begin match Infer.unify Int.Map.empty cr with
+      | Some tenv ->
+        print_string ("solve:\n" ^ strtype 1 (Infer.substitute tenv ty) ^ "\n");
+      | None -> print_string "Error: occurs check\n"
+    end
+  | None -> print_string "Error: free variable\n"
+;;
 

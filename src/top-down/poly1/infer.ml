@@ -1,62 +1,80 @@
 
+open Core.Std
 open Def
 
-module IntMap = Map.Make(
-    struct
-      type t = int
-      let compare i j = i - j
-    end
-  );;
-
-module StrMap = Map.Make(String);;
-
-type tconst = ltype * ltype;;
+type tconst = ty * ty
 type assump_elem
-    = Monovar of ltype
-    | Polyvar of (assump_elem StrMap.t * lexpr);;
-type assump = assump_elem StrMap.t;;
-type subst = ltype IntMap.t;;
+    = Monovar of ty
+    | Polyvar of (assump_elem String.Map.t * term)
+type assump = assump_elem String.Map.t
+type subst = ty Int.Map.t
 
-exception Occurs_check;;
-
-let rec infer (n : int) (env : assump) : lexpr -> int * tconst list * ltype =
-  let nt = TVar n in
+let rec constraints (n : int) (env : assump) :
+    term -> (int * tconst list * ty) option =
   function
-    | EVar str -> (match StrMap.find str env with
-      | Monovar t -> n, [], t
-      | Polyvar (env, expr) -> infer n env expr)
-    | EApp (expr1, expr2) ->
-      let n1, c1, t1 = infer (succ n) env expr1 in
-      let n2, c2, t2 = infer n1 env expr2 in
-      n2, (t1, TFun (t2, nt)) :: c1 @ c2, nt
-    | EAbs (ident, expr) ->
-      let n', c, t = infer (succ n) (StrMap.add ident (Monovar nt) env) expr in
-      n', c, TFun (nt, t)
-    | ELet (ident, expr1, expr2) ->
-      infer n (StrMap.add ident (Polyvar (env, expr1)) env) expr2
-;;
+    | EVar str ->
+      begin match String.Map.find env str with
+        | Some (Monovar t) -> Some (n, [], t)
+        | Some (Polyvar (env', term)) -> constraints n env' term
+        | None -> None
+      end
+    | EApp (term1, term2) ->
+      begin match constraints (succ n) env term1 with
+        | Some (n1, c1, t1) ->
+          begin match constraints n1 env term2 with
+            | Some (n2, c2, t2) ->
+              let tn = TVar n in
+              Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
+            | None -> None
+          end
+        | None -> None
+      end
+    | EAbs (ident, term) ->
+      begin
+        let tn = TVar n in
+        let newenv = String.Map.add ident (Monovar tn) env in
+        match constraints (succ n) newenv term with
+          | Some (n', c, t) -> Some (n', c, TFun (tn, t))
+          | None -> None
+      end
+    | ELet (ident, term1, term2) ->
+      let newenv = String.Map.add ident (Polyvar (env, term1)) env in
+      constraints n newenv term2
 
-let rec type_pc (env : subst) : ltype -> ltype = function
-  | TVar n when IntMap.mem n env -> type_pc env (IntMap.find n env)
-  | t -> t
-;;
+let rec substitute (s : subst) : ty -> ty =
+  function
+    | TVar n ->
+      begin match Int.Map.find s n with
+        | Some t -> t
+        | None -> TVar n
+      end
+    | TFun (tl, tr) -> TFun (substitute s tl, substitute s tr)
 
-let rec solve (env : subst) ((lt, rt) : tconst) : subst =
-  let rec occurs_check n t =
-    match type_pc env t with
-      | TVar n' -> if n = n' then raise Occurs_check else ()
-      | TFun (tl, tr) -> occurs_check n tl ; occurs_check n tr
-  in
-  match type_pc env lt, type_pc env rt with
-    | TVar n, TVar n' when n = n' -> env
-    | TVar n, t | t, TVar n -> occurs_check n t ; IntMap.add n t env
-    | TFun (t1l, t1r), TFun (t2l, t2r) ->
-      solve (solve env (t1l, t2l)) (t1r, t2r)
-;;
+let rec occurs_check (n : int) : ty -> bool =
+  function
+    | TVar n' -> n = n'
+    | TFun (tl, tr) -> occurs_check n tl || occurs_check n tr
 
-let rec expand_type (env : subst) (t : ltype) : ltype =
-  match type_pc env t with
-    | TVar n -> TVar n
-    | TFun (tl, tr) -> TFun (expand_type env tl, expand_type env tr)
-;;
+let rec unify (env : subst) : tconst list -> subst option =
+  function
+    | [] -> Some env
+    | (TVar n, TVar n') :: cs when n = n' -> unify env cs
+    | (TVar n, t) :: cs | (t, TVar n) :: cs ->
+      let sub = substitute (Int.Map.singleton n t) in
+      if occurs_check n t
+        then None
+        else unify
+          (Int.Map.add n t (Int.Map.map sub env))
+          (List.map cs (fun (l, r) -> sub l, sub r))
+    | (TFun (t1l, t1r), TFun (t2l, t2r)) :: cs ->
+      unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
+
+let type_inference (e : term) : ty option =
+  match constraints 0 String.Map.empty e with
+    | Some (_, c, t) ->
+      begin match unify Int.Map.empty c with
+        | Some s -> Some (substitute s t)
+        | None -> None
+      end
+    | None -> None
 
