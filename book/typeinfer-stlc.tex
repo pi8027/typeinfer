@@ -493,6 +493,8 @@ OCaml のデータ型定義は、\texttt{type} キーワードによって行い
 
 型の中にある \texttt{*} はタプル(組)の型です。\texttt{t1 * t2 * ... * tn} とすると
 \texttt{t1}, \texttt{t2}, \dots, \texttt{tn} という型のタプルが作れます。
+タプルの値は、その要素の値をコンマで区切って並べることで表現できます。
+例えば、\texttt{1}と\texttt{2}のタプルは \texttt{1, 2} のように表記します。
 
 型のデータ型を定義しましょう。型の定義は図\ref{fig:stlc-type}の通りです。
 これを定義するとリスト\ref{list:ocaml-def-type}のようになります。
