@@ -97,9 +97,100 @@ let を含む任意の項から、その項中の let 項を全て簡約した�
 制約を生成するアルゴリズムに少し変更を加えることによって、
 より実装に向いた型推論アルゴリズムを得られます。
 
+let を含む項の場合では、導入される変数が二種類あります。
+一方は単相的に束縛され、もう一方は多相的に束縛されます。
+
+制約の生成の上でこれらを区別するようにしましょう。
+単相の変数は型だけを持っておけば良いはずです。一方、多相の変数は型環境と項を持っておき、
+変数が使われる度に制約を生成することで適切な制約集合が得られます。
+これらを区別するため、前者は持つ型を $t$ としたときに $\mathrm{Mono}(t)$ と、
+後者は型環境と項をそれぞれ $\Gamma$ と $e$ としたときに $\mathrm{Poly}(\Gamma, e)$ と表記します。
+
+let を含む項に対する制約生成アルゴリズム $\mathcal{C}_P$ を、
+図\ref{fig:algorithm-cp}のように定義します。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    \mathcal{C}_P(\Gamma, x) &=
+      \begin{cases}
+        \mathit{failure}          & (x \notin \mathit{dom}(\Gamma)) \\
+        t                         & (\mathrm{Mono}(t) = \Gamma(x)) \\
+        \mathcal{C}_P(\Gamma', e) & (\mathrm{Poly}(\Gamma', e) = \Gamma(x)) \\
+      \end{cases} \\
+    \mathcal{C}_P(\Gamma, e_1 \, e_2) &=
+      \begin{array}[t]{l}
+        \mathrm{let}
+          \begin{array}[t]{l}
+            (c_1, t_1) = \mathcal{C}_P(\Gamma, e_1) \\
+            (t_2, t_2) = \mathcal{C}_P(\Gamma, e_2) \\
+            t_3 = \mathrm{fresh}
+          \end{array} \\
+        \mathrm{in} (c_1 \cup c_2 \cup \{t_1 = t_2 \to t_3\}, t_3)
+      \end{array} \\
+    \mathcal{C}_P(\Gamma, \lambda x . e) &=
+      \begin{array}[t]{l}
+        \mathrm{let}
+          \begin{array}[t]{l}
+            t_1 = \mathrm{fresh} \\
+            (c, t_2) = \mathcal{C}_P((\Gamma, x : \mathrm{Mono}(t_1)), e)
+          \end{array} \\
+        \mathrm{in} (c, t_1 \to t_2)
+      \end{array} \\
+    \mathcal{C}_P(\Gamma, \letterm{x}{e_1}{e_2}) &=
+      \mathcal{C}_P((\Gamma, x : \mathrm{Poly}(\Gamma, e_1)), e_2)
+  \end{align*}
+  \caption{方程式の生成アルゴリズム $\mathcal C_P$}
+  \label{fig:algorithm-cp}
+\end{figure}
+
 
 
 \subsection{実装}
+
+
+
+\begin{lstlisting}
+type assump_elem
+    = Monovar of ty
+    | Polyvar of (assump_elem String.Map.t * term)
+type assump = assump_elem String.Map.t
+\end{lstlisting}
+
+
+
+\begin{lstlisting}
+let rec constraints (n : int) (env : assump) :
+    term -> (int * tconst list * ty) option =
+  function
+    | EVar str ->
+      begin match String.Map.find env str with
+        | Some (Monovar t) -> Some (n, [], t)
+        | Some (Polyvar (env', term)) -> constraints n env' term
+        | None -> None
+      end
+    | EApp (term1, term2) ->
+      begin match constraints (succ n) env term1 with
+        | Some (n1, c1, t1) ->
+          begin match constraints n1 env term2 with
+            | Some (n2, c2, t2) ->
+              let tn = TVar n in
+              Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
+            | None -> None
+          end
+        | None -> None
+      end
+    | EAbs (ident, term) ->
+      begin
+        let tn = TVar n in
+        let newenv = String.Map.add ident (Monovar tn) env in
+        match constraints (succ n) newenv term with
+          | Some (n', c, t) -> Some (n', c, TFun (tn, t))
+          | None -> None
+      end
+    | ELet (ident, term1, term2) ->
+      let newenv = String.Map.add ident (Polyvar (env, term1)) env in
+      constraints n newenv term2
+\end{lstlisting}
 
 
 
