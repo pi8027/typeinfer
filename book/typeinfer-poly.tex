@@ -42,11 +42,11 @@ let 項を追加した項を、図\ref{fig:poly-lambda-term}のように定義�
       & \bnfvert (\lambda x . e)     && \text{($\lambda$ 抽象)} \\
       & \bnfvert (\letterm{x}{e}{e}) && \text{(let 項)}
   \end{align*}
-  \caption{$\lambda$ 計算の項}
+  \caption{$\lambda$ 計算の項に let を追加した項}
   \label{fig:poly-lambda-term}
 \end{figure}
 
-追加の省略に関する規則は以下の通りです。
+省略に関する追加の規則は以下の通りです。
 
 \begin{enumerate}
   \item 項 $e$ の部分項 $(\letterm{x}{e_1}{e_2})$ は、$e_2$ の左右に対応する括弧があれば、
@@ -59,16 +59,59 @@ let 項を追加した項を、図\ref{fig:poly-lambda-term}のように定義�
 
 \section{置換による多相}
 
-最も簡単な let 項に対する型推論は、let で束縛された項に関する等式集合をその場で生成せずに、
-その変数が使われる度に等式集合を生成することで実現できます。
+\subsection{アルゴリズム}
 
-$\lambda$ 抽象で束縛される変数は今まで通り型環境にその変数に割り当てられた型を持つことになりますが、
-let 項で束縛される変数に関してはは制約の生成に必要な情報を持つことになります。
-制約の生成に必要なのは型環境と項なので、それらのペアを型環境に持っておくことにしましょう。
+この節では、多相性を含む新しい項の定義に対する最も簡単な型付けの体系と、
+その体系に合った適切な型推論アルゴリズムを定義します。
+
+多相を導入する項、即ち let 項を全て簡約してしまえば、
+多相性がどこにも現れない実行の意味で等価な項が得られるはずです。
+
+let を含む任意の項から、その項中の let 項を全て簡約した項を計算するアルゴリズムが存在します。
+このアルゴリズムの名前を $\mathcal R_\mathrm{let}$ とします。
+
+アルゴリズム $\mathcal R_\mathrm{let}$ は図\ref{fig:algorithm-rlet}のように定義できます。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    \mathcal R_\mathrm{let}(x) &= x \\
+    \mathcal R_\mathrm{let}(e_1 e_2) &=
+      \mathcal R_\mathrm{let}(e_1) \, \mathcal R_\mathrm{let}(e_2) \\
+    \mathcal R_\mathrm{let}(\lambda x . e) &=
+      \lambda x . \mathcal R_\mathrm{let}(e) \\
+    \mathcal R_\mathrm{let}(\letterm{x}{e_1}{e_2}) &=
+      \mathcal R_\mathrm{let}(e_2 [x := \mathcal R_\mathrm{let}(e_1)])
+  \end{align*}
+  \caption{アルゴリズム $\mathcal R_\mathrm{let}$}
+  \label{fig:algorithm-rlet}
+\end{figure}
+
+このアルゴリズムは再帰に関して項の構造もしくは項中の let 項の数が減少しているため、
+正しい帰納的定義になっています。
+
+これによって let を含む項を let を含まない等価な項に変換し、
+2章で示したアルゴリズムによって型推論をすることで、let を含む項の型を推論できます。
+
+ただし、簡約をしてしまうと変数の捕獲が問題になってしまう場合があります。
+適切な $\alpha$ 変換をするアルゴリズムを書いても良いのですが、
+制約を生成するアルゴリズムに少し変更を加えることによって、
+より実装に向いた型推論アルゴリズムを得られます。
+
+
+
+\subsection{実装}
 
 
 
 \section{パラメトリック多相}
+
+
+
+\subsection{アルゴリズム}
+
+
+
+\subsection{実装}
 
 
 
