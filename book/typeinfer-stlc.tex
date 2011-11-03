@@ -598,7 +598,7 @@ let rec constraints (n : int) (env : assump) :
       ...
 \end{lstlisting}
 のように記述できます。\texttt{let rec} は再帰関数を束縛するためのキーワードです。
-一番目、二番目の引数はそれぞれ \texttt{n}、\texttt{env} という名前で束縛されています。
+一番目、二番目の引数はそれぞれ \texttt{n}、\texttt{env} という名前に束縛されています。
 \texttt{...} の部分に、それぞれの項の種類に対する方程式生成の計算が入ります。
 
 残りの \texttt{...} の部分を全て埋めた完全な \texttt{constraints} 関数の定義は、
