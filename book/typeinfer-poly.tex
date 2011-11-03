@@ -30,9 +30,6 @@ $\lambda$ 項の定義に追加します。
 この新しい項の要素を\textbf{let 項 (let term)} と呼び、
 $(\letterm{x}{e_1}{e_2})$ のように表記します。
 
-この項の簡約の上での意味は $(\lambda x . e_2) \, e_1$ と同一であり、
-$e_1$ が多相的に変数 $x$ に束縛されるものとします。
-
 let 項を追加した項を、図\ref{fig:poly-lambda-term}のように定義します。
 
 \begin{figure}[htbp]
@@ -45,6 +42,11 @@ let 項を追加した項を、図\ref{fig:poly-lambda-term}のように定義�
   \caption{$\lambda$ 計算の項に let を追加した項}
   \label{fig:poly-lambda-term}
 \end{figure}
+
+let 項の簡約の上での意味は $(\lambda x . e_2) \, e_1$ と同一であり、
+変数 $x$ が項 $e_1$ に多相的に束縛されるものとします。
+
+$\lambda$ 抽象で束縛されている変数を単相的な変数、let 項で束縛されている変数を多相的な変数と呼びます。
 
 省略に関する追加の規則は以下の通りです。
 
@@ -100,65 +102,94 @@ let を含む任意の項から、その項中の let 項を全て簡約した�
 let を含む項の場合では、導入される変数が二種類あります。
 一方は単相的に束縛され、もう一方は多相的に束縛されます。
 
-制約の生成の上でこれらを区別するようにしましょう。
+型環境の上でこれらを区別するようにしましょう。
 単相の変数は型だけを持っておけば良いはずです。一方、多相の変数は型環境と項を持っておき、
 変数が使われる度に制約を生成することで適切な制約集合が得られます。
 これらを区別するため、前者は持つ型を $t$ としたときに $\mathrm{Mono}(t)$ と、
 後者は型環境と項をそれぞれ $\Gamma$ と $e$ としたときに $\mathrm{Poly}(\Gamma, e)$ と表記します。
+\footnote{それぞれ、monomorphic (単相的)と polymorphic (多相的)の略。}
 
 let を含む項に対する制約生成アルゴリズム $\mathcal{C}_P$ を、
 図\ref{fig:algorithm-cp}のように定義します。
 
 \begin{figure}[htbp]
   \begin{align*}
-    \mathcal{C}_P(\Gamma, x) &=
+    \mathcal C_P(\Gamma, x) &=
       \begin{cases}
         \mathit{failure}          & (x \notin \mathit{dom}(\Gamma)) \\
         t                         & (\mathrm{Mono}(t) = \Gamma(x)) \\
-        \mathcal{C}_P(\Gamma', e) & (\mathrm{Poly}(\Gamma', e) = \Gamma(x)) \\
+        \mathcal C_P(\Gamma', e) & (\mathrm{Poly}(\Gamma', e) = \Gamma(x)) \\
       \end{cases} \\
-    \mathcal{C}_P(\Gamma, e_1 \, e_2) &=
+    \mathcal C_P(\Gamma, e_1 \, e_2) &=
       \begin{array}[t]{l}
         \mathrm{let}
           \begin{array}[t]{l}
-            (c_1, t_1) = \mathcal{C}_P(\Gamma, e_1) \\
-            (t_2, t_2) = \mathcal{C}_P(\Gamma, e_2) \\
+            (c_1, t_1) = \mathcal C_P(\Gamma, e_1) \\
+            (t_2, t_2) = \mathcal C_P(\Gamma, e_2) \\
             t_3 = \mathrm{fresh}
           \end{array} \\
         \mathrm{in} (c_1 \cup c_2 \cup \{t_1 = t_2 \to t_3\}, t_3)
       \end{array} \\
-    \mathcal{C}_P(\Gamma, \lambda x . e) &=
+    \mathcal C_P(\Gamma, \lambda x . e) &=
       \begin{array}[t]{l}
         \mathrm{let}
           \begin{array}[t]{l}
             t_1 = \mathrm{fresh} \\
-            (c, t_2) = \mathcal{C}_P((\Gamma, x : \mathrm{Mono}(t_1)), e)
+            (c, t_2) = \mathcal C_P((\Gamma, x : \mathrm{Mono}(t_1)), e)
           \end{array} \\
         \mathrm{in} (c, t_1 \to t_2)
       \end{array} \\
-    \mathcal{C}_P(\Gamma, \letterm{x}{e_1}{e_2}) &=
-      \mathcal{C}_P((\Gamma, x : \mathrm{Poly}(\Gamma, e_1)), e_2)
+    \mathcal C_P(\Gamma, \letterm{x}{e_1}{e_2}) &=
+      \mathcal C_P((\Gamma, x : \mathrm{Poly}(\Gamma, e_1)), e_2)
   \end{align*}
   \caption{方程式の生成アルゴリズム $\mathcal C_P$}
   \label{fig:algorithm-cp}
 \end{figure}
 
+アルゴリズム $\mathcal C$ からの主な変更点は三箇所です。
 
+\begin{itemize}
+  \item 項が変数であった場合に、それが単相の変数か多相の変数かによって計算が変わります。
+
+        単相の変数であれば、型環境から得られる型をそのまま返します。
+        多相の変数であれば、型環境から得られる型環境と項を用いて制約集合を生成します。
+
+  \item $\lambda$ 抽象に関する制約の生成で、
+        型環境に追加される情報が $\mathrm{Mono}(t)$ の形になる。
+
+  \item let 項に対する制約の生成が追加されました。
+
+        型環境 $\Gamma$ と $(\letterm{x}{e_1}{e_2})$ という項を取る場合、
+        $\Gamma$ に変数 $x$ と $\mathrm{Poly}(\Gamma, e_1)$ の対応付けを追加した型環境を作り、
+        その型環境と $e_2$ を使って制約の生成を行います。
+\end{itemize}
+
+これと第2章で示した単一化アルゴリズムを用いて、
+let 項を含む項に対する適切な型推論アルゴリズムを作れます。
 
 \subsection{実装}
 
+多相性を実現するための制約生成アルゴリズムを実装してみましょう。
 
+型環境をリスト\ref{list:ocaml-def-poly-type-environment}のように定義します。
 
-\begin{lstlisting}
+\begin{lstlisting}[caption=型環境の定義, label=list:ocaml-def-poly-type-environment]
 type assump_elem
     = Monovar of ty
     | Polyvar of (assump_elem String.Map.t * term)
 type assump = assump_elem String.Map.t
 \end{lstlisting}
 
+\texttt{assump\_elem} 型は型環境の一つの要素を表しています。
 
+\texttt{Monovar} は単相変数用のコンストラクタ、\texttt{Polyvar} は多相変数用のコンストラクタです。
 
-\begin{lstlisting}
+\texttt{assump} 型は型環境を表しています。
+第2章での定義と違い、\texttt{assump\_elem} 型を用いていることに注意してください。
+
+\texttt{constraints} 関数をリスト\ref{list:ocaml-poly-constraints}のように定義します。
+
+\begin{lstlisting}[caption=制約の生成, label=list:ocaml-poly-constraints]
 let rec constraints (n : int) (env : assump) :
     term -> (int * tconst list * ty) option =
   function
@@ -192,7 +223,7 @@ let rec constraints (n : int) (env : assump) :
       constraints n newenv term2
 \end{lstlisting}
 
-
+これも、2章で示した \texttt{constraints} 関数からの変更点はアルゴリズムと変更と同様の三箇所です。
 
 \section{パラメトリック多相}
 
