@@ -457,7 +457,7 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 
 $\lambda$ 計算の実行について考えてみましょう。
 
-$\lambda$ 計算の実行の本質は、左辺が $\lambda$ 抽象になっている関数適用
+$\lambda$ 計算の実行の基本は、左辺が $\lambda$ 抽象になっている関数適用
 ($(\lambda x . e_1) \, e_2$ の形をしている $\lambda$ 項)を解く操作です。
 この操作によって得られる項は、項 $e_1$ 中の自由変数 $x$ に項 $e_2$ を代入した項です。
 
@@ -499,6 +499,9 @@ $\lambda$ 計算の $\beta$ 簡約を、図 \ref{fig:beta-reduction} のよう�
 
 \textsc{R-Beta} 規則のように上が空になっている規則は、
 無条件で下に書いてあることを認めて良いということを表しています。
+
+$(\lambda x . e_1) e_2$ の形をしている項のみが、\textsc{R-Beta} 規則を用いて簡約できます。
+このような形をしている項のことを、\textbf{$\beta$ 基 ($\beta$-redex)} と呼びます。
 
 $\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます。
 
@@ -548,7 +551,7 @@ $\alpha$ 同値と $\beta$ 簡約の関係を含む最小の同値関係と定�
 
 \subparagraph{解答}
 
-外側の関数適用が簡約できます。
+この項の部分項は、外側の関数適用のみが $\beta$ 基となっています。
 $x \, x [x := \lambda x . x \, x] = (\lambda x . x \, x) \, (\lambda x . x \, x)$ なので、
 \[
   \infere{R-Beta}{
