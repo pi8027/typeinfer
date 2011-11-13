@@ -3,11 +3,27 @@
 
 \section{多相の必要性}
 
-単純型付き $\lambda$ 計算に整数値と整数型とタプル(組)の型を追加した体系では、
-$(\lambda x. x) \, 12, (\lambda x . x) \, (\lambda x . x)$
-という項は $\mathrm{int} \times (\alpha \to \alpha)$ という型で型付けできます。
-\footnote{$e_1, e_2$ は $e_1$ と $e_2$ の組の項を表します。
-$t_1 \times t_2$ は $t_1$ 型の値と $t_2$ 型の値の組の型を表します。}
+$(\lambda x. x) \, 12, (\lambda x . x) \, (\lambda x . x)$ という項の型を考えてみましょう。
+
+ここで、$(e_1, e_2)$ という形で表わされている部分は $e_1$ と $e_2$ の直積(タプル)です。
+型 $t_1$ と型 $t_2$ の直積型を $(t_1 \times t_2)$ という形で表現します。
+直積に関する追加の型付け規則 \textsc{T-Pro} を、図\ref{fig:product-type-judgement}のように定義します。
+
+\begin{figure}[htbp]
+  \[
+    \infere{T-Pro}{
+      \Gamma \vdash (e_1, e_2) : (t_1 \times t_2)
+    }{
+      \Gamma \vdash e_1 : t_1 &
+      \Gamma \vdash e_2 : t_2
+    }
+  \]
+  \caption{直積に関する型判定}
+  \label{fig:product-type-judgement}
+\end{figure}
+
+今考えている項は、整数値の型を $\mathrm{int}$ とすると
+$\mathrm{int} \times (\alpha \to \alpha)$ という型で型付けできます。
 
 しかし、この項の中の恒等関数を括り出して $(\lambda f .(f \, 12, f \, f)) \, (\lambda x . x)$
 のように書き換えてやると、型付けできなくなってしまいます。
@@ -29,8 +45,9 @@ $\lambda$ 項の定義に追加します。
 
 この新しい項の要素を\textbf{let 項 (let term)} と呼び、
 $(\letterm{x}{e_1}{e_2})$ のように表記します。
+また、この新しく定義される項全体を $\lambda^\mathrm{let}$ 項と呼びます。
 
-let 項を追加した項を、図\ref{fig:poly-lambda-term}のように定義します。
+$\lambda^{let}$ 項を、図\ref{fig:poly-lambda-term}のように定義します。
 
 \begin{figure}[htbp]
   \begin{align*}
@@ -39,11 +56,11 @@ let 項を追加した項を、図\ref{fig:poly-lambda-term}のように定義�
       & \bnfvert (\lambda x . e)     && \text{($\lambda$ 抽象)} \\
       & \bnfvert (\letterm{x}{e}{e}) && \text{(let 項)}
   \end{align*}
-  \caption{$\lambda$ 計算の項に let を追加した項}
+  \caption{$\lambda^\mathrm{let}$ 項}
   \label{fig:poly-lambda-term}
 \end{figure}
 
-let 項の簡約の上での意味は $(\lambda x . e_2) \, e_1$ と同一であり、
+let 項 $(\letterm{x}{e_1}{e_2})$ の簡約の上での意味は $(\lambda x . e_2) \, e_1$ と同一であり、
 変数 $x$ が項 $e_1$ に多相的に束縛されるものとします。
 
 $\lambda$ 抽象で束縛されている変数を単相的な変数、let 項で束縛されている変数を多相的な変数と呼びます。
@@ -59,39 +76,44 @@ $\lambda$ 抽象で束縛されている変数を単相的な変数、let 項で
 ここまでの内容で、省略表記であることが明らかでない let 項の表記は省略されていてはならない。
 \end{note}
 
+このような体系を考えることにより、前節で出てきた $(\lambda f .(f \, 12, f \, f)) \, (\lambda x . x)$
+という項は、$\letterm{x}{\lambda x . x}{f \, 12, f \, f}$ に書き換えられます。
+適切な型付けの体系を与えることで、この項を型付けすることができるようになります。
+
 \section{置換による多相}
 
 \subsection{アルゴリズム}
 
-この節では、多相性を含む新しい項の定義に対する最も簡単な型付けの体系と、
+この節では、$\lambda^\mathrm{let}$ 項に対する最も簡単な型付けの体系と、
 その体系に合った適切な型推論アルゴリズムを定義します。
 
 多相を導入する項、即ち let 項を全て簡約してしまえば、
 多相性がどこにも現れない値として同値な項が得られるはずです。
 
 let を含む任意の項から、その項中の let 項を全て簡約した項を計算するアルゴリズムが存在します。
-このアルゴリズムの名前を $\mathcal R_\mathrm{let}$ とします。
+このアルゴリズムの名前を $\mathcal R^\mathrm{let}$ とします。
 
-アルゴリズム $\mathcal R_\mathrm{let}$ は図\ref{fig:algorithm-rlet}のように定義できます。
+アルゴリズム $\mathcal R^\mathrm{let}$ は図\ref{fig:algorithm-rlet}のように定義できます。
 
 \begin{figure}[htbp]
   \begin{align*}
-    \mathcal R_\mathrm{let}(x) &= x \\
-    \mathcal R_\mathrm{let}(e_1 e_2) &=
-      \mathcal R_\mathrm{let}(e_1) \, \mathcal R_\mathrm{let}(e_2) \\
-    \mathcal R_\mathrm{let}(\lambda x . e) &=
-      \lambda x . \mathcal R_\mathrm{let}(e) \\
-    \mathcal R_\mathrm{let}(\letterm{x}{e_1}{e_2}) &=
-      \mathcal R_\mathrm{let}(e_2 [x := \mathcal R_\mathrm{let}(e_1)])
+    \mathcal R^\mathrm{let}(x) &= x \\
+    \mathcal R^\mathrm{let}(e_1 e_2) &=
+      \mathcal R^\mathrm{let}(e_1) \, \mathcal R^\mathrm{let}(e_2) \\
+    \mathcal R^\mathrm{let}(\lambda x . e) &=
+      \lambda x . \mathcal R^\mathrm{let}(e) \\
+    \mathcal R^\mathrm{let}(\letterm{x}{e_1}{e_2}) &=
+      \mathcal R^\mathrm{let}(e_2 [x := \mathcal R^\mathrm{let}(e_1)])
   \end{align*}
-  \caption{アルゴリズム $\mathcal R_\mathrm{let}$}
+  \caption{アルゴリズム $\mathcal R^\mathrm{let}$}
   \label{fig:algorithm-rlet}
 \end{figure}
 
-このアルゴリズムは再帰に関して項の構造もしくは項中の let 項の数が減少しているため、
-正しい帰納的定義になっています。
+このアルゴリズムは再帰に関して項中の let 項の出現数もしくは項の構造が減少し、
+かつ項中の let 項の出現数が増加することは無いため、
+項中の let 項の出現数と項の構造の辞書式順序の帰納法を使った正しい帰納的定義になっています。
 
-これによって let を含む項を let を含まない等価な項に変換し、
+これによって $\lambda^\mathrm{let}$ 項を $\lambda$ 項に変換し、
 2章で示したアルゴリズムによって型推論をすることで、let を含む項の型を推論できます。
 
 ただし、簡約をしてしまうと変数の捕獲が問題になってしまう場合があります。
@@ -99,8 +121,7 @@ let を含む任意の項から、その項中の let 項を全て簡約した�
 制約を生成するアルゴリズムに少し変更を加えることによって、
 より実装に向いた型推論アルゴリズムを得られます。
 
-let を含む項の場合では、導入される変数が二種類あります。
-一方は単相的に束縛され、もう一方は多相的に束縛されます。
+$\lambda^\mathrm{let}$ 項には、単相的に束縛される変数と多相的に束縛される変数があります。
 
 型環境の上でこれらを区別するようにしましょう。
 単相の変数は型だけを持っておけば良いはずです。一方、多相の変数は型環境と項を持っておき、
@@ -109,40 +130,40 @@ let を含む項の場合では、導入される変数が二種類あります�
 後者は型環境と項をそれぞれ $\Gamma$ と $e$ としたときに $\mathrm{Poly}(\Gamma, e)$ と表記します。
 \footnote{それぞれ、monomorphic (単相的)と polymorphic (多相的)の略。}
 
-let を含む項に対する制約生成アルゴリズム $\mathcal{C}_P$ を、
+$\lambda^\mathrm{let}$ 項に対する制約生成アルゴリズム $\mathcal C^\mathrm{let}$ を、
 図\ref{fig:algorithm-cp}のように定義します。
 
 \begin{figure}[htbp]
   \begin{align*}
-    \mathcal C_P(\Gamma, x) &=
+    \mathcal C^\mathrm{let}(\Gamma, x) &=
       \begin{cases}
         \mathit{failure}          & (x \notin \mathit{dom}(\Gamma)) \\
         t                         & (\mathrm{Mono}(t) = \Gamma(x)) \\
-        \mathcal C_P(\Gamma', e) & (\mathrm{Poly}(\Gamma', e) = \Gamma(x)) \\
+        \mathcal C^\mathrm{let}(\Gamma', e) & (\mathrm{Poly}(\Gamma', e) = \Gamma(x)) \\
       \end{cases} \\
-    \mathcal C_P(\Gamma, e_1 \, e_2) &=
+    \mathcal C^\mathrm{let}(\Gamma, e_1 \, e_2) &=
       \begin{array}[t]{l}
         \mathrm{let}
           \begin{array}[t]{l}
-            (c_1, t_1) = \mathcal C_P(\Gamma, e_1) \\
-            (c_2, t_2) = \mathcal C_P(\Gamma, e_2) \\
+            (c_1, t_1) = \mathcal C^\mathrm{let}(\Gamma, e_1) \\
+            (c_2, t_2) = \mathcal C^\mathrm{let}(\Gamma, e_2) \\
             t_3 = \mathrm{fresh}
           \end{array} \\
         \mathrm{in} (c_1 \cup c_2 \cup \{t_1 = t_2 \to t_3\}, t_3)
       \end{array} \\
-    \mathcal C_P(\Gamma, \lambda x . e) &=
+    \mathcal C^\mathrm{let}(\Gamma, \lambda x . e) &=
       \begin{array}[t]{l}
         \mathrm{let}
           \begin{array}[t]{l}
             t_1 = \mathrm{fresh} \\
-            (c, t_2) = \mathcal C_P((\Gamma, x : \mathrm{Mono}(t_1)), e)
+            (c, t_2) = \mathcal C^\mathrm{let}((\Gamma, x : \mathrm{Mono}(t_1)), e)
           \end{array} \\
         \mathrm{in} (c, t_1 \to t_2)
       \end{array} \\
-    \mathcal C_P(\Gamma, \letterm{x}{e_1}{e_2}) &=
-      \mathcal C_P((\Gamma, x : \mathrm{Poly}(\Gamma, e_1)), e_2)
+    \mathcal C^\mathrm{let}(\Gamma, \letterm{x}{e_1}{e_2}) &=
+      \mathcal C^\mathrm{let}((\Gamma, x : \mathrm{Poly}(\Gamma, e_1)), e_2)
   \end{align*}
-  \caption{方程式の生成アルゴリズム $\mathcal C_P$}
+  \caption{方程式の生成アルゴリズム $\mathcal C^\mathrm{let}$}
   \label{fig:algorithm-cp}
 \end{figure}
 
@@ -165,11 +186,23 @@ let を含む項に対する制約生成アルゴリズム $\mathcal{C}_P$ を�
 \end{itemize}
 
 これと第2章で示した単一化アルゴリズムを用いて、
-let 項を含む項に対する適切な型推論アルゴリズムを作れます。
+$\lambda^\mathrm{let}$ 項に対する適切な型推論アルゴリズムを作れます。
 
 \subsection{実装}
 
 多相性を実現するための制約生成アルゴリズムを実装してみましょう。
+
+$\lambda^\mathrm{let}$ 項のデータ型をリスト\ref{list:ocaml-def-ll-term}のように定義します。
+
+\begin{lstlisting}[caption=$\lambda^\mathrm{let}$ 項の定義, label=list:ocaml-def-ll-term]
+type term
+  = EVar of string
+  | EApp of (term * term)
+  | EAbs of (string * term)
+  | ELet of (string * term * term)
+\end{lstlisting}
+
+\texttt{ELet} コンストラクタが let 項のコンストラクタです。
 
 型環境をリスト\ref{list:ocaml-def-poly-type-environment}のように定義します。
 
@@ -223,19 +256,21 @@ let rec constraints (n : int) (env : assump) :
       constraints n newenv term2
 \end{lstlisting}
 
-これも、2章で示した \texttt{constraints} 関数からの変更点はアルゴリズムと変更と同様の三箇所です。
+2章で示した \texttt{constraints} 関数からの変更点はアルゴリズムと変更と同様の三箇所です。
+また、型環境の定義が少し違うものになっているため、
+変数に関わる部分で \texttt{Monovar} や \texttt{Polyvar} が使われています。
 
 \section{パラメトリック多相}
 
-置き換えによる多相性を含む $\lambda$ 計算の型推論は、この本で目標とする範囲の推論アルゴリズムと
-完全に一致していると言えます。
+置き換えによる $\lambda^\mathrm{let}$ 項の型推論は、
+この本で目標とする範囲の推論アルゴリズムと完全に一致しています。
 
 しかし、この方法では時間的なコストが大きくなってしまう、
 型が一致しないときに問題のある項を適切に示せないなどの問題があり、
 多くの言語処理系では別の方法を採用しています。
 
-ここでは、そのより良い方法である\textbf{パラメトリック多相 (parametric polymorphism)} を用いた
-型付けの体系と、それに基いた推論規則について説明します。
+ここでは、そのより良い方法である\textbf{パラメトリック多相 (parametric polymorphism)}
+を用いた型付けの体系と、それに基いた推論アルゴリズムについて説明します。
 
 パラメトリック多相の話に入るために、多相性の関わる項の例を幾つか考えてみます。
 
@@ -256,27 +291,10 @@ $\dots$ の中で恒等関数 $i$ を多相的に扱うことができます。
 さて、ここでどの型変数を任意の型として良いのかという問題がありますが、
 全ての型変数を任意の型として良いわけではありません。
 
-もう一つ、
-新しい例として $\lambda a . \letterm{f}{\lambda b . (a, b)}{(f, f)}$ という項を考えてみましょう。
+もう一つ、新しい例として直積型を含む体系ににおける
+$\lambda a . \letterm{f}{\lambda b . (a, b)}{(f, f)}$ という項の型を考えてみましょう。
 
-ここで、$(e_1, e_2)$ という形で表わされている部分は $e_1$ と $e_2$ の直積(タプル)です。
-型 $t_1$ と型 $t_2$ の直積型を $(t_1 \times t_2)$ という形で表現します。
-直積に関する追加の型付け規則 \textsc{T-Pro} を、図\ref{fig:product-type-judgement}のように定義します。
-
-\begin{figure}[htbp]
-  \[
-    \infere{T-Pro}{
-      \Gamma \vdash (e_1, e_2) : (t_1 \times t_2)
-    }{
-      \Gamma \vdash e_1 : t_1 &
-      \Gamma \vdash e_2 : t_2
-    }
-  \]
-  \caption{直積に関する型判定}
-  \label{fig:product-type-judgement}
-\end{figure}
-
-さて、今考えている項は、
+この項は、
 $\alpha \to ((\gamma \to (\alpha \times \gamma)) \times (\delta \to (\alpha \times \delta)))$
 で型付けでき、かつこれが最も一般的な型です。
 これは二つの $f$ の直積を結果としていますが、それぞれの $f$ に相当する型は
