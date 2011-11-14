@@ -457,9 +457,9 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 
 \section{$\beta$ 簡約}
 
-$\lambda$ 計算の実行について考えてみましょう。
+$\lambda$ 計算の評価(実行)について考えてみましょう。
 
-$\lambda$ 計算の実行の基本は、左辺が $\lambda$ 抽象になっている関数適用
+$\lambda$ 計算の評価の基本は、左辺が $\lambda$ 抽象になっている関数適用
 ($(\lambda x . e_1) \, e_2$ の形をしている $\lambda$ 項)を解く操作です。
 この操作によって得られる項は、項 $e_1$ 中の自由変数 $x$ に項 $e_2$ を代入した項です。
 
