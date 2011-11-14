@@ -6,16 +6,16 @@
 $(\lambda x. x) \, 12, (\lambda x . x) \, (\lambda x . x)$ という項の型を考えてみましょう。
 
 ここで、$(e_1, e_2)$ という形で表わされている部分は $e_1$ と $e_2$ の直積(タプル)です。
-型 $t_1$ と型 $t_2$ の直積型を $(t_1 \times t_2)$ という形で表現します。
+型 $\tau_1$ と型 $\tau_2$ の直積型を $(\tau_1 \times \tau_2)$ という形で表現します。
 直積に関する追加の型付け規則 \textsc{T-Pro} を、図\ref{fig:product-type-judgement}のように定義します。
 
 \begin{figure}[htbp]
   \[
     \infere{T-Pro}{
-      \Gamma \vdash (e_1, e_2) : (t_1 \times t_2)
+      \Gamma \vdash (e_1, e_2) : (\tau_1 \times \tau_2)
     }{
-      \Gamma \vdash e_1 : t_1 &
-      \Gamma \vdash e_2 : t_2
+      \Gamma \vdash e_1 : \tau_1 &
+      \Gamma \vdash e_2 : \tau_2
     }
   \]
   \caption{直積に関する型判定}
@@ -31,8 +31,8 @@ $\mathrm{int} \times (\alpha \to \alpha)$ という型で型付けできます�
 $\mathrm{int} \to \mathrm{int}$ と $(\alpha \to \alpha) \to \alpha \to \alpha$ と
 $\alpha \to \alpha$ のように全て一致しないことによる問題です。
 
-これらの型はどれも $t_1 \to t_1$ の形を持っていますが、
-それぞれ $t_1$ に入る型が違ってしまうために型が合いません。
+これらの型はどれも $\tau_1 \to \tau_1$ の形を持っていますが、
+それぞれ $\tau_1$ に入る型が違ってしまうために型が合いません。
 これでは任意の型に関する関数などが書けず、そのために同じ定義を何度も書かなければなりません。
 
 この章で扱う多相は、この「任意の型」を扱うための多相です。
@@ -126,7 +126,7 @@ $\lambda^\mathrm{let}$ 項には、単相的に束縛される変数と多相的
 型環境の上でこれらを区別するようにしましょう。
 単相の変数は型だけを持っておけば良いはずです。一方、多相の変数は型環境と項を持っておき、
 変数が使われる度に制約を生成することで適切な制約集合が得られます。
-これらを区別するため、前者は持つ型を $t$ としたときに $\mathrm{Mono}(t)$ と、
+これらを区別するため、前者は持つ型を $\tau$ としたときに $\mathrm{Mono}(\tau)$ と、
 後者は型環境と項をそれぞれ $\Gamma$ と $e$ としたときに $\mathrm{Poly}(\Gamma, e)$ と表記します。
 \footnote{それぞれ、monomorphic (単相的)と polymorphic (多相的)の略。}
 
@@ -138,27 +138,27 @@ $\lambda^\mathrm{let}$ 項に対する制約生成アルゴリズム $\mathcal C
     \mathcal C^\mathrm{let}(\Gamma, x) &=
       \begin{cases}
         \mathit{failure}          & (x \notin \mathit{dom}(\Gamma)) \\
-        t                         & (\mathrm{Mono}(t) = \Gamma(x)) \\
+        \tau                      & (\mathrm{Mono}(\tau) = \Gamma(x)) \\
         \mathcal C^\mathrm{let}(\Gamma', e) & (\mathrm{Poly}(\Gamma', e) = \Gamma(x)) \\
       \end{cases} \\
     \mathcal C^\mathrm{let}(\Gamma, e_1 \, e_2) &=
       \begin{array}[t]{l}
         \mathrm{let}
           \begin{array}[t]{l}
-            (c_1, t_1) = \mathcal C^\mathrm{let}(\Gamma, e_1) \\
-            (c_2, t_2) = \mathcal C^\mathrm{let}(\Gamma, e_2) \\
-            t_3 = \mathrm{fresh}
+            (c_1, \tau_1) = \mathcal C^\mathrm{let}(\Gamma, e_1) \\
+            (c_2, \tau_2) = \mathcal C^\mathrm{let}(\Gamma, e_2) \\
+            \tau_3 = \mathrm{fresh}
           \end{array} \\
-        \mathrm{in} (c_1 \cup c_2 \cup \{t_1 = t_2 \to t_3\}, t_3)
+        \mathrm{in} (c_1 \cup c_2 \cup \{\tau_1 = \tau_2 \to \tau_3\}, \tau_3)
       \end{array} \\
     \mathcal C^\mathrm{let}(\Gamma, \lambda x . e) &=
       \begin{array}[t]{l}
         \mathrm{let}
           \begin{array}[t]{l}
-            t_1 = \mathrm{fresh} \\
-            (c, t_2) = \mathcal C^\mathrm{let}((\Gamma, x : \mathrm{Mono}(t_1)), e)
+            \tau_1 = \mathrm{fresh} \\
+            (c, \tau_2) = \mathcal C^\mathrm{let}((\Gamma, x : \mathrm{Mono}(\tau_1)), e)
           \end{array} \\
-        \mathrm{in} (c, t_1 \to t_2)
+        \mathrm{in} (c, \tau_1 \to \tau_2)
       \end{array} \\
     \mathcal C^\mathrm{let}(\Gamma, \letterm{x}{e_1}{e_2}) &=
       \mathcal C^\mathrm{let}((\Gamma, x : \mathrm{Poly}(\Gamma, e_1)), e_2)
@@ -176,7 +176,7 @@ $\lambda^\mathrm{let}$ 項に対する制約生成アルゴリズム $\mathcal C
         多相の変数であれば、型環境から得られる型環境と項を用いて制約集合を生成します。
 
   \item $\lambda$ 抽象に関する制約の生成で、
-        型環境に追加される情報が $\mathrm{Mono}(t)$ の形になる。
+        型環境に追加される情報が $\mathrm{Mono}(\tau)$ の形になる。
 
   \item let 項に対する制約の生成が追加されました。
 
@@ -277,15 +277,14 @@ let rec constraints (n : int) (env : assump) :
 まずは、恒等関数 $\lambda x . x$ について考えましょう。
 この項の最も広い意味での型は、$\alpha \to \alpha$ です。
 
-$\letterm{i}{\lambda x . x}{\dots}$ のように書くことで、
-$\dots$ の中で恒等関数 $i$ を多相的に扱うことができます。
-このとき、その全ての $i$ の型はどれも $t_1 \to t_1$ の形をしているはずです。
-つまり、多相的な恒等関数は、任意の型 $\alpha$ に関して $\alpha \to \alpha$ という型を持つと言えます。
-パラメトリック多相では、
-このような型を記号 $\forall$ を用いて $\forall \alpha . \alpha \to \alpha$ のように表記します。
+$\letterm{i}{\lambda x . x}{\dots}$ のように書くことで、$\dots$ の中で恒等関数 $i$
+を多相的に扱うことができます。このとき、その全ての $i$ の型はどれも $\tau_1 \to \tau_1$
+の形をしているはずです。つまり、多相的な恒等関数は、任意の型 $\alpha$ に関して $\alpha \to \alpha$
+という型を持つと言えます。パラメトリック多相では、このような型を記号 $\forall$ を用いて
+$\forall \alpha . \alpha \to \alpha$ のように表記します。
 
-この例のように、項 $e$ が型 $t$ で型付けできるとき、
-項 $e$ に多相的に束縛された変数 $x$ は幾つかの任意の型に関して型 $t$ を持つと言えます。
+この例のように、項 $e$ が型 $\tau$ で型付けできるとき、
+項 $e$ に多相的に束縛された変数 $x$ は幾つかの任意の型に関して型 $\tau$ を持つと言えます。
 項 $x$ の型は、変数 $x$ の型の任意の型全てに適切に型を代入することによって得られます。
 
 さて、ここでどの型変数を任意の型として良いのかという問題がありますが、
