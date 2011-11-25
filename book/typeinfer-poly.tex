@@ -328,14 +328,14 @@ $\lambda^\mathrm{let}$ の型と型スキームを図\ref{fig:polymorphism-type}
   \label{fig:polymorphism-type}
 \end{figure}
 
-型に関しては今までと同様の省略規則を用います。型スキームに関して以下の省略規則を用います。
+型に関しては今までと同様の省略規則を用います。型スキームに関して以下の省略規則を導入します。
 
-\begin{itemize}
+\begin{enumerate}
   \item 型スキーム $\forall \alpha . \forall \beta . \dots \forall \gamma . \tau$ は、
         $\forall \alpha \beta \dots \gamma . \tau$ と省略できます。
-\end{itemize}
+\end{enumerate}
 
-パラメトリック多相型システムの型判定を、図\ref{fig:poly-type-judgement}のように定義します。
+$\lambda^\mathrm{let}$ の型判定を図\ref{fig:poly-type-judgement}のように定義します。
 
 \begin{figure}[htbp]
   \[
@@ -371,20 +371,20 @@ $\lambda^\mathrm{let}$ の型と型スキームを図\ref{fig:polymorphism-type}
   \]
   \[
     \infere{P-App}{
-      \Gamma \vdash e : \sigma [t := \tau]
+      \Gamma \vdash e : \sigma [\alpha := \tau]
     }{
-      \Gamma \vdash e : \forall t . \sigma
+      \Gamma \vdash e : \forall \alpha . \sigma
     }
   \]
   \[
     \infere{P-Abs}{
-      \Gamma \vdash e : \forall t . \sigma
+      \Gamma \vdash e : \forall \alpha . \sigma
     }{
       \Gamma \vdash e : \sigma &
-      t \notin FTV(\Gamma)
+      \alpha \notin FTV(\Gamma)
     }
   \]
-  \caption{パラメトリック多相型システムの型判定}
+  \caption{$\lambda^\mathrm{let}$ の型判定}
   \label{fig:poly-type-judgement}
 \end{figure}
 
@@ -398,6 +398,44 @@ $\lambda^\mathrm{let}$ の型と型スキームを図\ref{fig:polymorphism-type}
 規則 \textsc{P-Abs} は規則 \textsc{T-Let} の内側のみに出現すれば
 十分に広い意味の型が付くことが分かります。
 
+$\lambda^\mathrm{let}$ の型判定を図\ref{fig:poly-type-judgement2}のように定義し直すことができます。
+
+\begin{figure}[htbp]
+  \[
+    \infere{T-Var}{
+      \Gamma \vdash x : \tau_0 [\alpha := \tau_1, \dots, \beta := \tau_n]
+    }{
+      x : \forall \alpha \dots \beta . \tau_0 \in \Gamma
+    }
+  \]
+  \[
+    \infere{T-App}{
+      \Gamma \vdash e_1 \, e_2 : \tau_2
+    }{
+      \Gamma \vdash e_1 : \tau_1 \to \tau_2 &
+      \Gamma \vdash e_2 : \tau_1
+    }
+  \]
+  \[
+    \infere{T-Abs}{
+      \Gamma \vdash \lambda x . e : \tau_1 \to \tau_2
+    }
+    {
+      \Gamma, x : \tau_1 \vdash e : \tau_2
+    }
+  \]
+  \[
+    \infere{T-Let}{
+      \Gamma \vdash \letterm{x}{e_1}{e_2} : \tau_2
+    }{
+      \Gamma \vdash e_1 : \tau_1 &
+      \Gamma, x : \forall A . \tau_1 \vdash e_2 : \tau_2 &
+      \forall \alpha \in A . \alpha \notin FTV(\Gamma)
+    }
+  \]
+  \caption{$\lambda^\mathrm{let}$ の型判定}
+  \label{fig:poly-type-judgement2}
+\end{figure}
 
 
 \subsection{アルゴリズム}
