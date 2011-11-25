@@ -312,6 +312,92 @@ $\beta$ は任意の型となっていますが、$\alpha$ はなっていませ
 
 \subsection{理論}
 
+単相の型のことを型と呼び、多相の($\forall$ の付いた)型のことを型スキームと呼びます。
+
+型を記号 $\tau$ で表し、型スキームを記号 $\sigma$ で表します。
+$\lambda^\mathrm{let}$ の型と型スキームを図\ref{fig:polymorphism-type}のように定義します。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    \tau   & \bnfcce  \alpha \\
+           & \bnfvert (\tau \to \tau) \\
+    \sigma & \bnfcce  \tau \\
+           & \bnfvert \forall \alpha . \sigma
+  \end{align*}
+  \caption{$\lambda^\mathrm{let}$ の型}
+  \label{fig:polymorphism-type}
+\end{figure}
+
+型に関しては今までと同様の省略規則を用います。型スキームに関して以下の省略規則を用います。
+
+\begin{itemize}
+  \item 型スキーム $\forall \alpha . \forall \beta . \dots \forall \gamma . \tau$ は、
+        $\forall \alpha \beta \dots \gamma . \tau$ と省略できます。
+\end{itemize}
+
+パラメトリック多相型システムの型判定を、図\ref{fig:poly-type-judgement}のように定義します。
+
+\begin{figure}[htbp]
+  \[
+    \infere{T-Var}{
+      \Gamma \vdash x : \sigma
+    }{
+      x : \sigma \in \Gamma
+    }
+  \]
+  \[
+    \infere{T-App}{
+      \Gamma \vdash e_1 \, e_2 : \tau_2
+    }{
+      \Gamma \vdash e_1 : \tau_1 \to \tau_2 &
+      \Gamma \vdash e_2 : \tau_1
+    }
+  \]
+  \[
+    \infere{T-Abs}{
+      \Gamma \vdash \lambda x . e : \tau_1 \to \tau_2
+    }
+    {
+      \Gamma, x : \tau_1 \vdash e : \tau_2
+    }
+  \]
+  \[
+    \infere{T-Let}{
+      \Gamma \vdash \letterm{x}{e_1}{e_2} : \tau
+    }{
+      \Gamma \vdash e_1 : \sigma &
+      \Gamma, x : \sigma \vdash e_2 : \tau
+    }
+  \]
+  \[
+    \infere{P-App}{
+      \Gamma \vdash e : \sigma [t := \tau]
+    }{
+      \Gamma \vdash e : \forall t . \sigma
+    }
+  \]
+  \[
+    \infere{P-Abs}{
+      \Gamma \vdash e : \forall t . \sigma
+    }{
+      \Gamma \vdash e : \sigma &
+      t \notin FTV(\Gamma)
+    }
+  \]
+  \caption{パラメトリック多相型システムの型判定}
+  \label{fig:poly-type-judgement}
+\end{figure}
+
+規則 \textsc{T-Let} は let 項に関する型付け規則です。
+
+規則 \textsc{P-App} は型スキームの任意の型に具体的な型をあてはめ、型を単相にする規則です。
+
+規則 \textsc{P-App} は型環境に含まれない型変数を任意の型とし、型を多相にする規則です。
+
+これらの規則全体を見ると、規則 \textsc{P-App} は規則 \textsc{T-Var} の外側のみに、
+規則 \textsc{P-Abs} は規則 \textsc{T-Let} の内側のみに出現すれば
+十分に広い意味の型が付くことが分かります。
+
 
 
 \subsection{アルゴリズム}

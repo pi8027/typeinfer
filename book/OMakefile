@@ -6,14 +6,14 @@ DVIPDFMFLAGS = -p b5
 
 TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
 
-main_draft.pdf : main_draft.ps
-	ps2pdf main_draft.ps
+main-draft.pdf : main-draft.ps
+	ps2pdf main-draft.ps
 
-main_final.pdf : main_final.ps
-	ps2pdf main_final.ps
+main-final.pdf : main-final.ps
+	ps2pdf main-final.ps
 
-LaTeXDocument(main_draft, main_draft)
-LaTeXDocument(main_final, main_final)
+LaTeXDocument(main-draft, main-draft)
+LaTeXDocument(main-final, main-final)
 
-.DEFAULT : main_draft.pdf main_final.pdf
+.DEFAULT : main-draft.pdf main-final.pdf
 
