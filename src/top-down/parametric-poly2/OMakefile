@@ -1,5 +1,9 @@
 
-FILES[] = def lexer parser infer main
+USE_OCAMLFIND = true
+OCAMLFLAGS = -thread
+OCAMLPACKS = core
+
+FILES = def lexer parser infer main
 PROGRAM = main
 
 .DEFAULT: $( OCamlProgram $(PROGRAM) , $(FILES) )

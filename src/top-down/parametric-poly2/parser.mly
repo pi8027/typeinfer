@@ -2,7 +2,7 @@
 %token LET IN
 %token LPAREN RPAREN LAMBDA ARROW EQUAL EOF
 %start main
-%type <Def.lexpr> main
+%type <Def.term> main
 %%
 
 main: expr EOF { $1 }
