@@ -137,8 +137,8 @@ $\lambda^\mathrm{let}$ 項に対する制約生成アルゴリズム $\mathcal C
   \begin{align*}
     \mathcal C^\mathrm{let}(\Gamma, x) &=
       \begin{cases}
-        \mathit{failure}          & (x \notin \mathit{dom}(\Gamma)) \\
-        \tau                      & (\mathrm{Mono}(\tau) = \Gamma(x)) \\
+        \mathit{failure}                    & (x \notin \mathit{dom}(\Gamma)) \\
+        \tau                                & (\mathrm{Mono}(\tau) = \Gamma(x)) \\
         \mathcal C^\mathrm{let}(\Gamma', e) & (\mathrm{Poly}(\Gamma', e) = \Gamma(x)) \\
       \end{cases} \\
     \mathcal C^\mathrm{let}(\Gamma, e_1 \, e_2) &=
@@ -439,6 +439,76 @@ $\lambda^\mathrm{let}$ の型判定を図\ref{fig:poly-type-judgement2}のよう
 
 この型判定規則では、多相性の導入を \textsc{T-Let} 規則に含め、
 多相性の除去を \textsc{T-Var} 規則に含むようにしました。
+
+\subsection{アルゴリズム}
+
+新しい $\lambda^\mathrm{let}$ の型判定規則を元に、
+$\lambda^\mathrm{let}$ の型推論アルゴリズムを考えてみましょう。
+
+パラメトリック多相を持つ型システムに対する型推論で最も重要なのは、多相型を作る計算、
+即ち多相にして良い型変数の集合の計算だと言えます。
+
+多相にして良い型変数は let 項の外側の型環境に含まれない全ての型変数ですが、
+多相にする型に含まれない型変数を多相にしてしまっても意味はありません。
+よって、多相にする型に含まれる型変数のうち、
+外側の型環境に含まれない全ての型変数を多相にすれば良いことが分かります。
+
+しかし、2章で示したような制約の生成と制約解消を完全に分離した形の推論アルゴリズムでは、
+制約の生成の途中で多相にして良い型変数を判定できず、多相型を作る計算ができません。
+この問題を解決するためには、多相型を作る時点でその部分の制約を解消する必要があります。
+
+新しい型判定規則を用いた $\lambda^\mathrm{let}$ の制約生成アルゴリズム
+$\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義できます。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    \mathcal C^\mathrm{let'}(\Gamma, x) &=
+    \begin{cases}
+      \mathit{failure}
+        & (x \notin \mathit{dom}(\Gamma)) \\
+      \tau [\alpha := \mathrm{fresh}, \dots, \beta := \mathrm{fresh}]
+        & (\forall \alpha \dots \beta . \tau = \Gamma(x))
+    \end{cases} \\
+    \mathcal C^\mathrm{let'}(\Gamma, e_1 \, e_2) &=
+    \begin{array}[t]{l}
+      \mathrm{let}
+        \begin{array}[t]{l}
+          (c_1, \tau_1) = \mathcal C^\mathrm{let'}(\Gamma, e_1) \\
+          (c_2, \tau_2) = \mathcal C^\mathrm{let'}(\Gamma, e_2) \\
+          \tau_3 = \mathrm{fresh}
+        \end{array} \\
+      \mathrm{in} (c_1 \cup c_2 \cup \{\tau_1 = \tau_2 \to \tau_3\}, \tau_3)
+    \end{array} \\
+    \mathcal C^\mathrm{let'}(\Gamma, \lambda x . e) &=
+    \begin{array}[t]{l}
+      \mathrm{let}
+        \begin{array}[t]{l}
+          \tau_1 = \mathrm{fresh} \\
+          (c, \tau_2) = \mathcal C^\mathrm{let'}((\Gamma, x : \tau_1), e)
+        \end{array} \\
+      \mathrm{in} (c, \tau_1 \to \tau_2)
+    \end{array} \\
+    \mathcal C^\mathrm{let'}(\Gamma, \letterm{x}{e_1}{e_2}) &=
+    \begin{array}[t]{l}
+      \mathrm{let}
+        \begin{array}[t]{l}
+          (c_1, \tau_1) = \mathcal C^\mathrm{let'}(\Gamma, e_1) \\
+          \tau_1'       = \tau_1 [\mathcal U(c_1)] \\
+          \sigma_1      = \forall (FTV(\tau_1') - FTV(\Gamma)) . \tau_1' \\
+          (c_2, \tau_2) = \mathcal C^\mathrm{let'}((\Gamma, x : \sigma_1) , e_2)
+        \end{array} \\
+      \mathrm{in} (c_1 \cup c_2, \tau_2)
+    \end{array}
+  \end{align*}
+  \caption{方程式の生成アルゴリズム $\mathcal C^\mathrm{let'}$}
+  \label{fig:algorithm-c-let2}
+\end{figure}
+
+このアルゴリズムでは、項が変数であるときに多相型の任意の型にフレッシュな型を代入しています。
+また、項が let 項であるときに多相になる項の制約生成で得られた制約をアルゴリズム $\mathcal U$
+によって解き、その結果を用いて多相型を作っています。
+
+\section{Algorithm $\mathcal W$}
 
 \subsection{アルゴリズム}
 
