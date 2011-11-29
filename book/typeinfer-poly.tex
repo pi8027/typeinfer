@@ -457,6 +457,32 @@ $\lambda^\mathrm{let}$ の型推論アルゴリズムを考えてみましょう
 制約の生成の途中で多相にして良い型変数を判定できず、多相型を作る計算ができません。
 この問題を解決するためには、多相型を作る時点でその部分の制約を解消する必要があります。
 
+制約生成で使う多相型を作る関数 $\mathit{generalize}$ と多相型を単相にする関数
+$\mathit{instantiate}$ をそれぞれ図\ref{fig:generalize}と\ref{fig:instantiate}のように定義します。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    \mathit{generalize}(\Gamma, \tau) &= \forall (FTV(\tau) - FTV(\Gamma)) . \tau
+  \end{align*}
+  \caption{多相型を作る関数 $\mathit{generalize}$}
+  \label{fig:generalize}
+\end{figure}
+
+\begin{figure}[htbp]
+  \begin{align*}
+    \mathit{instantiate}(\forall \alpha ... \beta . \tau) &=
+      \tau [\alpha := \mathrm{fresh}, \dots, \beta := \mathrm{fresh}]
+  \end{align*}
+  \caption{多相型を単相にする関数 $\mathit{instantiate}$}
+  \label{fig:instantiate}
+\end{figure}
+
+$\mathit{generalize}$ では、
+型に含まれる型変数のうち型環境に含まれない型変数全てを任意の型とするように多相型を作っています。
+
+$\mathit{instantiate}$ では、
+多相型の任意の型全てにフレッシュな型を代入しています。
+
 新しい型判定規則を用いた $\lambda^\mathrm{let}$ の制約生成アルゴリズム
 $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義できます。
 
@@ -464,10 +490,8 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
   \begin{align*}
     \mathcal C^\mathrm{let'}(\Gamma, x) &=
     \begin{cases}
-      \mathit{failure}
-        & (x \notin \mathit{dom}(\Gamma)) \\
-      \tau [\alpha := \mathrm{fresh}, \dots, \beta := \mathrm{fresh}]
-        & (\forall \alpha \dots \beta . \tau = \Gamma(x))
+      \mathit{failure} & (x \notin \mathit{dom}(\Gamma)) \\
+      \mathit{instantiate}(\sigma) & (\sigma = \Gamma(x))
     \end{cases} \\
     \mathcal C^\mathrm{let'}(\Gamma, e_1 \, e_2) &=
     \begin{array}[t]{l}
@@ -493,9 +517,8 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
       \mathrm{let}
         \begin{array}[t]{l}
           (c_1, \tau_1) = \mathcal C^\mathrm{let'}(\Gamma, e_1) \\
-          \tau_1'       = \tau_1 [\mathcal U(c_1)] \\
-          \sigma_1      = \forall (FTV(\tau_1') - FTV(\Gamma)) . \tau_1' \\
-          (c_2, \tau_2) = \mathcal C^\mathrm{let'}((\Gamma, x : \sigma_1) , e_2)
+          \tau_1'       = \tau_1 \, \mathcal U(c_1) \\
+          (c_2, \tau_2) = \mathcal C^\mathrm{let'}((\Gamma, x : \mathit{generalize(\Gamma, \tau_1')}) , e_2)
         \end{array} \\
       \mathrm{in} (c_1 \cup c_2, \tau_2)
     \end{array}
