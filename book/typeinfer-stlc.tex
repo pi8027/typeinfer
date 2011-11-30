@@ -291,9 +291,10 @@ $\tau_1 \to \tau_2$ となります。
 \begin{figure}[htbp]
   \begin{align*}
     \mathcal{C}(\Gamma, x) &=
-      \mathrm{if} ~ x \notin \mathit{dom}(\Gamma) ~
-      \mathrm{then} ~ \mathit{failure} ~
-      \mathrm{else} ~ (\emptyset, \Gamma(x)) \\
+    \begin{cases}
+      \mathit{failure}       & (x \notin \mathit{dom}{\Gamma}) \\
+      (\emptyset, \Gamma(x)) & (\text{otherwise}) \\
+    \end{cases} \\
     \mathcal{C}(\Gamma, e_1 \, e_2) &=
     \begin{array}[t]{l}
       \mathrm{let}

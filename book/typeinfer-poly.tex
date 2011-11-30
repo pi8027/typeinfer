@@ -490,8 +490,8 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
   \begin{align*}
     \mathcal C^\mathrm{let'}(\Gamma, x) &=
     \begin{cases}
-      \mathit{failure} & (x \notin \mathit{dom}(\Gamma)) \\
-      \mathit{instantiate}(\sigma) & (\sigma = \Gamma(x))
+      \mathit{failure}                          & (x \notin \mathit{dom}(\Gamma)) \\
+      (\emptyset, \mathit{instantiate}(\sigma)) & (\sigma = \Gamma(x))
     \end{cases} \\
     \mathcal C^\mathrm{let'}(\Gamma, e_1 \, e_2) &=
     \begin{array}[t]{l}
@@ -527,12 +527,21 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
   \label{fig:algorithm-c-let2}
 \end{figure}
 
-このアルゴリズムでは、項が let 項であるときに多相になる項の制約生成で得られた制約をアルゴリズム
-$\mathcal U$ によって解き、その結果を用いて多相型を作っています。
+このアルゴリズムでは、項が let 項であるときに多相になる項の制約生成で得られた制約を
+アルゴリズム $\mathcal U$ によって解き、その結果を用いて多相型を作っています。
 
-\section{Algorithm $\mathcal W$}
+\section{$\mathcal W$}
 
 \subsection{アルゴリズム}
+
+アルゴリズム $\mathcal C^\mathrm{let'}$ では制約の生成の途中で一部分だけ制約を解くようにしましたが、
+そうしてしまうのであれば制約集合を持っておく必要は無く、
+制約はその場で解いてしまえば良いことになります。
+
+そのようにして得られる $\lambda^\mathrm{let}$ の型推論アルゴリズムが $\mathcal W$ です。
+アルゴリズム $\mathcal W$ は型環境と項のペアを取り、代入と型のペアを返します。
+アルゴリズム $\mathcal W$ が返す代入は、
+今までの制約生成アルゴリズムが返していた制約を解いたものに相当します。
 
 
 
