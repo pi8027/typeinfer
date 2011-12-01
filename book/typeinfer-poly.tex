@@ -543,6 +543,49 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
 アルゴリズム $\mathcal W$ が返す代入は、
 今までの制約生成アルゴリズムが返していた制約を解いたものに相当します。
 
+アルゴリズム $\mathcal W$ の定義を図\ref{fig:algorithm-w}に示します。
+
+\begin{figure}[htbp]
+  \begin{align*}
+    \mathcal W(\Gamma, x) &=
+    \begin{cases}
+      \mathit{failure} & (x \notin \mathit{dom}(\Gamma)) \\
+      \mathit{instantiate}(\sigma) & (\sigma = \Gamma(x))
+    \end{cases} \\
+    \mathcal W(\Gamma, e_1 \, e_2) &=
+    \begin{array}[t]{l}
+      \mathrm{let}
+        \begin{array}[t]{l}
+          (s_1, \tau_1) = \mathcal W(\Gamma, e_1) \\
+          (s_2, \tau_2) = \mathcal W(\Gamma \, s_1, e_2) \\
+          \tau_3 = \mathrm{fresh} \\
+          s_3 = \mathcal U(\{\tau_1 \, s_2 = \tau_2 \to \tau_3\})
+        \end{array} \\
+      \mathrm{in} (s_1 \cup s_2 \cup s_3, \tau_3 \, s_3)
+    \end{array} \\
+    \mathcal W(\Gamma, \lambda x. e) &=
+    \begin{array}[t]{l}
+      \mathrm{let}
+        \begin{array}[t]{l}
+          \tau_2 = \mathrm{fresh} \\
+          (s_1, \tau_1) = \mathcal W((\Gamma, x : \tau_2), e) \\
+        \end{array} \\
+      \mathrm{in} (s_1, \tau_2 \, s_1 \to \tau_1)
+    \end{array} \\
+    \mathcal W(\Gamma, \letterm{x}{e_1}{e_2}) &=
+    \begin{array}[t]{l}
+      \mathrm{let}
+        \begin{array}[t]{l}
+          (s_1, \tau_1) = \mathcal W(\Gamma, e_1) \\
+          (s_2, \tau_2) = \mathcal W((\Gamma \, s_1, x : \mathit{generalize}(\Gamma \, s_1, \tau_1)), e_2) \\
+        \end{array} \\
+      \mathrm{in} (s_1 \cup s_2, \tau_2)
+    \end{array}
+  \end{align*}
+  \caption{型推論アルゴリズム $\mathcal W$}
+  \label{fig:algorithm-w}
+\end{figure}
+
 
 
 \subsection{実装}
