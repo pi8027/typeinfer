@@ -68,54 +68,31 @@ let instantiate (n : int) (vs, ty : typescheme) : int * ty =
 
 let rec infer (n : int) (env : assump) :
     term -> (int * subst * ty) option =
+  let open Option.Monad_infix in
   function
     | EVar str ->
-      begin match String.Map.find env str with
-        | Some ts ->
-          let (n', ty) = instantiate n ts in
-          Some (n', Int.Map.empty, ty)
-        | None -> None
-      end
+      String.Map.find env str >>| fun ts ->
+      let (n', ty) = instantiate n ts in (n', Int.Map.empty, ty)
     | EApp (term1, term2) ->
-      begin match infer (succ n) env term1 with
-        | Some (n1, s1, t1) ->
-          begin match infer n1 (substitute_assump s1 env) term2 with
-            | Some (n2, s2, t2) ->
-              let tn = TVar n in
-              begin match unify Int.Map.empty
-                  [substitute s2 t1, TFun (t2, tn)] with
-                | Some s3 ->
-                  begin match merge_substs [s1; s2; s3] with
-                    | Some s4 -> Some (n2, s4, substitute s3 tn)
-                    | None -> None
-                  end
-                | None -> None
-              end
-            | None -> None
-          end
-        | None -> None
-      end
+      infer (succ n) env term1 >>= fun (n1, s1, t1) ->
+      infer n1 (substitute_assump s1 env) term2
+        >>= fun (n2, s2, t2) ->
+      let tn = TVar n in
+      unify Int.Map.empty [substitute s2 t1, TFun (t2, tn)]
+        >>= fun s3 ->
+      merge_substs [s1; s2; s3] >>| fun s4 ->
+      n2, s4, substitute s3 tn
     | EAbs (ident, term) ->
       let tn = TVar n in
       let newenv = String.Map.add ident (Int.Set.empty, tn) env in
-      begin match infer (succ n) newenv term with
-        | Some (n', s, t) -> Some (n', s, substitute s (TFun (tn, t)))
-        | None -> None
-      end
+      infer (succ n) newenv term >>| fun (n', s, t) ->
+      n', s, substitute s (TFun (tn, t))
     | ELet (ident, term1, term2) ->
-      begin match infer n env term1 with
-        | Some (n1, s1, t1) ->
-          let env' = substitute_assump s1 env in
-          let sigma = generalize env' t1 in
-          let newenv = String.Map.add ident sigma env' in
-          begin match infer n1 newenv term2 with
-            | Some (n2, s2, t2) ->
-              begin match merge_subst s1 s2 with
-                | Some s3 -> Some (n2, s3, t2)
-                | None -> None
-              end
-            | None -> None
-          end
-        | None -> None
-      end
+      infer n env term1 >>= fun (n1, s1, t1) ->
+      let env' = substitute_assump s1 env in
+      let sigma = generalize env' t1 in
+      let newenv = String.Map.add ident sigma env' in
+      infer n1 newenv term2 >>= fun (n2, s2, t2) ->
+      merge_subst s1 s2 >>| fun s3 ->
+      n2, s3, t2
 
