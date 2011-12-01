@@ -26,7 +26,7 @@ let rec strtype (level : int) : ty -> string = function
 let term = Parser.main Lexer.token (Lexing.from_channel stdin);;
 print_string ("term:\n" ^ strterm 2 term ^ "\n\n");;
 
-match Infer.infer 0 String.Map.empty Int.Map.empty term with
+match Infer.infer 0 String.Map.empty term with
   | Some (_, _, ty) ->
     print_string ("infer:\n" ^ strtype 1 ty ^ "\n\n")
   | None -> print_string "Error: free variable\n"
