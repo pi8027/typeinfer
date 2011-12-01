@@ -550,7 +550,7 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
     \mathcal W(\Gamma, x) &=
     \begin{cases}
       \mathit{failure} & (x \notin \mathit{dom}(\Gamma)) \\
-      \mathit{instantiate}(\sigma) & (\sigma = \Gamma(x))
+      (\emptyset, \mathit{instantiate}(\sigma)) & (\sigma = \Gamma(x))
     \end{cases} \\
     \mathcal W(\Gamma, e_1 \, e_2) &=
     \begin{array}[t]{l}
