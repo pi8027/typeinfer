@@ -78,7 +78,7 @@ $\lambda$ 抽象で束縛されている変数を単相的な変数、let 項で
 
 このような体系を考えることにより、前節で出てきた $(\lambda f .(f \, 12, f \, f)) \, (\lambda x . x)$
 という項は、$\letterm{x}{\lambda x . x}{f \, 12, f \, f}$ に書き換えられます。
-適切な型付けの体系を与えることで、この項を型付けすることができるようになります。
+適切な型付けの体系を与えることで、この項を型付けできるようになります。
 
 \section{置換による多相}
 
@@ -567,10 +567,10 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
     \begin{array}[t]{l}
       \mathrm{let}
         \begin{array}[t]{l}
-          \tau_2 = \mathrm{fresh} \\
-          (s_1, \tau_1) = \mathcal W((\Gamma, x : \tau_2), e) \\
+          \tau_1 = \mathrm{fresh} \\
+          (s, \tau_1) = \mathcal W((\Gamma, x : \tau_1), e) \\
         \end{array} \\
-      \mathrm{in} (s_1, \tau_2 \, s_1 \to \tau_1)
+      \mathrm{in} (s, \tau_1 \, s \to \tau_2)
     \end{array} \\
     \mathcal W(\Gamma, \letterm{x}{e_1}{e_2}) &=
     \begin{array}[t]{l}
@@ -586,7 +586,36 @@ $\mathcal C^\mathrm{let'}$ は図\ref{fig:algorithm-c-let2}のように定義で
   \label{fig:algorithm-w}
 \end{figure}
 
+定義の詳細を読まなくても、$\mathcal C^\mathrm{let'}$ と似た形をしていることが分かると思います。
+それぞれの部分がどう対応しているのか見ていきましょう。
 
+まず、項が変数 $x$ の場合を見ます。失敗する場合を除けば、
+アルゴリズム $\mathcal C^\mathrm{let'}$ は $(\emptyset,\mathit{instantiate}(\Gamma(x)))$ を結果とし、
+アルゴリズム $\mathcal W$ は $(\emptyset, \mathit{instantiate}(\Gamma(x)))$ を結果とします。
+
+一見これは全く同じ物に見えますが、
+前者の結果に含まれる $\emptyset$ は制約集合を表し、後者は代入を表します。
+空の制約集合を解消すると空の代入が得られるのは明らかなので、これは正しく対応していると言えます。
+
+次に、項が関数適用 $e_1 \, e_2$ の場合を見ます。
+let による最初の束縛は真に一致するものであると言えますが、
+二番目の束縛では最初の束縛で得られた代入 $s_1$ を型環境に適用して使っています。
+このように生成された代入を次々と適用していくことによって、
+$\mathcal C^\mathrm{let'}$ と同等の計算ができます。
+それ以降でも同様に型 $\tau_1$ に代入 $s_2$ を適用し、型 $tau_3$ に代入 $s_3$ を適用しています。
+また、結果の代入は途中で得られた代入を全て足したものとなっています。
+
+項が $\lambda$ 抽象 $\lambda x. e$ の場合も、同様の変更が為されています。
+項 $e$ に関する型推論で得られた代入 $s$ を、それがまだ適用されていない型 $\tau_1$ に適用しています。
+
+項が let 項 $\letterm{x}{e_1}{e_2}$ の場合も、
+二番目の束縛で使われている $\Gamma$ に代入 $s_1$ が適用されています。
+
+さて、鋭い読者であれば、
+ここで代入が適用されるべき箇所とそうでない箇所の違いについて疑問に思うかもしれません。
+しかし、$\mathcal W$ が返す型には常にそれが返す代入が適用された後の状態にあるとすれば、
+とある時点での型推論の計算をそれまでに生成された代入を十分に適用して行う方法は上に示したような
+方法であり、そうすることで結果が $\mathcal W$ としての性質を十分に満たせると分かります。
 
 \subsection{実装}
 
