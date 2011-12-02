@@ -47,7 +47,8 @@ let rec unify (env : subst) : tconst list -> subst option =
       unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
 
 let merge_subst (s1 : subst) (s2 : subst) : subst option =
-  unify s1 (List.map (Int.Map.to_alist s2) (fun (k, v) -> TVar k, v))
+  let f s = List.map (Int.Map.to_alist s) (fun (k, v) -> TVar k, v) in
+  unify Int.Map.empty (f s1 @ f s2)
 
 let merge_substs (s : subst list) : subst option =
   let f s1 s2 =
