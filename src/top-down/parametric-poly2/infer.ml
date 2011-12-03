@@ -12,9 +12,6 @@ let rec freevars : ty -> Int.Set.t =
     | TVar n -> Int.Set.singleton n
     | TFun (tl, tr) -> Int.Set.union (freevars tl) (freevars tr)
 
-let freevars_ts (vs, t : typescheme) : Int.Set.t =
-  Int.Set.diff (freevars t) vs
-
 let rec substitute (s : subst) : ty -> ty =
   function
     | TVar n ->
@@ -59,7 +56,7 @@ let merge_substs (s : subst list) : subst option =
 
 let generalize (env : assump) (t : ty) : typescheme =
   let vs = String.Map.fold ~init:Int.Set.empty env
-    ~f:(fun ~key:_ ~data:t m -> Int.Set.union (freevars_ts t) m) in
+    ~f:(fun ~key:_ ~data:(_, t) m -> Int.Set.union (freevars t) m) in
   Int.Set.diff (freevars t) vs, t
 
 let instantiate (n : int) (vs, ty : typescheme) : int * ty =
