@@ -619,7 +619,88 @@ $\mathcal C^\mathrm{let'}$ と同等の計算ができます。
 
 \subsection{実装}
 
+アルゴリズム $\mathcal W$ を OCaml で実装してみましょう。
 
+\begin{lstlisting}[caption=型スキームの定義, label=list:ocaml-def-type-scheme]
+type typescheme = Int.Set.t * ty
+\end{lstlisting}
+
+\begin{lstlisting}[caption=型環境の定義, label=list:ocaml-def-type-environment-w]
+type assump = typescheme String.Map.t
+\end{lstlisting}
+
+\begin{lstlisting}[caption=型に含まれる変数集合の計算, label=list:ocaml-freevars]
+let rec freevars : ty -> Int.Set.t =
+  function
+    | TVar n -> Int.Set.singleton n
+    | TFun (tl, tr) -> Int.Set.union (freevars tl) (freevars tr)
+\end{lstlisting}
+
+\begin{lstlisting}[caption=型環境に代入を適用, label=list:ocaml-substitute-assump]
+let substitute_assump (subst : subst) (assump : assump) : assump =
+  String.Map.map (fun (vs, t) -> vs, substitute subst t) assump
+\end{lstlisting}
+
+\begin{lstlisting}[caption=代入の合成, label=list:ocaml-merge-subst]
+let merge_subst (s1 : subst) (s2 : subst) : subst option =
+  let f s = List.map (Int.Map.to_alist s) (fun (k, v) -> TVar k, v) in
+  unify Int.Map.empty (f s1 @ f s2)
+\end{lstlisting}
+
+\begin{lstlisting}[caption=代入リストの合成, label=list:ocaml-merge-substs]
+let merge_substs (s : subst list) : subst option =
+  let f s1 s2 =
+    match s1 with
+      | Some s1' -> merge_subst s1' s2
+      | None -> None in
+  List.fold s ~init:(Some Int.Map.empty) ~f:f
+\end{lstlisting}
+
+\begin{lstlisting}[caption=多相型を作る, label=list:ocaml-generalize]
+let generalize (env : assump) (t : ty) : typescheme =
+  let vs = String.Map.fold ~init:Int.Set.empty env
+    ~f:(fun ~key:_ ~data:(_, t) m -> Int.Set.union (freevars t) m) in
+  Int.Set.diff (freevars t) vs, t
+\end{lstlisting}
+
+\begin{lstlisting}[caption=多相型を単相にする, label=list:ocaml-instantiate]
+let instantiate (n : int) (vs, ty : typescheme) : int * ty =
+  let (n', s) = Int.Set.fold vs ~init:(n, Int.Map.empty)
+    ~f:(fun v (n, s) -> (succ n, Int.Map.add v (TVar n) s)) in
+  n', substitute s ty
+\end{lstlisting}
+
+\begin{lstlisting}[caption=型推論アルゴリズム $\mathcal W$ の実装, label=list:ocaml-algorithm-w]
+let rec infer (n : int) (env : assump) :
+    term -> (int * subst * ty) option =
+  let open Option.Monad_infix in
+  function
+    | EVar str ->
+      String.Map.find env str >>| fun ts ->
+      let (n', ty) = instantiate n ts in (n', Int.Map.empty, ty)
+    | EApp (term1, term2) ->
+      infer (succ n) env term1 >>= fun (n1, s1, t1) ->
+      infer n1 (substitute_assump s1 env) term2
+        >>= fun (n2, s2, t2) ->
+      let tn = TVar n in
+      unify Int.Map.empty [substitute s2 t1, TFun (t2, tn)]
+        >>= fun s3 ->
+      merge_substs [s1; s2; s3] >>| fun s4 ->
+      n2, s4, substitute s3 tn
+    | EAbs (ident, term) ->
+      let tn = TVar n in
+      let newenv = String.Map.add ident (Int.Set.empty, tn) env in
+      infer (succ n) newenv term >>| fun (n', s, t) ->
+      n', s, substitute s (TFun (tn, t))
+    | ELet (ident, term1, term2) ->
+      infer n env term1 >>= fun (n1, s1, t1) ->
+      let env' = substitute_assump s1 env in
+      let sigma = generalize env' t1 in
+      let newenv = String.Map.add ident sigma env' in
+      infer n1 newenv term2 >>= fun (n2, s2, t2) ->
+      merge_subst s1 s2 >>| fun s3 ->
+      n2, s3, t2
+\end{lstlisting}
 
 \section{まとめ}
 
