@@ -1,27 +1,27 @@
 
-本章では、$\lambda$ 計算の基礎を説明します。
-$\lambda$ 計算は、関数の計算に関する理論を扱うための計算体系です。
-現在使われている多くの関数型プログラミング言語の基礎には、$\lambda$ 計算があると言えます。
+本章では、$\lambda$計算の基礎を説明します。
+$\lambda$計算は、関数の計算に関する理論を扱うための計算体系です。
+現在使われている多くの関数型プログラミング言語の基礎には、$\lambda$計算があると言えます。
 
 次章から書く型推論の対象となる言語も、
-最初は $\lambda$ 計算のシンプルな型システムとして知られる単純型付き $\lambda$ 計算です。
+最初は$\lambda$計算のシンプルな型システムとして知られる単純型付き$\lambda$計算です。
 
-この章では、前提知識として必要な $\lambda$ 計算と単純型付き $\lambda$ 計算について説明します。
+この章では、前提知識として必要な$\lambda$計算と単純型付き$\lambda$計算について説明します。
 
 \section{関数}
 
-\textbf{関数 (function)}は、与えられた値に依存して値が一意に決定されるような対応を表します。
-例えば、与えられた数値に $1$ を足した値を対応させる関数 $s$ は、
+\textbf{関数(function)}は、与えられた値に依存して値が一意に決定されるような対応を表します。
+例えば、与えられた数値に$1$を足した値を対応させる関数$s$は、
 \[
   s(x) = x+1
 \]
 のように表記します。
 
-上のように定義された関数 $s$ に値$2$を与えるには、
+上のように定義された関数$s$に値$2$を与えるには、
 \[
   s(2)
 \]
-のように表記します。また、この値は $2+1$、即ち$3$となります。
+のように表記します。また、この値は$2+1$、即ち$3$となります。
 
 さて、このような関数を値として扱うことを考えてみましょう。
 関数名のみを書くことで、関数の値を指すものとします。
@@ -30,23 +30,23 @@ $\lambda$ 計算は、関数の計算に関する理論を扱うための計算�
 \[
   a(f, x) = f(x)
 \]
-とすると、関数 $f$ と値 $x$ に依存し、
-関数 $f$ に値 $x$ を与えた値を対応させる関数 $a$ を書けます。
+とすると、関数$f$と値$x$に依存し、
+関数$f$に値$x$を与えた値を対応させる関数$a$を書けます。
 
-$\lambda$ 計算では、関数を $\lambda$ という記号を使って
-$\lambda \text{変数} . \text{変数に依存する式}$ と表記します。
-例えば、関数 $s$ は、
+$\lambda$計算では、関数を$\lambda$という記号を使って
+$\lambda \text{変数} . \text{変数に依存する式}$と表記します。
+例えば、関数$s$は、
 \[
   \lambda x . x + 1
 \]
-と表記します。\footnote{本来の $\lambda$ 計算には数値や加算は含まれませんが、
+と表記します。\footnote{本来の$\lambda$計算には数値や加算は含まれませんが、
 分かりやすいように適宜このような表記を使います。}。
 
-関数に値を与えることを、\textbf{関数適用 (function application)}
-もしくは単に\textbf{適用 (application)} といいます。
-$\lambda$ 計算の関数適用は、関数と引数を順番に並べて表記します。
+関数に値を与えることを、\textbf{関数適用(function application)}
+もしくは単に\textbf{適用(application)}といいます。
+$\lambda$計算の関数適用は、関数と引数を順番に並べて表記します。
 引数部分を括弧で括る必要はありません。
-例えば、関数 $(\lambda x . x + 1)$ に値 $2$ を与えるには、
+例えば、関数$(\lambda x . x + 1)$に値$2$を与えるには、
 \[
   (\lambda x . x + 1) \, 2
 \]
@@ -60,90 +60,90 @@ $\lambda$ 計算の関数適用は、関数と引数を順番に並べて表記�
 
 この関数は元々2引数の関数ですが、関数を返す関数のように書かれています。
 これは、2引数の関数を最初の引数を取って残りの1引数関数が求まる関数に変換しています。
-3引数の関数 $f(x, y, z)$ も、$\lambda x . \lambda y . \lambda z . f(x, y, z)$
+3引数の関数$f(x, y, z)$も、$\lambda x . \lambda y . \lambda z . f(x, y, z)$
 のように変換できます。4引数以上でも、同様の変換を適用できます。
 
 このように、関数を結果とする関数によって表現された多変数関数を
-\textbf{カリー化された関数 (curried function)} といいます。
+\textbf{カリー化された関数(curried function)}といいます。
 カリー化によって、どのような多変数関数も複数の1引数関数で表現できます。
 
-これらの記号 $\lambda$ で関数を表すような計算の表現を
-$\lambda$ 計算の\textbf{項 (term)} もしくは\textbf{$\lambda$ 項 ($\lambda$-term)} と呼びます。
+これらの記号$\lambda$で関数を表すような計算の表現を
+$\lambda$計算の\textbf{項(term)}もしくは\textbf{$\lambda$項($\lambda$-term)}と呼びます。
 
-\section{$\lambda$ 計算}
+\section{$\lambda$計算}
 
-この節では、$\lambda$ 項を定義します。
+この節では、$\lambda$項を定義します。
 
 変数の集合は、可算無限集合であるものとします。
 即ち、変数の集合は自然数と一対一の対応を持ちます。
-変数を表すメタ変数としては、$x, y, z, \dots$ などを用います。
+変数を表すメタ変数としては、$x, y, z, \dots$などを用います。
 
-$\lambda$ 計算の項を、図\ref{fig:lambda-term}のように帰納的に定義します。
+$\lambda$計算の項を、図\ref{fig:lambda-term}のように帰納的に定義します。
 
 \begin{figure}[htbp]
   \begin{align*}
     e & \bnfcce  x               && \text{(変数)} \\
       & \bnfvert (e \, e)        && \text{(関数適用)} \\
-      & \bnfvert (\lambda x . e) && \text{($\lambda$ 抽象)}
+      & \bnfvert (\lambda x . e) && \text{($\lambda$抽象)}
   \end{align*}
-  \caption{$\lambda$ 計算の項}
+  \caption{$\lambda$計算の項}
   \label{fig:lambda-term}
 \end{figure}
 
-このような表現の形式を、\textbf{BNF (Backus-Naur form)} といいます。
-この表記では、構造の名前、$::=$、中身として取り得る表現の列を $|$ で区切った表記を並べて書きます。
-BNF は良く構文の表現に利用されますが、本書では主に構造の表現に利用しています。
+このような表現の形式を、\textbf{BNF (Backus-Naur form)}といいます。
+この表記では、構造の名前、$::=$、中身として取り得る表現の列を$|$で区切った表記を並べて書きます。
+BNFは良く構文の表現に利用されますが、本書では主に構造の表現に利用しています。
 
 図\ref{fig:lambda-term}の定義を分かりやすく書き直すと、以下のような意味になります。
 
 \begin{itemize}
-  \item 変数 $x$ は $\lambda$ 項である。
-  \item $\lambda$ 項 $e_1$ と $\lambda$ 項 $e_2$ から作られる式 $(e_1 \, e_2)$ は $\lambda$ 項である。
-  \item 変数 $x$ と $\lambda$ 項 $e$ から作られる式 $(\lambda x . e)$ は $\lambda$ 項である。
-  \item 以上の規則で作れる $\lambda$ 項のみが、正しい $\lambda$ 項である。
+  \item 変数$x$は$\lambda$項である。
+  \item$\lambda$項$e_1$と$\lambda$項$e_2$から作られる式$(e_1 \, e_2)$は$\lambda$項である。
+  \item 変数$x$と$\lambda$項$e$から作られる式$(\lambda x . e)$は$\lambda$項である。
+  \item 以上の規則で作れる$\lambda$項のみが、正しい$\lambda$項である。
 \end{itemize}
 
-項の定義に $\lambda$ 抽象が含まれていますが、これは前節までの関数に対応します。
+項の定義に$\lambda$抽象が含まれていますが、これは前節までの関数に対応します。
 
 項のことを\textbf{式}という場合もあります。
 
 また、図\ref{fig:lambda-term}の定義を見て分かる通り、
-純粋な $\lambda$ 計算には整数値や論理値などの定数が存在しません。
+純粋な$\lambda$計算には整数値や論理値などの定数が存在しません。
 しかし、整数値や論理値などを関数を使ってエンコードできると知られています。
 ここでは分かりやすいように適宜整数などを使うことがあります。
 
-$\lambda$ 項 $e$ の一部分となっているような項を、$e$ の
-\textbf{$\lambda$ 部分項 ($\lambda$-subterm)} もしくは単に\textbf{部分項 (subterm)} と呼びます。
+$\lambda$項$e$の一部分となっているような項を、$e$の
+\textbf{$\lambda$部分項($\lambda$-subterm)}もしくは単に\textbf{部分項(subterm)}と呼びます。
 
-$\lambda$ 項において、変数 $x$ の出現とは、項の上で変数 $x$ が現れる位置を意味します。
-とある変数 $x$ の出現が $\lambda$ 抽象 $(\lambda x . e)$ の部分項であるとき、
-変数 $x$ の出現は\textbf{束縛されている (bound)} といい、
-そうでない変数 $x$ の出現は\textbf{自由 (free)} であるといいます。
+$\lambda$項において、変数$x$の出現とは、項の上で変数$x$が現れる位置を意味します。
+とある変数$x$の出現が$\lambda$抽象$(\lambda x . e)$の部分項であるとき、
+変数$x$の出現は\textbf{束縛されている(bound)}といい、
+そうでない変数$x$の出現は\textbf{自由(free)}であるといいます。
 
-束縛された出現を持つ変数を\textbf{束縛変数 (bound variable)} といい、
-自由な出現を持つ変数を \textbf{自由変数 (free variable)} といいます。
+束縛された出現を持つ変数を\textbf{束縛変数(bound variable)}といい、
+自由な出現を持つ変数を\textbf{自由変数(free variable)}といいます。
 
-$\lambda$ 項の表記を簡単にするための省略の規則を以下に示します。
+$\lambda$項の表記を簡単にするための省略の規則を以下に示します。
 
 \begin{enumerate}
-  \item 項 $e$ の部分項 $((e_1 \, e_2) \, e_3)$ は $(e_1 \, e_2 \, e_3)$ と省略できます。
+  \item 項$e$の部分項$((e_1 \, e_2) \, e_3)$は$(e_1 \, e_2 \, e_3)$と省略できます。
         すなわち、関数適用の構文は左結合です。
-  \item 項 $e$ の部分項 $(\lambda x . e_1)$ は、$e_1$ の左右に対応する括弧があれば、
+  \item 項$e$の部分項$(\lambda x . e_1)$は、$e_1$の左右に対応する括弧があれば、
         その括弧を省略できます。
-  \item 項 $e$ が $(\dots)$ のように左右を対応する括弧で囲まれているとき、その括弧を省略できます。
+  \item 項$e$が$(\dots)$のように左右を対応する括弧で囲まれているとき、その括弧を省略できます。
         これは、一番外側の括弧を省略するための規則なので、
         部分項に対する規則ではないということに注意してください。
 \end{enumerate}
 
 一番目の規則を繰り返し適用することで、カリー化された多変数関数の適用の形をしている部分項
-$(\dots((f \, x_1) \, x_2) \dots x_n)$ は $(f \, x_1 \, x_2 \dots x_n)$ のように省略できます。
+$(\dots((f \, x_1) \, x_2) \dots x_n)$は$(f \, x_1 \, x_2 \dots x_n)$のように省略できます。
 
 また、通常は以下の追加の規則も使います。
 
 \begin{enumerate}
   \setcounter{enumi}{3}
-  \item 項 $e$ の部分項 $(\lambda x_1. (\dots (\lambda x_n . e_1) \dots))$ は
-        $(\lambda x_1 \dots x_n . e_1)$ と省略できます。
+  \item 項$e$の部分項$(\lambda x_1. (\dots (\lambda x_n . e_1) \dots))$は
+       $(\lambda x_1 \dots x_n . e_1)$と省略できます。
 \end{enumerate}
 
 本書では、この四番目の規則による省略は行いません。
@@ -154,79 +154,79 @@ $(\dots((f \, x_1) \, x_2) \dots x_n)$ は $(f \, x_1 \, x_2 \dots x_n)$ のよ�
 
 \begin{exercise}
 
-次のうち、$\lambda$ 計算の項として正しくない表現はどれか。
+次のうち、$\lambda$計算の項として正しくない表現はどれか。
 
 \begin{enumerate}
-  \item $\lambda x . x$
-  \item $\lambda f . f \, x$
-  \item $f \, (\lambda x)$
+  \item$\lambda x . x$
+  \item$\lambda f . f \, x$
+  \item$f \, (\lambda x)$
 \end{enumerate}
 
 \subparagraph{解答}
 
 \begin{enumerate}
-  \item $x$ が変数として正しく、$\lambda x . x$ 全体も $\lambda$ 抽象として正しいので
+  \item$x$が変数として正しく、$\lambda x . x$全体も$\lambda$抽象として正しいので
         正しい項になっています。
-  \item $f$ と $x$ がそれぞれ変数として正しく、$f \, x$ が関数適用として正しく、
-        $\lambda f . f \, x$ 全体も $\lambda$ 抽象として正しいので正しい項になっています。
-  \item $f$ と $x$ はそれぞれ変数として正しい形になっていますが、
-        $\lambda x$ は正しい $\lambda$ 計算の項の形をしていません。
-        よって、$f \, (\lambda x)$ 全体も正しい $\lambda$ 計算の項ではありません。
+  \item$f$と$x$がそれぞれ変数として正しく、$f \, x$が関数適用として正しく、
+       $\lambda f . f \, x$全体も$\lambda$抽象として正しいので正しい項になっています。
+  \item$f$と$x$はそれぞれ変数として正しい形になっていますが、
+       $\lambda x$は正しい$\lambda$計算の項の形をしていません。
+        よって、$f \, (\lambda x)$全体も正しい$\lambda$計算の項ではありません。
 \end{enumerate}
 
-$\lambda$ 計算の項として正しくない表現は、三番目の $f \, (\lambda x)$ です。
+$\lambda$計算の項として正しくない表現は、三番目の$f \, (\lambda x)$です。
 
 \end{exercise}
 
 \begin{exercise}
 
-次の $\lambda$ 項の下線部の変数は、束縛変数と自由変数のどちらか。
+次の$\lambda$項の下線部の変数は、束縛変数と自由変数のどちらか。
 
 \begin{enumerate}
-  \item $\lambda x . \lambda y . \underline{x}$
-  \item $\lambda y . (\lambda f . f \, x) \, \underline{f}$
+  \item$\lambda x . \lambda y . \underline{x}$
+  \item$\lambda y . (\lambda f . f \, x) \, \underline{f}$
 \end{enumerate}
 
 \subparagraph{解答}
 
 \begin{enumerate}
-  \item 下線部の変数 $x$ の出現が $\lambda x . \lambda y . x$ の部分項となっているので、束縛変数です。
-  \item 下線部の変数 $f$ の出現は $\lambda f . e$ の形の項の部分項となっていないので、自由変数です。
-        $\lambda f . f \, x$ という部分項がありますが、
-        下線分の変数 $f$ の出現がこの項の部分項でないことに注意してください。
+  \item 下線部の変数$x$の出現が$\lambda x . \lambda y . x$の部分項となっているので、束縛変数です。
+  \item 下線部の変数$f$の出現は$\lambda f . e$の形の項の部分項となっていないので、自由変数です。
+       $\lambda f . f \, x$という部分項がありますが、
+        下線分の変数$f$の出現がこの項の部分項でないことに注意してください。
 \end{enumerate}
 
 \end{exercise}
 
-\section{$\alpha$ 同値}
+\section{$\alpha$同値}
 
-\textbf{$\alpha$ 同値 ($\alpha$-equivalent)}は、$\lambda$ 項の構文上の同値関係です。
-項 $e_1$ と項 $e_2$ が $\alpha$ 同値であるということを記号 $\alphaeq$ を用いて
-$e_1 \alphaeq e_2$ と表記します。
+\textbf{$\alpha$同値($\alpha$-equivalent)}は、$\lambda$項の構文上の同値関係です。
+項$e_1$と項$e_2$が$\alpha$同値であるということを記号$\alphaeq$を用いて
+$e_1 \alphaeq e_2$と表記します。
 
-$\alpha$ 同値の基本は、とある項の束縛変数の名前を置き換えても、
-それは同じ項であるということです。例えば、$\lambda x . x$ は $\lambda y . y$ と $\alpha$ 同値です。
+$\alpha$同値の基本は、とある項の束縛変数の名前を置き換えても、
+それは同じ項であるということです。例えば、$\lambda x . x$は$\lambda y . y$と$\alpha$同値です。
 
-この関係を定義するためには、置き換える対象の束縛変数を束縛している $\lambda$ 抽象
-$\lambda x . e$ に関して、項 $e$ に自由出現する変数 $x$ を全て置き換えた項を考える必要があります。
+この関係を定義するためには、置き換える対象の束縛変数を束縛している$\lambda$抽象
+$\lambda x . e$に関して、項$e$に自由出現する変数$x$を全て置き換えた項を考える必要があります。
 
 まず、この置き換えについて考えましょう。項に自由出現する特定の変数を別の項で置き換える操作を
-\textbf{代入 (substitution)} と呼びます。
+\textbf{代入(substitution)}と呼びます。
 
-自由変数 $x$ を全て項 $e$ に置き換える代入を
+自由変数$x$を全て項$e$に置き換える代入を
 \[
   [x := e]
 \]
 と表記します。
 
-項 $e_1$ に代入 $[x := e_2]$ を適用した項、即ち項 $e_1$ 中の自由変数 $x$ を全て項 $e_2$ に置き換える
+項$e_1$に代入$[x := e_2]$を適用した項、即ち項$e_1$中の自由変数$x$を全て項$e_2$に置き換える
 ことによって得られる項を
 \[
   e_1 [x := e_2]
 \]
 と表記します。
 
-代入の適用は、図 \ref{fig:lambda-substitute} のようにも定義できます。
+代入の適用は、図\ref{fig:lambda-substitute}のようにも定義できます。
 
 \begin{figure}[htbp]
   \begin{align*}
@@ -248,14 +248,14 @@ $\lambda x . e$ に関して、項 $e$ に自由出現する変数 $x$ を全て
   \label{fig:lambda-substitute}
 \end{figure}
 
-$\alpha$ 同値の関係を、図\ref{fig:alpha-equivalent}のように定義します。
+$\alpha$同値の関係を、図\ref{fig:alpha-equivalent}のように定義します。
 
 \begin{figure}[htbp]
   \[
     \infere{Eq-Alpha}{
       (\lambda x . e) \alphaeq (\lambda y . e [x := y])
     }{
-      \text{項 $e$ に変数 $y$ が自由出現しない}
+      \text{項$e$に変数$y$が自由出現しない}
     }
   \]
   \[
@@ -291,39 +291,39 @@ $\alpha$ 同値の関係を、図\ref{fig:alpha-equivalent}のように定義し
       e \alphaeq e'
     }
   \]
-  \caption{$\alpha$ 同値}
+  \caption{$\alpha$同値}
   \label{fig:alpha-equivalent}
 \end{figure}
 
 この分数のような表記は、上が仮定で下が結論であるような規則を表しています。
 つまり、上に書いてあることが成り立てば、下に書いてあることを成り立つとして良いということになります。
 
-規則の右側に書かれている \textsc{Eq-Alpha}, \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans},
-\textsc{Eq-App}, \textsc{Eq-Abs} は、規則の名前を表しています。
+規則の右側に書かれている\textsc{Eq-Alpha}, \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans},
+\textsc{Eq-App}, \textsc{Eq-Abs}は、規則の名前を表しています。
 
 規則を一つずつ見てみましょう。
 
-規則 \textsc{Eq-Alpha} は、束縛変数の置き換えの規則です。
-中身は、項 $e$ に変数 $y$ が自由出現しないなら、項 $\lambda x . e$ と $\lambda x . e [x := y]$ は
-$\alpha$ 同値であるということを表しています。
-項 $e$ に変数 $y$ が自由出現してはいけないのは、そのような変数に置き換えてしまうと
-自由出現していた変数がその $\lambda$ 抽象で束縛されてしまい、意味が変わってしまうからです。
+規則\textsc{Eq-Alpha}は、束縛変数の置き換えの規則です。
+中身は、項$e$に変数$y$が自由出現しないなら、項$\lambda x . e$と$\lambda x . e [x := y]$は
+$\alpha$同値であるということを表しています。
+項$e$に変数$y$が自由出現してはいけないのは、そのような変数に置き換えてしまうと
+自由出現していた変数がその$\lambda$抽象で束縛されてしまい、意味が変わってしまうからです。
 
-規則 \textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans} は同値関係としての性質、
+規則\textsc{Eq-Refl}, \textsc{Eq-Sym}, \textsc{Eq-Trans}は同値関係としての性質、
 それぞれ反射性、対称性、推移性を表しています。
 
-規則 \textsc{Eq-App} は、関数適用の左辺と右辺をそれぞれ $\alpha$ 同値な項に置き換えても、
-全体として $\alpha$ 同値であるという規則です。
+規則\textsc{Eq-App}は、関数適用の左辺と右辺をそれぞれ$\alpha$同値な項に置き換えても、
+全体として$\alpha$同値であるという規則です。
 
-規則 \textsc{Eq-Abs} は、$\lambda$ 抽象の内側の項を $\alpha$ 同値な項に置き換えても、
-全体として $\alpha$ 同値であるという規則です。
+規則\textsc{Eq-Abs}は、$\lambda$抽象の内側の項を$\alpha$同値な項に置き換えても、
+全体として$\alpha$同値であるという規則です。
 
-本書ではこれ以降 $\alpha$ 同値性を構文的な等しさとして扱い、
-$=_\alpha$ も紛らわしさなどの問題がなければ単に $=$ と表記します。
+本書ではこれ以降$\alpha$同値性を構文的な等しさとして扱い、
+$=_\alpha$も紛らわしさなどの問題がなければ単に$=$と表記します。
 
 \begin{exercise}
 
-以下の $\alpha$ 同値関係が成り立つことを示せ。
+以下の$\alpha$同値関係が成り立つことを示せ。
 
 \[
   \lambda f . \lambda x . f \, (f \, x) \alphaeq
@@ -332,27 +332,27 @@ $=_\alpha$ も紛らわしさなどの問題がなければ単に $=$ と表記�
 
 \subparagraph{解答}
 
-この $\alpha$ 同値関係では、左辺の束縛変数 $x$ を $y$ に置き換えています。
-この変数 $x$ を束縛している $\lambda$ 抽象のみに着目すると、
+この$\alpha$同値関係では、左辺の束縛変数$x$を$y$に置き換えています。
+この変数$x$を束縛している$\lambda$抽象のみに着目すると、
 \[
   \lambda x . f \, (f \, x) \alphaeq \lambda y . f \, (f \, y)
 \]
-という $\alpha$ 同値関係が成立しているはずです。
-項 $f \, (f \, x)$ に変数 $y$ は自由出現しておらず、
-$f \, (f \, x) [x := y] = f \, (f \, y)$ が成立するので、規則 \textsc{Eq-Alpha} を使うと
+という$\alpha$同値関係が成立しているはずです。
+項$f \, (f \, x)$に変数$y$は自由出現しておらず、
+$f \, (f \, x) [x := y] = f \, (f \, y)$が成立するので、規則\textsc{Eq-Alpha}を使うと
 \[
   \infere{Eq-Alpha}{
     \lambda x . f \, (f \, x) \alphaeq
     \lambda y . f \, (f \, y)
   }{
-    \text{項 $f \, (f \, x)$ に変数 $y$ が自由出現しない}
+    \text{項$f \, (f \, x)$に変数$y$が自由出現しない}
   }
 \]
 と書けます。
 
-上で作れた $\alpha$ 同値関係は、
-全体から見れば同じ形をした $\lambda$ 抽象の内側の項に関する関係です。
-よって、規則 \textsc{Eq-Abs} を使うと
+上で作れた$\alpha$同値関係は、
+全体から見れば同じ形をした$\lambda$抽象の内側の項に関する関係です。
+よって、規則\textsc{Eq-Abs}を使うと
 \[
   \infere{Eq-Abs}{
     \lambda f . \lambda x . f \, (f \, x) \alphaeq
@@ -366,7 +366,7 @@ $f \, (f \, x) [x := y] = f \, (f \, y)$ が成立するので、規則 \textsc{
 
 このようにして、
 $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f \, y)$
-は正しい $\alpha$ 同値関係であると示せます。
+は正しい$\alpha$同値関係であると示せます。
 
 実際はこの二つの証明の段階を繋げて、証明全体を
 \[
@@ -378,7 +378,7 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
       \lambda x . f \, (f \, x) \alphaeq
       \lambda y . f \, (f \, y)
     }{
-      \text{項 $f \, (f \, x)$ に変数 $y$ が自由出現しない}
+      \text{項$f \, (f \, x)$に変数$y$が自由出現しない}
     }
   }
 \]
@@ -401,24 +401,24 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 \[
   (\lambda f . f \, (\underline{f} \, y))
 \]
-という項になります。しかし、下線部の $f$ が代入された項の一部であるにも関わらず、
-束縛変数になってしまいました。このとき、変数 $f$ は\textbf{捕獲 (capture)} されたといいます。
+という項になります。しかし、下線部の$f$が代入された項の一部であるにも関わらず、
+束縛変数になってしまいました。このとき、変数$f$は\textbf{捕獲(capture)}されたといいます。
 
-一方、$\lambda f . f \, x$ と $\alpha$ 同値な項 $\lambda g . g \, x$ であれば、
+一方、$\lambda f . f \, x$と$\alpha$同値な項$\lambda g . g \, x$であれば、
 \[
   (\lambda g . g \, (\underline{f} \, y))
 \]
-のようになるため、変数 $f$ は捕獲されません。
+のようになるため、変数$f$は捕獲されません。
 
 変数の捕獲によって、本来の意味と異なる項ができてしまうという問題が考えられます。
-この問題を防ぐため、$\lambda$ 計算で扱う項は、$\alpha$ 同値である項を選んでくることによって、
+この問題を防ぐため、$\lambda$計算で扱う項は、$\alpha$同値である項を選んでくることによって、
 束縛変数の名前は他のどの変数とも重複しないようにします。
 
 本書のこれ以降の内容では、このような適切な項の選択を暗黙的に行うものとします。
 
 \begin{exercise}
 
-以下の $\lambda$ 項の変数名を適切に付け替えよ。
+以下の$\lambda$項の変数名を適切に付け替えよ。
 
 \[
   (\lambda f . \lambda x . f \, x) \, x
@@ -426,7 +426,7 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 
 \subparagraph{解答}
 
-この項は、変数 $x$ が重複しています。束縛されている変数 $x$ を変数 $y$ に置き換えると、
+この項は、変数$x$が重複しています。束縛されている変数$x$を変数$y$に置き換えると、
 \[
   (\lambda f . \lambda y . f \, y) \, x
 \]
@@ -434,7 +434,7 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 
 この項は、名前の重複している自由変数と束縛変数や、別々に束縛されている同じ名前の束縛変数を含みません。
 
-この書き換えの $\alpha$ 同値関係としての正しさは、以下の証明木によって説明できます。
+この書き換えの$\alpha$同値関係としての正しさは、以下の証明木によって説明できます。
 
 \[
   \infere{Eq-App}{
@@ -446,7 +446,7 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
       \infere{Eq-Alpha}{
         \lambda x . f \, x \alphaeq \lambda y . f \, y
       }{
-        \text{項 $f \, x$ に変数 $y$ が自由出現しない}
+        \text{項$f \, x$に変数$y$が自由出現しない}
       }
     } &
     \infere{Eq-Refl}{x \alphaeq x}{}
@@ -455,18 +455,18 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 
 \end{exercise}
 
-\section{$\beta$ 簡約}
+\section{$\beta$簡約}
 
-$\lambda$ 計算の評価(実行)について考えてみましょう。
+$\lambda$計算の評価(実行)について考えてみましょう。
 
-$\lambda$ 計算の評価の基本は、左辺が $\lambda$ 抽象になっている関数適用
-($(\lambda x . e_1) \, e_2$ の形をしている $\lambda$ 項)を解く操作です。
-この操作によって得られる項は、項 $e_1$ 中の自由変数 $x$ に項 $e_2$ を代入した項です。
+$\lambda$計算の評価の基本は、左辺が$\lambda$抽象になっている関数適用
+($(\lambda x . e_1) \, e_2$の形をしている$\lambda$項)を解く操作です。
+この操作によって得られる項は、項$e_1$中の自由変数$x$に項$e_2$を代入した項です。
 
-項の中の関数適用を一箇所解く操作を、\textbf{$\beta$簡約 ($\beta$-reduction)} と呼びます。
-$e_1$ を $\beta$ 簡約して $e_2$ にできるという二項関係を、
-記号 $\betared$ を用いて $e_1 \betared e_2$ と表記します。
-$\lambda$ 計算の $\beta$ 簡約を、図 \ref{fig:beta-reduction} のように定義します。
+項の中の関数適用を一箇所解く操作を、\textbf{$\beta$簡約($\beta$-reduction)}と呼びます。
+$e_1$を$\beta$簡約して$e_2$にできるという二項関係を、
+記号$\betared$を用いて$e_1 \betared e_2$と表記します。
+$\lambda$計算の$\beta$簡約を、図\ref{fig:beta-reduction}のように定義します。
 
 \begin{figure}[htbp]
   \[
@@ -495,24 +495,24 @@ $\lambda$ 計算の $\beta$ 簡約を、図 \ref{fig:beta-reduction} のよう�
       e \betared e'
     }
   \]
-  \caption{$\beta$ 簡約}
+  \caption{$\beta$簡約}
   \label{fig:beta-reduction}
 \end{figure}
 
-\textsc{R-Beta} 規則のように上が空になっている規則は、
+\textsc{R-Beta}規則のように上が空になっている規則は、
 無条件で下に書いてあることを認めて良いということを表しています。
 
-$(\lambda x . e_1) e_2$ の形をしている項のみが、\textsc{R-Beta} 規則を用いて簡約できます。
-このような形をしている項のことを、\textbf{$\beta$ 基 ($\beta$-redex)} と呼びます。
+$(\lambda x . e_1) e_2$の形をしている項のみが、\textsc{R-Beta}規則を用いて簡約できます。
+このような形をしている項のことを、\textbf{$\beta$基($\beta$-redex)}と呼びます。
 
-$\lambda$ 項の評価は $\beta$ 簡約の並びによって表現できます。
+$\lambda$項の評価は$\beta$簡約の並びによって表現できます。
 
-$\lambda$ 項の値としての同値関係は、
-$\alpha$ 同値と $\beta$ 簡約の関係を含む最小の同値関係と定義できます。
+$\lambda$項の値としての同値関係は、
+$\alpha$同値と$\beta$簡約の関係を含む最小の同値関係と定義できます。
 
 \begin{exercise}
 
-以下の $\beta$ 簡約が正しいことを示せ。
+以下の$\beta$簡約が正しいことを示せ。
 
 \[
   (\lambda x . x) \, f \, y \betared f \, y
@@ -520,18 +520,17 @@ $\alpha$ 同値と $\beta$ 簡約の関係を含む最小の同値関係と定�
 
 \subparagraph{解答}
 
-これは、$(\lambda x . x) \, f$ の部分を簡約すれば良さそうです。$x [x := f] = f$ なので、
-規則 \textsc{R-Beta} を使うと
+これは、$(\lambda x . x) \, f$の部分を簡約すれば良さそうです。$x [x := f] = f$なので、
+規則\textsc{R-Beta}を使うと
 \[
   \infere{R-Beta}{
     (\lambda x . x) \, f \betared f
   }{}
 \]
-と書けます。この部分式は全体から見ると関数適用の左辺なので、規則 \textsc{R-App1} を使うと
+と書けます。この部分式は全体から見ると関数適用の左辺なので、規則\textsc{R-App1}を使うと
 \[
   \infere{R-App1}{
-    (\lambda x . x) \, f \, y \betared f \,
- y
+    (\lambda x . x) \, f \, y \betared f \, y
   }{
     \infere{R-Beta}{
       (\lambda x . x) \, f \betared f
@@ -539,13 +538,13 @@ $\alpha$ 同値と $\beta$ 簡約の関係を含む最小の同値関係と定�
   }
 \]
 と書けます。
-このようにして、$(\lambda x . x) \, f \, y \betared f \, y$ が正しい $\beta$ 簡約であると示せます。
+このようにして、$(\lambda x . x) \, f \, y \betared f \, y$が正しい$\beta$簡約であると示せます。
 
 \end{exercise}
 
 \begin{exercise}
 
-以下の $\lambda$ 項を簡約せよ。
+以下の$\lambda$項を簡約せよ。
 
 \[
   (\lambda x . x \, x) \, (\lambda x . x \, x)
@@ -553,8 +552,8 @@ $\alpha$ 同値と $\beta$ 簡約の関係を含む最小の同値関係と定�
 
 \subparagraph{解答}
 
-この項の部分項は、外側の関数適用のみが $\beta$ 基となっています。
-$x \, x [x := \lambda x . x \, x] = (\lambda x . x \, x) \, (\lambda x . x \, x)$ なので、
+この項の部分項は、外側の関数適用のみが$\beta$基となっています。
+$x \, x [x := \lambda x . x \, x] = (\lambda x . x \, x) \, (\lambda x . x \, x)$なので、
 \[
   \infere{R-Beta}{
     (\lambda x . x \, x) \, (\lambda x . x \, x) \betared
@@ -564,66 +563,66 @@ $x \, x [x := \lambda x . x \, x] = (\lambda x . x \, x) \, (\lambda x . x \, x)
 となります。
 
 しかし、簡約した結果として自分自身と同じ項が作れてしまいました。
-このことから、この項は無限長の $\beta$ 簡約列を作ることができ、評価が停止しないと分かります。
+このことから、この項は無限長の$\beta$簡約列を作ることができ、評価が停止しないと分かります。
 
-この例以外にも、無限長の $\beta$ 簡約列を作れる $\lambda$ 項は無数に存在しています。
+この例以外にも、無限長の$\beta$簡約列を作れる$\lambda$項は無数に存在しています。
 
 \end{exercise}
 
-\section{型付き $\lambda$ 計算}
+\section{型付き$\lambda$計算}
 
-前の練習問題のように、無限長の $\beta$ 簡約列を作れるような $\lambda$ 項を作れます。
+前の練習問題のように、無限長の$\beta$簡約列を作れるような$\lambda$項を作れます。
 
-また、純粋な $\lambda$ 計算の範囲の話ではありませんが、定数値や定数値に対する演算を含む計算体系では、
+また、純粋な$\lambda$計算の範囲の話ではありませんが、定数値や定数値に対する演算を含む計算体系では、
 特定の種類の定数値のみを対象とできる演算を考えたい場合があります。例えば、
 \[
   \text{true} + 1
 \]
 は加算が数値に対する二項演算であって欲しいとすると、
-真偽値 true と整数値 $1$ に対して適用されているため意図に反した計算であると言えます。
+真偽値trueと整数値$1$に対して適用されているため意図に反した計算であると言えます。
 
 このような、停止しない計算や意図に反する計算を「正しくない計算」と見做し、正しくない計算を
-表している項を排除する仕組みが\textbf{型付き $\lambda$ 計算 (typed lambda calculus)} です。
+表している項を排除する仕組みが\textbf{型付き$\lambda$計算(typed lambda calculus)}です。
 \footnote{
-ただし、型付き $\lambda$ 計算から派生したプログラミング言語のほとんどは
+ただし、型付き$\lambda$計算から派生したプログラミング言語のほとんどは
 プログラムが停止しないことや失敗することを許容しています。
 しかし、その多くは型によってプログラムの間違いのほとんどを検出し、排除することに成功しています。}
 
-型付き $\lambda$ 計算における\textbf{型 (type)} とは、とある項に対して適用可能な操作の表現です。
+型付き$\lambda$計算における\textbf{型(type)}とは、とある項に対して適用可能な操作の表現です。
 
-\subsection{単純型付き $\lambda$ 計算}
+\subsection{単純型付き$\lambda$計算}
 
-\textbf{単純型付き $\lambda$ 計算 (simply typed lambda calculus, $\lambda^\to$)} は、
+\textbf{単純型付き$\lambda$計算(simply typed lambda calculus,$\lambda^\to$)}は、
 型付きラムダ計算の体系の一つです。
 
-単純型付き $\lambda$ 計算の型を、図\ref{fig:stlc-type}のように帰納的に定義します。
+単純型付き$\lambda$計算の型を、図\ref{fig:stlc-type}のように帰納的に定義します。
 
 \begin{figure}[htbp]
   \begin{align*}
     \tau & \bnfcce  \alpha          && \text{(型変数)} \\
          & \bnfvert (\tau \to \tau) && \text{(関数の型)}
   \end{align*}
-  \caption{単純型付き $\lambda$ 計算の型}
+  \caption{単純型付き$\lambda$計算の型}
   \label{fig:stlc-type}
 \end{figure}
 
-このように、型変数と関数の型だけからなる表現を単純型付き $\lambda$ 計算の型とします。
+このように、型変数と関数の型だけからなる表現を単純型付き$\lambda$計算の型とします。
 型は同じ型変数を使うことで同じ型であることを表し、
-$(\tau_1 \to \tau_2)$ は型 $\tau_1$ の値から型 $\tau_2$ の値への関数を表します。
+$(\tau_1 \to \tau_2)$は型$\tau_1$の値から型$\tau_2$の値への関数を表します。
 
-例えば、$\lambda x. x$ (恒等関数)は $(\alpha \to \alpha)$ という型を持ちます。
+例えば、$\lambda x. x$(恒等関数)は$(\alpha \to \alpha)$という型を持ちます。
 
-$\lambda$ 項の表記と同様に、以下のような省略のための規則を導入します。
+$\lambda$項の表記と同様に、以下のような省略のための規則を導入します。
 
 \begin{enumerate}
-  \item 型 $\tau$ の部分 ($\tau_1 \to (\tau_2 \to \tau_3))$ は
-        $\tau_1 \to \tau_2 \to \tau_3$ と省略できます。
-  \item 型 $\tau$ が $(\dots)$ のように左右を対応する括弧で囲まれているとき、その括弧を省略できます。
+  \item 型$\tau$の部分$(\tau_1 \to (\tau_2 \to \tau_3))$は
+       $\tau_1 \to \tau_2 \to \tau_3$と省略できます。
+  \item 型$\tau$が$(\dots)$のように左右を対応する括弧で囲まれているとき、その括弧を省略できます。
 \end{enumerate}
 
 一番目の規則を繰り返し適用することで、
-部分 $(\tau_1 \to (\tau_2 \to \dots \to (\tau_{n-1} \to \tau_n)\dots))$
-を $(\tau_1 \to \tau_2 \to \dots \to \tau_n)$ と省略できます。
+部分$(\tau_1 \to (\tau_2 \to \dots \to (\tau_{n-1} \to \tau_n)\dots))$
+を$(\tau_1 \to \tau_2 \to \dots \to \tau_n)$と省略できます。
 カリー化された多変数関数の型は、このような形を持ちます。
 
 \begin{note}
@@ -632,21 +631,21 @@ $\lambda$ 項の表記と同様に、以下のような省略のための規則�
 
 \subsection{型判定}
 
-単純型付き $\lambda$ 計算では、
-項に正しく型付けできるということを\textbf{型判定 (type judgement)} で表します。
+単純型付き$\lambda$計算では、
+項に正しく型付けできるということを\textbf{型判定(type judgement)}で表します。
 
-型環境 $\Gamma$ の下で項 $e$ の型が $\tau$ である、ということを
+型環境$\Gamma$の下で項$e$の型が$\tau$である、ということを
 \[ \Gamma \vdash e : \tau \]
 と表記します。
 
-型環境 $\Gamma$ は、変数名と型のペアの集合($x_1 : \tau_1, x_2 : \tau_2, \dots, x_n : \tau_n$)です。
+型環境$\Gamma$は、変数名と型のペアの集合($x_1 : \tau_1, x_2 : \tau_2, \dots, x_n : \tau_n$)です。
 これは型を決定する上での文脈であり、変数の型はここから引いてくることになります。
 
-型判定を型環境、項、型の間の関係とみなし、\textbf{型付け関係 (typing relation)} と呼ぶこともあります。
+型判定を型環境、項、型の間の関係とみなし、\textbf{型付け関係(typing relation)}と呼ぶこともあります。
 
-型環境 $\Gamma$ に「変数 $x$ の型が $\tau$ である」という情報が含まれていることを
-$x : \tau \in \Gamma$ と表記します。また、空の型環境を $\emptyset$ と表記し、型環境 $\Gamma$ に
-「変数 $y$ の型が $\tau$ である」ということを追加した環境を $\Gamma , y : \tau$ と表記します。
+型環境$\Gamma$に「変数$x$の型が$\tau$である」という情報が含まれていることを
+$x : \tau \in \Gamma$と表記します。また、空の型環境を$\emptyset$と表記し、型環境$\Gamma$に
+「変数$y$の型が$\tau$である」ということを追加した環境を$\Gamma , y : \tau$と表記します。
 型環境に関する規則を、図\ref{fig:stlc-type-environment}のように定義します。
 
 \begin{figure}[htbp]
@@ -666,25 +665,25 @@ $x : \tau \in \Gamma$ と表記します。また、空の型環境を $\emptyse
   \label{fig:stlc-type-environment}
 \end{figure}
 
-規則 \textsc{T-Env1} は、
-型環境 $\Gamma, x : \tau$ に「変数 $x$ の型が $\tau$ である」が無条件に含まれる、と読みます。
+規則\textsc{T-Env1}は、
+型環境$\Gamma, x : \tau$に「変数$x$の型が$\tau$である」が無条件に含まれる、と読みます。
 
-規則 \textsc{T-Env2} は、
-型環境 $\Gamma$ に「変数 $x$ の型が $\tau_1$ である」が含まれていてかつ $x \neq y$ であれば、
-型環境 $\Gamma, y : \tau_2$ に「変数 $x$ の型が $\tau_1$ である」が含まれる、と読みます。
+規則\textsc{T-Env2}は、
+型環境$\Gamma$に「変数$x$の型が$\tau_1$である」が含まれていてかつ$x \neq y$であれば、
+型環境$\Gamma, y : \tau_2$に「変数$x$の型が$\tau_1$である」が含まれる、と読みます。
 
 これらの規則は、単純に型環境に特定の変数と型のペアが含まれているということを
 表す規則でないということに注意してください。
-例えば、$x : \tau_1 \in \emptyset, x : \tau_1, y : \tau_2$ は成立しますが、
-$x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$ は成立しません。
+例えば、$x : \tau_1 \in \emptyset, x : \tau_1, y : \tau_2$は成立しますが、
+$x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$は成立しません。
 
-なぜこうなっているのかというと、$\lambda x . \lambda x . x$ などの項における末尾の変数 $x$ は、
-内側の $\lambda$ 抽象の $x$ であって外側の $\lambda$ 抽象の $x$ ではないからです。
+なぜこうなっているのかというと、$\lambda x . \lambda x . x$などの項における末尾の変数$x$は、
+内側の$\lambda$抽象の$x$であって外側の$\lambda$抽象の$x$ではないからです。
 型環境は後から追加された情報ほど深いスコープの変数になっているので、
 最後に追加された同じ名前の変数のみを取れるような規則となっています。
 
-単純型付き $\lambda$ 計算の型判定を、図\ref{fig:stlc-type-judgement}のように定義します。
-このルールは、$\lambda$ 計算の項の種類一つに対してルールが一つであるということに注意してください。
+単純型付き$\lambda$計算の型判定を、図\ref{fig:stlc-type-judgement}のように定義します。
+このルールは、$\lambda$計算の項の種類一つに対してルールが一つであるということに注意してください。
 
 \begin{figure}[htbp]
   \[
@@ -710,25 +709,25 @@ $x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$ は成立しません。
       \Gamma, x : \tau_1 \vdash e : \tau_2
     }
   \]
-  \caption{単純型付き $\lambda$ 計算の型判定}
+  \caption{単純型付き$\lambda$計算の型判定}
   \label{fig:stlc-type-judgement}
 \end{figure}
 
-規則 \textsc{T-Var} は、型環境 $\Gamma$ に「変数 $x$ の型が $\tau$ である」が含まれていれば、
-型環境 $\Gamma$ の下で式 $x$ の型は $\tau$ である、と読みます。
+規則\textsc{T-Var}は、型環境$\Gamma$に「変数$x$の型が$\tau$である」が含まれていれば、
+型環境$\Gamma$の下で式$x$の型は$\tau$である、と読みます。
 
-規則 \textsc{T-App} は、
-型環境 $\Gamma$ の下で式 $e_1$ の型が $\tau_1 \to \tau_2$ かつ $e_2$ の型が $\tau_1$ であれば、
-型環境 $\Gamma$ の下で式 $e_1 ~ e_2$ の型は $\tau_2$ である、と読みます。
+規則\textsc{T-App}は、
+型環境$\Gamma$の下で式$e_1$の型が$\tau_1 \to \tau_2$かつ$e_2$の型が$\tau_1$であれば、
+型環境$\Gamma$の下で式$e_1 ~ e_2$の型は$\tau_2$である、と読みます。
 
-規則 \textsc{T-Abs} は、
-型環境 $\Gamma , x : \tau_1$ の下で式 $e$ の型が $\tau_2$ であれば、
-型環境 $\Gamma$ の下で式 $\lambda x . e$ の型が $\tau_1 \to \tau_2$ である、と読みます。
+規則\textsc{T-Abs}は、
+型環境$\Gamma , x : \tau_1$の下で式$e$の型が$\tau_2$であれば、
+型環境$\Gamma$の下で式$\lambda x . e$の型が$\tau_1 \to \tau_2$である、と読みます。
 
-また、定数などを含む $\lambda$ 項に型を付ける場合には、
+また、定数などを含む$\lambda$項に型を付ける場合には、
 それらの定数や関連する演算に関しての規則を追加する必要があります。
-例えば、論理値(bool 型)と整数値(int 型)と整数値の加算を加えた定義は、
-項に論理値と整数値を加え、型に bool 型と int 型を加えた上で、
+例えば、論理値(bool型)と整数値(int型)と整数値の加算を加えた定義は、
+項に論理値と整数値を加え、型にbool型とint型を加えた上で、
 図\ref{fig:stlc-type-judgement-constants}の型判定規則を追加します。
 
 \begin{figure}[htbp]
@@ -762,12 +761,12 @@ $x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$ は成立しません。
 
 \subsection{型を付ける}
 
-ここまでに出てきた規則を利用して、実際に $\lambda$ 項に型を付けてみましょう。
+ここまでに出てきた規則を利用して、実際に$\lambda$項に型を付けてみましょう。
 
-\subsubsection{例1 : $\lambda x . x + 1$}
+\subsubsection{例1 :$\lambda x . x + 1$}
 
-例として、項 $\lambda x . x + 1$ に型を付けてみます。
-項の外側から、即ち型判定木の下の方から構築していきましょう。一番外側は $\lambda$ 抽象なので、
+例として、項$\lambda x . x + 1$に型を付けてみます。
+項の外側から、即ち型判定木の下の方から構築していきましょう。一番外側は$\lambda$抽象なので、
 \[
   \infere{T-Abs}{
     \emptyset \vdash \lambda x . x + 1 : ?_0 \to ?_1
@@ -777,7 +776,7 @@ $x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$ は成立しません。
 \]
 と書けます。
 
-ただし、ここでの記号 $?$ はまだ確定していない型を表現しています。
+ただし、ここでの記号$?$はまだ確定していない型を表現しています。
 同じ番号を振ることで同じ型であることを表現しています。
 
 次に出てきたのは加算なので、
@@ -793,9 +792,9 @@ $x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$ は成立しません。
     }
   }
 \]
-と書けます。規則 \textsc{T-Plus} によって $?_1$ が int 型に置き換えられたことに注意してください。
+と書けます。規則\textsc{T-Plus}によって$?_1$がint型に置き換えられたことに注意してください。
 
-次に、左側の項 $x$ の型判定を埋めましょう。規則 \textsc{T-Var} と規則 \textsc{T-Env1} を使うと、
+次に、左側の項$x$の型判定を埋めましょう。規則\textsc{T-Var}と規則\textsc{T-Env1}を使うと、
 \[
   \infere{T-Abs}{
     \emptyset \vdash \lambda x . x + 1 : \text{int} \to \text{int}
@@ -814,9 +813,9 @@ $x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$ は成立しません。
     }
   }
 \]
-と書けます。ここでも、規則 \textsc{T-Env1} の制約により $?_0$ が int 型に置き換わりました。
+と書けます。ここでも、規則\textsc{T-Env1}の制約により$?_0$がint型に置き換わりました。
 
-最後に、定数1の型判定を埋めます。規則 \textsc{T-Int} を使って、
+最後に、定数1の型判定を埋めます。規則\textsc{T-Int}を使って、
 \[
   \infere{T-Abs}{
     \emptyset \vdash \lambda x . x + 1 : \text{int} \to \text{int}
@@ -842,12 +841,12 @@ $x : \tau_1 \in \emptyset, x : \tau_1, x : \tau_2$ は成立しません。
 と書けます。これで型判定全体が作れました。
 
 このようにして、
-$\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ であることの理由付けができます。
+$\lambda x . x + 1$の型が$\text{int} \to \text{int}$であることの理由付けができます。
 
-\subsubsection{例2 : $\lambda x . \lambda y . x$}
+\subsubsection{例2 :$\lambda x . \lambda y . x$}
 
-もう一つの例として、項 $\lambda x . \lambda y . x$ に型を付けてみます。
-まず、項全体は $\lambda$ 抽象なので、
+もう一つの例として、項$\lambda x . \lambda y . x$に型を付けてみます。
+まず、項全体は$\lambda$抽象なので、
 \[
   \infere{T-Abs}{
     \emptyset \vdash \lambda x . \lambda y . x : ?_0 \to ?_1
@@ -857,7 +856,7 @@ $\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ であることの理�
 \]
 と書けます。
 
-次に現れているのも $\lambda$ 抽象なので、
+次に現れているのも$\lambda$抽象なので、
 \[
   \infere{T-Abs}{
     \emptyset \vdash \lambda x . \lambda y . x : ?_0 \to ?_2 \to ?_3
@@ -869,7 +868,7 @@ $\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ であることの理�
     }
   }
 \]
-と書けます。規則 \textsc{T-Abs} の制約により、$?_1$ が $?_2 \to ?_3$ に置き換わりました。
+と書けます。規則 textsc{T-Abs}の制約により、$?_1$が$?_2 \to ?_3$に置き換わりました。
 
 次に現れているのは変数なので、
 \[
@@ -894,18 +893,18 @@ $\lambda x . x + 1$ の型が $\text{int} \to \text{int}$ であることの理�
     }
   }
 \]
-と書けます。規則 \textsc{T-Env} の制約により $?_0$ と $?_3$ が同一であると分かったため、
-$?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$ で置き換えても構いません。
+と書けます。規則\textsc{T-Env}の制約により$?_0$と$?_3$が同一であると分かったため、
+$?_3$を$?_0$で置き換えました。ただし、これは$?_0$を$?_3$で置き換えても構いません。
 
-これで一応型は付けられたように見えますが、記号 $?$ がそのまま残ってしまいました。
+これで一応型は付けられたように見えますが、記号$?$がそのまま残ってしまいました。
 これらは、とりあえず型変数で表現することにします。
-今の例であれば、$\alpha \to \beta \to \alpha$ のように書きます。
+今の例であれば、$\alpha \to \beta \to \alpha$のように書きます。
 
-この推論後に残ってしまう $?$ については、また3章で別の形で出てきます。
+この推論後に残ってしまう$?$については、また3章で別の形で出てきます。
 
 \begin{exercise}
 
-以下の項が単純型付き $\lambda$ 計算において型付け不可能であることを示せ。
+以下の項が単純型付き$\lambda$計算において型付け不可能であることを示せ。
 
 \[
   \text{true} + 1
@@ -927,14 +926,14 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 \]
 と書けます。
 
-しかし、ここで $\emptyset \vdash \text{true} : \text{int}$ の部分に注目すると、
+しかし、ここで$\emptyset \vdash \text{true} : \text{int}$の部分に注目すると、
 このような型判定を作れる規則は存在しません。
 
 \end{exercise}
 
 \begin{exercise}
 
-以下の項が単純型付き $\lambda$ 計算において型付け不可能であることを示せ。
+以下の項が単純型付き$\lambda$計算において型付け不可能であることを示せ。
 
 \[
   (\lambda x . x \, x) \, (\lambda x . x \, x)
@@ -942,7 +941,7 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 
 \subparagraph{解答}
 
-これは無限長の $\beta$ 簡約列を作れる $\lambda$ 項の例です。
+これは無限長の$\beta$簡約列を作れる$\lambda$項の例です。
 本当に型付け不可能なのか確かめてみましょう。
 
 まず、項全体が関数適用になっているので、
@@ -956,7 +955,7 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
 \]
 と書けます。
 
-次に、左側の $\lambda$ 抽象に注目すると、
+次に、左側の$\lambda$抽象に注目すると、
 \[
   \infere{T-App}{
     \emptyset \vdash (\lambda x . x \, x) \, (\lambda x . x \, x) : ?_1
@@ -969,11 +968,11 @@ $?_3$ を $?_0$ で置き換えました。ただし、これは $?_0$ を $?_3$
     \emptyset \vdash \lambda x . x \, x : ?_0
   }
 \]
-と書けます。ここで、$\{x : ?_0\}$ というのは $\emptyset, x : ?_0$ の簡略表記です。
-これ以降も、$\emptyset, x_1 : \tau_1, \dots, x_n : \tau_n$ を
-$\{x_1 : \tau_1, \dots, x_n : \tau_n\}$ と表記することがあります。
+と書けます。ここで、$\{x : ?_0\}$というのは$\emptyset, x : ?_0$の簡略表記です。
+これ以降も、$\emptyset, x_1 : \tau_1, \dots, x_n : \tau_n$を
+$\{x_1 : \tau_1, \dots, x_n : \tau_n\}$と表記することがあります。
 
-次に、$x \, x$ の関数適用に注目すると、
+次に、$x \, x$の関数適用に注目すると、
 \[
   \infere{T-App}{
     \emptyset \vdash (\lambda x . x \, x) \, (\lambda x . x \, x) : ?_1
@@ -993,7 +992,7 @@ $\{x_1 : \tau_1, \dots, x_n : \tau_n\}$ と表記することがあります。
 \]
 と書けます。
 
-次に、二つの変数 $x$ に注目すると、
+次に、二つの変数$x$に注目すると、
 \[
   \infere{T-App}{
     \emptyset \vdash (\lambda x . x \, x) \, (\lambda x . x \, x) : ?_1
@@ -1021,26 +1020,26 @@ $\{x_1 : \tau_1, \dots, x_n : \tau_n\}$ と表記することがあります。
     \emptyset \vdash \lambda x . x \, x : ?_0
   }
 \]
-と書けます。規則 \textsc{T-Var} 内の制約により $?_2$ が $?_0$ に置き換わりました。
+と書けます。規則\textsc{T-Var}内の制約により$?_2$が$?_0$に置き換わりました。
 
-しかし、ここで $x : ?_0 \to ?_1 \in \{x : ?_0\}$ の部分がまだ書かれていません。
-この形を見る限りでは規則 \textsc{T-Env1} が適用されるように見えますが、
-もしそうだとすると $?_0 = ?_0 \to ?_1$ であるような型 $?_0$ がなくてはいけません。
-しかしそれは $((\dots \to ?_1) \to ?_1) \to ?_1$ のような無限長の型になってしまいます。
+しかし、ここで$x : ?_0 \to ?_1 \in \{x : ?_0\}$の部分がまだ書かれていません。
+この形を見る限りでは規則\textsc{T-Env1}が適用されるように見えますが、
+もしそうだとすると$?_0 = ?_0 \to ?_1$であるような型$?_0$がなくてはいけません。
+しかしそれは$((\dots \to ?_1) \to ?_1) \to ?_1$のような無限長の型になってしまいます。
 \footnote{型推論において、このような無限長の型が作られないことを保証し、
 型推論が停止しないことを防ぐための仕組みを出現検査(occurs check)と言います。
 これは2章で説明します。}
 
 型の定義は帰納的であるため、このような無限長の型を作ることはできません。
-このことから、項 $(\lambda x . x \, x) \, (\lambda x . x \, x)$ は型付けできないと分かります。
+このことから、項$(\lambda x . x \, x) \, (\lambda x . x \, x)$は型付けできないと分かります。
 
 \subparagraph{別解}
 
 帰納法により、「項が型付けできればその項の任意の部分は型付け可能」、
 また、その対偶「とある項の部分が型付け不可能であれば全体も型付け不可能」が証明できます。
 
-$\lambda x . x \, x$ 自体が型付け不可能なので、この二つの事実から
-$(\lambda x . x \, x) \, (\lambda x . x \, x)$ が型付け不可能であると言えます。
+$\lambda x . x \, x$自体が型付け不可能なので、この二つの事実から
+$(\lambda x . x \, x) \, (\lambda x . x \, x)$が型付け不可能であると言えます。
 
 \end{exercise}
 
@@ -1052,17 +1051,17 @@ $(\lambda x . x \, x) \, (\lambda x . x \, x)$ が型付け不可能であると
 
 1章では、型推論を始める前に、その前提となる知識を一通り解説しています。主に三つの物事を説明しました。
 
-一つ目は、型無し $\lambda$ 計算の基礎です。
-ここでは、$\lambda$ 項の定義、$\alpha$ 変換とそれによる変数名の適切な選択、
-$\beta$ 簡約について説明しました。
-これによって、型無し $\lambda$ 計算の定義と計算体系としての意味を与えています。
+一つ目は、型無し$\lambda$計算の基礎です。
+ここでは、$\lambda$項の定義、$\alpha$変換とそれによる変数名の適切な選択、
+$\beta$簡約について説明しました。
+これによって、型無し$\lambda$計算の定義と計算体系としての意味を与えています。
 また、項としての同値関係と値としての同値関係を規定しています。
 
-二つ目は、型付き $\lambda$ 計算の概要と、
-$\lambda$ 計算の型付けの体系の一種である単純型付き $\lambda$ 計算の定義です。
-これによって、型無し $\lambda$ 計算で発生し得る計算として正しくない項を排除し、
+二つ目は、型付き$\lambda$計算の概要と、
+$\lambda$計算の型付けの体系の一種である単純型付き$\lambda$計算の定義です。
+これによって、型無し$\lambda$計算で発生し得る計算として正しくない項を排除し、
 型によって項に意味を与えられました。
 
-三つ目は、型の付けられていない単純型付き $\lambda$ 計算の項に型を付ける方法です。
+三つ目は、型の付けられていない単純型付き$\lambda$計算の項に型を付ける方法です。
 これによって、次の章から始まる型推論に相当する計算を、人の手によってできるようになりました。
 
