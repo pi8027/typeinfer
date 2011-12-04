@@ -43,16 +43,9 @@ let rec unify (env : subst) : tconst list -> subst option =
     | (TFun (t1l, t1r), TFun (t2l, t2r)) :: cs ->
       unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
 
-let merge_subst (s1 : subst) (s2 : subst) : subst option =
-  let f s = List.map (Int.Map.to_alist s) (fun (k, v) -> TVar k, v) in
-  unify Int.Map.empty (f s1 @ f s2)
-
 let merge_substs (s : subst list) : subst option =
-  let f s1 s2 =
-    match s1 with
-      | Some s1' -> merge_subst s1' s2
-      | None -> None in
-  List.fold s ~init:(Some Int.Map.empty) ~f:f
+  let f s = List.map (Int.Map.to_alist s) (fun (k, v) -> TVar k, v) in
+  unify Int.Map.empty (List.concat (List.map s f))
 
 let generalize (env : assump) (t : ty) : typescheme =
   let vs = String.Map.fold ~init:Int.Set.empty env
@@ -91,6 +84,6 @@ let rec infer (n : int) (env : assump) :
       let sigma = generalize env' t1 in
       let newenv = String.Map.add ident sigma env' in
       infer n1 newenv term2 >>= fun (n2, s2, t2) ->
-      merge_subst s1 s2 >>| fun s3 ->
+      merge_substs [s1; s2] >>| fun s3 ->
       n2, s3, t2
 

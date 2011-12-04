@@ -623,45 +623,64 @@ $\mathcal C^\mathrm{let'}$と同等の計算ができます。
 アルゴリズム$\mathcal W$をOCamlで実装してみましょう。
 
 項と型の定義は置き換えによる多相の実装と同様のものを使用します。
+単一化の関数\texttt{unify}も今までと同様のものを使用します。
+
 型スキームの型\texttt{typescheme}は、リスト\ref{list:ocaml-def-type-scheme}のように定義します。
 
 \begin{lstlisting}[caption=型スキームの定義, label=list:ocaml-def-type-scheme]
 type typescheme = Int.Set.t * ty
 \end{lstlisting}
 
-\texttt{Int.Set.t}は\texttt{int}型の値の集合を表す型です。
+\texttt{Int.Set.t}は整数(\texttt{int}型の値)の集合を表す型です。
 これを用いて、任意の型変数の集合を表しています。
+
+型環境の型\texttt{assump}を、リスト\ref{list:ocaml-def-type-environment-w}のように定義します。
 
 \begin{lstlisting}[caption=型環境の定義, label=list:ocaml-def-type-environment-w]
 type assump = typescheme String.Map.t
 \end{lstlisting}
 
-\begin{lstlisting}[caption=型に含まれる変数集合の計算, label=list:ocaml-freevars]
+今までの幾つかの定義とは違い、型環境が持つのは型スキームです。
+
+$\mathit{generalize}$の計算を記述するためには、型に含まれる型変数の集合を計算できなければいけません。
+
+型に含まれる型変数集合を計算する関数\texttt{freevars}を
+リスト\ref{list:ocaml-freevars}のように定義します。
+
+\begin{lstlisting}[caption=型に含まれる型変数集合の計算, label=list:ocaml-freevars]
 let rec freevars : ty -> Int.Set.t =
   function
     | TVar n -> Int.Set.singleton n
     | TFun (tl, tr) -> Int.Set.union (freevars tl) (freevars tr)
 \end{lstlisting}
 
+\texttt{Int.Set.singleton}関数は\texttt{int}型の値を取り、その値のみを要素とする集合を返す関数です。
+\texttt{Int.Set.union}関数は二つの\texttt{int}型の値の集合を取り、それらの和集合を返す関数です。
+
+\texttt{freevars}関数は、型変数に関してはその型変数だけを要素とする集合を作り、
+関数の型に関してはそれが含む二つの型の型変数集合の和集合を作ることで、
+型の構造に関して帰納的に型変数の集合を作っています。
+
+型環境に代入を適用する関数\texttt{substitute\_assump}を
+リスト\ref{list:ocaml-substitute-assump}のように定義します。
+
 \begin{lstlisting}[caption=型環境に代入を適用, label=list:ocaml-substitute-assump]
 let substitute_assump (subst : subst) (assump : assump) : assump =
   String.Map.map (fun (vs, t) -> vs, substitute subst t) assump
 \end{lstlisting}
 
+型環境に含まれる型スキームの型の部分全てに代入を適用すれば良いので、
+文字列からのマップの全要素に対するマップ関数\texttt{String.Map.map}を用いてこのように書けます。
+
+代入を合成する関数\texttt{merge\_substs}をリスト\ref{list:ocaml-merge-subst}のように定義します。
+
 \begin{lstlisting}[caption=代入の合成, label=list:ocaml-merge-subst]
-let merge_subst (s1 : subst) (s2 : subst) : subst option =
+let merge_substs (s : subst list) : subst option =
   let f s = List.map (Int.Map.to_alist s) (fun (k, v) -> TVar k, v) in
-  unify Int.Map.empty (f s1 @ f s2)
+  unify Int.Map.empty (List.concat (List.map s f))
 \end{lstlisting}
 
-\begin{lstlisting}[caption=代入リストの合成, label=list:ocaml-merge-substs]
-let merge_substs (s : subst list) : subst option =
-  let f s1 s2 =
-    match s1 with
-      | Some s1' -> merge_subst s1' s2
-      | None -> None in
-  List.fold s ~init:(Some Int.Map.empty) ~f:f
-\end{lstlisting}
+
 
 \begin{lstlisting}[caption=多相型を作る, label=list:ocaml-generalize]
 let generalize (env : assump) (t : ty) : typescheme =
@@ -670,12 +689,16 @@ let generalize (env : assump) (t : ty) : typescheme =
   Int.Set.diff (freevars t) vs, t
 \end{lstlisting}
 
+
+
 \begin{lstlisting}[caption=多相型を単相にする, label=list:ocaml-instantiate]
 let instantiate (n : int) (vs, ty : typescheme) : int * ty =
   let (n', s) = Int.Set.fold vs ~init:(n, Int.Map.empty)
     ~f:(fun v (n, s) -> (succ n, Int.Map.add v (TVar n) s)) in
   n', substitute s ty
 \end{lstlisting}
+
+
 
 \begin{lstlisting}[caption=型推論アルゴリズム$\mathcal W$の実装, label=list:ocaml-algorithm-w]
 let rec infer (n : int) (env : assump) :
@@ -705,9 +728,11 @@ let rec infer (n : int) (env : assump) :
       let sigma = generalize env' t1 in
       let newenv = String.Map.add ident sigma env' in
       infer n1 newenv term2 >>= fun (n2, s2, t2) ->
-      merge_subst s1 s2 >>| fun s3 ->
+      merge_substs [s1; s2] >>| fun s3 ->
       n2, s3, t2
 \end{lstlisting}
+
+
 
 \section{まとめ}
 
