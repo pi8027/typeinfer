@@ -1,4 +1,0 @@
-
-.SUBDIRS: stlc fixpoint poly1 poly2 \
-    parametric-poly1 parametric-poly2 parametric-poly3
-
