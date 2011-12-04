@@ -770,7 +770,10 @@ match a with
 と書いていたものが\texttt{a >>= f}と書けるようになります。
 これは、計算\texttt{a}の結果を用いて計算\texttt{f}をするという風に読めます。
 
-
+\texttt{infer}関数は、この\texttt{option}モナドを使って実装をより
+$\mathcal W$の定義に近い形で書いています。
+\texttt{a >>= fun p -> b}が暗黙的な失敗を含む$\letterm{p}{a}{b}$
+に対応していることに注意すれば、$\mathcal W$の定義との対応関係が分かるはずです。
 
 \section{まとめ}
 
