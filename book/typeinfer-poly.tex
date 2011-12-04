@@ -631,7 +631,8 @@ $\mathcal C^\mathrm{let'}$と同等の計算ができます。
 type typescheme = Int.Set.t * ty
 \end{lstlisting}
 
-\texttt{Int.Set.t}は整数(\texttt{int}型の値)の集合を表す型です。
+\texttt{Int.Set.t}は整数(\texttt{int}型の値)の集合を表す型です。マップなどと同様に、
+\texttt{String.Set}モジュールで同じように操作できる文字列の集合が提供されています。
 これを用いて、任意の型変数の集合を表しています。
 
 型環境の型\texttt{assump}を、リスト\ref{list:ocaml-def-type-environment-w}のように定義します。
@@ -654,8 +655,8 @@ let rec freevars : ty -> Int.Set.t =
     | TFun (tl, tr) -> Int.Set.union (freevars tl) (freevars tr)
 \end{lstlisting}
 
-\texttt{Int.Set.singleton}関数は\texttt{int}型の値を取り、その値のみを要素とする集合を返す関数です。
-\texttt{Int.Set.union}関数は二つの\texttt{int}型の値の集合を取り、それらの和集合を返す関数です。
+集合のモジュールの\texttt{singleton}関数は集合の要素の型の値を取り、その値のみを要素とする集合を返す関数です。
+集合のモジュールの\texttt{union}関数は二つの集合を取り、それらの和集合を返す関数です。
 
 \texttt{freevars}関数は、型変数に関してはその型変数だけを要素とする集合を作り、
 関数の型に関してはそれが含む二つの型の型変数集合の和集合を作ることで、
@@ -670,17 +671,24 @@ let substitute_assump (subst : subst) (assump : assump) : assump =
 \end{lstlisting}
 
 型環境に含まれる型スキームの型の部分全てに代入を適用すれば良いので、
-文字列からのマップの全要素に対するマップ関数\texttt{String.Map.map}を用いてこのように書けます。
+マップのモジュールに含まれる関数\texttt{map}を用いてこのように書けます。
 
-代入を合成する関数\texttt{merge\_substs}をリスト\ref{list:ocaml-merge-subst}のように定義します。
+代入を合成する関数\texttt{merge\_substs}をリスト\ref{list:ocaml-merge-substs}のように定義します。
 
-\begin{lstlisting}[caption=代入の合成, label=list:ocaml-merge-subst]
+\begin{lstlisting}[caption=代入の合成, label=list:ocaml-merge-substs]
 let merge_substs (s : subst list) : subst option =
   let f s = List.map (Int.Map.to_alist s) (fun (k, v) -> TVar k, v) in
   unify Int.Map.empty (List.concat (List.map s f))
 \end{lstlisting}
 
+マップのモジュールの\texttt{to\_alist}関数はマップ型の値を取り、
+全要素のキーと値のペアのリストを返します。
 
+\texttt{merge\_subst}関数は代入のリストを取り、
+それらが合成できるならば代入を返し、できなければ失敗を返します。
+この関数は、渡された代入を全て制約集合に変換し、その制約集合を\texttt{unify}関数で解いています。
+
+多相型を作る関数\texttt{generalize}をリスト\ref{list:ocaml-generalize}のように定義します。
 
 \begin{lstlisting}[caption=多相型を作る, label=list:ocaml-generalize]
 let generalize (env : assump) (t : ty) : typescheme =
@@ -689,7 +697,12 @@ let generalize (env : assump) (t : ty) : typescheme =
   Int.Set.diff (freevars t) vs, t
 \end{lstlisting}
 
+マップのモジュールの\texttt{fold}関数はマップの畳み込みの関数です。
+\texttt{generalize}関数では、これを用いて型環境に含まれる型変数の集合\texttt{vs}を計算しています。
 
+集合のモジュールの\texttt{diff}関数は二つの集合を取り、差集合を返します。
+
+多相型を単相にする関数\texttt{instantiate}をリスト\ref{list:ocaml-instantiate}のように定義します。
 
 \begin{lstlisting}[caption=多相型を単相にする, label=list:ocaml-instantiate]
 let instantiate (n : int) (vs, ty : typescheme) : int * ty =
@@ -698,7 +711,15 @@ let instantiate (n : int) (vs, ty : typescheme) : int * ty =
   n', substitute s ty
 \end{lstlisting}
 
+\texttt{instantiate}関数はその中でフレッシュな型を生成できなければいけないので、
+型変数を表す整数がどこまで使われたかを表す状態を持たなければいけません。
+それが引数の\texttt{n}と、結果の組の左側の整数です。
 
+集合のモジュールの\texttt{fold}関数は集合の畳み込みの関数です。
+これを用いて型変数の集合の要素に順番にフレッシュな型変数を割り当てた代入を作り、型に適用しています。
+
+型推論アルゴリズム$\mathcal W$の関数\texttt{infer}を
+リスト\ref{list:ocaml-algorithm-w}のように定義します。
 
 \begin{lstlisting}[caption=型推論アルゴリズム$\mathcal W$の実装, label=list:ocaml-algorithm-w]
 let rec infer (n : int) (env : assump) :
