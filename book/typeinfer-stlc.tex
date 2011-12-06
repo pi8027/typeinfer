@@ -263,7 +263,7 @@ $((\alpha \to \alpha) \to \alpha \to \alpha) \to \alpha \to \alpha$で型付け�
 また、この仕組みによって作られた型変数のことを\textbf{フレッシュな型変数}と呼びます。
 
 方程式を生成するアルゴリズムの名前を$\mathcal C$としましょう
-\footnote{constraints の c から取りました。}。
+\footnote{constraintsのcから取りました。}。
 このアルゴリズムは、型環境$\Gamma$と項$e$を取り、方程式と項$e$の型を返すものとします。
 また、項$e$の自由変数とその型は型環境$\Gamma$に含まれていなければならないものとします。
 
@@ -598,12 +598,9 @@ OCamlでは、パターンマッチ分岐のできる無名関数は\texttt{func
 let rec constraints (n : int) (env : assump) :
     term -> (int * tconst list * ty) option =
   function
-    | EVar str ->
-      ...
-    | EApp (term1, term2) ->
-      ...
-    | EAbs (ident, term) ->
-      ...
+    | EVar str -> ...
+    | EApp (term1, term2) -> ...
+    | EAbs (ident, term) -> ...
 \end{lstlisting}
 のように記述できます。\texttt{let rec}は再帰関数を束縛するためのキーワードです。
 一番目、二番目の引数はそれぞれ\texttt{n}、\texttt{env}という名前に束縛されています。
