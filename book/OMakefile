@@ -1,8 +1,8 @@
 LATEX = platex --interaction=nonstopmode --kanji=utf8
 DVIPDFM = dvipdfmx
 
-DVIPSFLAGS = -t b5 -P pdf
-DVIPDFMFLAGS = -p b5
+DVIPSFLAGS = -t jisb5 -P pdf
+DVIPDFMFLAGS = -p jisb5
 
 TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
 
@@ -12,8 +12,12 @@ main-draft.pdf : main-draft.ps
 main-final.pdf : main-final.ps
 	ps2pdf main-final.ps
 
+layout.pdf : layout.ps
+	ps2pdf layout.ps
+
 LaTeXDocument(main-draft, main-draft)
 LaTeXDocument(main-final, main-final)
+LaTeXDocument(layout, layout)
 
-.DEFAULT : main-draft.pdf main-final.pdf
+.DEFAULT : main-draft.pdf main-final.pdf layout.pdf
 
