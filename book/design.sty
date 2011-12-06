@@ -1,25 +1,42 @@
 
-\def\ps@headings{%
-  \let\@oddfoot\@empty
-  \let\@evenfoot\@empty
-  \def\@evenhead{%
+%%%%%%%%%% ヘッダとフッタ
+
+\def\ps@headings{
+  \def\@oddhead{\underline{\hbox to \fullwidth{
+    \hfil{\if@twoside\rightmark\else\leftmark\fi}}}\hss}
+  \def\@oddfoot{\hfil\textbf\thepage}
+  \def\@evenhead{
     \if@mparswitch \hss \fi
-    \underline{\hbox to \fullwidth{\autoxspacing
-        \textbf{\thepage}\hfil\leftmark}}%
-    \if@mparswitch\else \hss \fi}%
-  \def\@oddhead{\underline{\hbox to \fullwidth{\autoxspacing
-        {\if@twoside\rightmark\else\leftmark\fi}\hfil\textbf{\thepage}}}\hss}%
+    \underline{\hbox to \fullwidth{\leftmark\hfil}}
+    \if@mparswitch\else \hss \fi}
+  \def\@evenfoot{\textbf\thepage\hfil}
   \let\@mkboth\markboth
-  \def\chaptermark##1{\markboth{%
+  \def\chaptermark##1{\markboth{
     \ifnum \c@secnumdepth >\m@ne
       \if@mainmatter
         \@chapapp\thechapter\@chappos\hskip1zw
       \fi
     \fi
-    ##1}{}}%
-  \def\sectionmark##1{\markright{%
+    ##1}{}}
+  \def\sectionmark##1{\markright{
     \ifnum \c@secnumdepth >\z@ \thesection \hskip1zw\fi
-    ##1}}}%
+    ##1}}}
+
+\def\ps@plainfoot{
+  \let\@mkboth\@gobbletwo
+  \let\@oddhead\@empty
+  \def\@oddfoot{\hfil\textbf\thepage}
+  \let\@evenhead\@empty
+  \def\@evenfoot{\textbf\thepage\hfil}}
+
+\renewcommand{\chapter}{
+  \if@openright\cleardoublepage\else\clearpage\fi
+  \thispagestyle{plainfoot}
+  \global\@topnum\z@
+  \if@english \@afterindentfalse \else \@afterindenttrue \fi
+  \secdef\@chapter\@schapter}
+
+%%%%%%%%%% 見出し
 
 \def\@makechapterhead#1{
   \vspace*{1\Cvs}
@@ -55,7 +72,7 @@
   {.5\Cvs \@plus.3\Cdp}
   {\normalfont\Large\headfont\raggedright
     \begin{picture}(0,0)
-    \put(0,-2){\color[gray]{0.6}\rule[0zw]{\linewidth}{1pt}}
+    \put(0,-2){\color[gray]{0.6}\rule[0zw]{\linewidth}{0.25mm}}
     \end{picture}
     {\Huge\color[gray]{0.6}{$\lambda$}\hspace{-0.6em}}
     }}
