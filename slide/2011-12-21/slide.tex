@@ -1,0 +1,98 @@
+\documentclass[cjk, 14pt]{beamer}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{ascmac}
+\usepackage{framed}
+\usepackage{tikz}
+
+\usetheme{Copenhagen}
+\usecolortheme{seahorse}
+\useinnertheme{rounded}
+\useoutertheme{shadow}
+
+\setbeamercovered{transparent}
+
+\lstset{
+  basicstyle=\ttfamily,
+  basicstyle=\color{white}\ttfamily\scriptsize,
+  backgroundcolor=\color{black},
+  columns=[l]{fullflexible}
+}
+
+\title{Algolithm $\mathcal W$ 入門}
+\subtitle{分かりやすい型推論入門本}
+\author{坂口和彦}
+\institute{筑波大学 情報学群 情報科学類 B1}
+\date{2011/12/21}
+
+
+\begin{document}
+
+\begin{frame}[empty]
+
+  \titlepage
+
+\end{frame}
+
+\begin{frame}{テーマ : Algorithm $\mathcal W$ 入門}
+
+ \begin{itemize}
+  \item Hindley-Milner の型推論アルゴリズム(Algorithm $\mathcal W$)の実装
+  \item 型推論の解説本
+ \end{itemize}
+ を作る
+
+\end{frame}
+
+\begin{frame}{なぜ型推論?}
+
+ \begin{itemize}
+  \item 型推論の機能を持つ言語を使う上で役に立つ
+  \item 言語処理系を実装する上で役に立つ
+  \item 学ぶ対象としてとても面白い
+  \item 好きだから
+ \end{itemize}
+
+\end{frame}
+
+\begin{frame}{成果物}
+
+ \begin{itemize}
+  \item \texttt{http://github.com/pi8027/typeinfer}
+  \begin{itemize}
+   \item OCaml による何種類かの型推論の実装
+   \item Algorithm $\mathcal W$ 入門
+  \end{itemize}
+ \end{itemize}
+
+ % ここで本の実物を見せる
+
+\end{frame}
+
+\begin{frame}{実装}
+
+ \begin{itemize}
+  \item 単純型付き$\lambda$計算の型推論 (\texttt{stlc})
+  \item 置換による多相型の型推論 (\texttt{poly})
+  \item パラメトリック多相型の型推論 (\texttt{parametric-poly1})
+  \item Algorithm $\mathcal W$ (\texttt{parametric-poly2})
+  \item Algorithm $\mathcal W$ (\texttt{parametric-poly3})
+ \end{itemize}
+
+\end{frame}
+
+\begin{frame}{書籍}
+
+ (ここに章の(?)依存関係グラフを入れる)
+
+\end{frame}
+
+\begin{frame}[plain]
+
+ ご清聴ありがとうございました。
+
+\end{frame}
+
+\end{document}

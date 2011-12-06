@@ -1,0 +1,13 @@
+
+LATEX = platex --interaction=nonstopmode --kanji=utf8
+DVIPDFM = dvipdfmx
+
+DVIPSFLAGS = -P pdf
+
+slide.pdf : slide.ps
+	ps2pdf slide.ps
+
+LaTeXDocument(slide, slide)
+
+.DEFAULT : slide.pdf
+
