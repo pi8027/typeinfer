@@ -1,6 +1,5 @@
 
-\chapter*{前書き}
-\markboth{前書き}{}
+\chapter{前書き}
 
 この本は、単純型付きラムダ計算からパラメトリック多相入りの型システム程度の範囲での型推論について、
 体系的かつ理論と実装に一対一の対応が現れる形でまとめた本です。最後まで読めばHindley-Milner
@@ -39,14 +38,42 @@ OCamlやHaskell、その他類似の型推論機能を持つ言語を使って�
 
 \section*{型推論の実装について}
 
-本書で用いる型推論の実装は関数型プログラミング言語OCaml 3.12.1、
-OCamlの標準ライブラリ、Jane Street's coreライブラリによって記述されています。
+本書で用いる幾つかの型推論の実装は、全て以下のツールとライブラリを用いて記述されています。
+
+\begin{itemize}
+ \item OCaml 3.12.1
+ \item OCaml 3.12.1標準ライブラリ
+ \item Jane Street's coreライブラリ
+\end{itemize}
+
 この型推論の実装は全て著者の坂口によるものです。
 
 本書の内容には、全てのソースコードは含めないようにしています。
-全てのソースコードは、以下のURIからダウンロードできます。
+完全なソースコードは、以下のURIからダウンロードできます。
 
-\texttt{http://github.com/pi8027/typeinfer}
+\texttt{http://github.com/pi8027/typeinfer/tree/first-edition/src}
+
+本書に関わる型推論の実装は何種類かの実装からなり、それぞれを別々のディレクトリに分けています。
+これらのディレクトリの名前は、それぞれ本書の内容と以下のように対応しています。
+
+\begin{description}
+  \item[stlc] 単純型付き$\lambda$計算の型推論 ($\mathcal C$, $\mathcal U$)
+  \item[poly] 置き換えによる多相型の型推論 ($\mathcal C^\mathrm{let}$)
+  \item[parametric-poly1] パラメトリック多相の型推論 ($\mathcal C^\mathrm{let'}$)
+  \item[parametric-poly2] アルゴリズム$\mathcal W$
+\end{description}
+
+それぞれの実装は、五つのファイルに分割されています。
+
+\begin{description}
+  \item[def.ml] データ型定義
+  \item[infer.ml] 型推論
+  \item[lexer.mll] 字句解析器
+  \item[parser.mly] 構文解析器
+  \item[main.ml] フロントエンド
+\end{description}
+
+型推論器だけが必要な場合は、\texttt{def.ml}と\texttt{infer.ml}だけで良いということになります。
 
 \section*{謝辞}
 

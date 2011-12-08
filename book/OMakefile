@@ -4,20 +4,32 @@ DVIPDFM = dvipdfmx
 DVIPSFLAGS = -t jisb5 -P pdf
 DVIPDFMFLAGS = -p jisb5
 
-TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
-
-main-draft.pdf : main-draft.ps
-	ps2pdf main-draft.ps
+cover-tree.tex : TTGen.hs
+	echo "\f g x . [y = x] f y (([h = g] h) y)" | runhaskell TTGen > cover-tree.tex
 
 main-final.pdf : main-final.ps
 	ps2pdf main-final.ps
 
+main-draft.pdf : main-draft.ps
+	ps2pdf main-draft.ps
+
 layout.pdf : layout.ps
 	ps2pdf layout.ps
 
-LaTeXDocument(main-draft, main-draft)
+cover.pdf : cover.ps
+	ps2pdf -dAutoRotatePages=/None cover.ps
+
+TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
 LaTeXDocument(main-final, main-final)
+
+TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
+LaTeXDocument(main-draft, main-draft)
+
+TEXDEPS =
 LaTeXDocument(layout, layout)
 
-.DEFAULT : main-draft.pdf main-final.pdf layout.pdf
+TEXDEPS = cover-tree.tex
+LaTeXDocument(cover, cover)
+
+.DEFAULT : main-final.pdf main-draft.pdf cover.pdf layout.pdf
 
