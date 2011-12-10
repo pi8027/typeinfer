@@ -1,15 +1,15 @@
 
 \addtolength\topmargin{-7zh}
 \addtolength\textheight{10zh}
-\addtolength\footskip{2zh}
+\addtolength\footskip{0zh}
 
 %%%%%%%%%% ヘッダとフッタ
 
 \def\ps@mypagestyle{
-  \def\@oddhead{\hspace{-1in}\hspace{-\voffset}\hspace{-\oddsidemargin}%
-    \underline{\hbox to \paperwidth{\hfil\rightmark\hspace{\oddsidemargin}\hspace{1in}\hspace{\voffset}}}}
-  \def\@evenhead{\hspace{-1in}\hspace{-\voffset}\hspace{-\evensidemargin}%
-    \underline{\hbox to \paperwidth{\hspace{1in}\hspace{\voffset}\hspace{\oddsidemargin}\leftmark\hfil}}}
+  \def\@oddhead{\hspace{-\paperwidth}\underline{\hbox to 2\paperwidth{%
+    \hfil\rightmark\hspace{\paperwidth}\hspace{-\fullwidth}}}}
+  \def\@evenhead{\hspace{-\paperwidth}\underline{\hbox to 2\paperwidth{%
+    \hspace{\paperwidth}\hspace{\textwidth}\hspace{-\fullwidth}\leftmark\hfil}}}
   \def\@oddfoot{\hbox to \fullwidth{\hfil\textbf\thepage}\hss}
   \def\@evenfoot{\hss\hbox to \fullwidth{\textbf\thepage\hfil}}
   \let\@mkboth\markboth
