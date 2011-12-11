@@ -48,7 +48,7 @@ $\lambda$項の定義に追加します。
 
 この新しい項の要素を\textbf{let項(let term)}と呼び、
 $(\letterm{x}{e_1}{e_2})$のように表記します。
-また、この新しく定義される項全体を$\lambda^\mathrm{let}$項と呼びます。
+また、この新しく定義される項全体を$\lambda^\mathrm{let}$項と呼ぶこととします。
 
 $\lambda^{let}$項を、図\ref{fig:poly-lambda-term}のように定義します。
 
@@ -66,7 +66,8 @@ $\lambda^{let}$項を、図\ref{fig:poly-lambda-term}のように定義します
 let項$(\letterm{x}{e_1}{e_2})$の簡約の上での意味は$(\lambda x . e_2) \, e_1$と同一であり、
 変数$x$が項$e_1$に多相的に束縛されるものとします。
 
-$\lambda$抽象で束縛されている変数を単相的な変数、let項で束縛されている変数を多相的な変数と呼びます。
+$\lambda$抽象で束縛されている変数を単相的な変数、
+let項で束縛されている変数を多相的な変数と呼ぶこととします。
 
 省略に関する追加の規則は以下の通りです。
 
@@ -598,7 +599,7 @@ $\mathcal C^\mathrm{let'}$は図\ref{fig:algorithm-c-let2}のように定義で�
 アルゴリズム$\mathcal C^\mathrm{let'}$は$(\emptyset,\mathit{instantiate}(\Gamma(x)))$を結果とし、
 アルゴリズム$\mathcal W$は$(\emptyset, \mathit{instantiate}(\Gamma(x)))$を結果とします。
 
-一見これは全く同じ物に見えますが、
+一見これは全く同じものに見えますが、
 前者の結果に含まれる$\emptyset$は制約集合を表し、後者は代入を表します。
 空の制約集合を解消すると空の代入が得られるのは明らかなので、これは正しく対応していると言えます。
 
