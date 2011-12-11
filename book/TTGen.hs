@@ -134,7 +134,7 @@ lookupAssump x assump@((y, t) : _) | x == y =
     return (t, Judge "T-Env1" [] (PIn x t assump))
 lookupAssump x assump@((y, _) : assump') = do
     (t, j) <- lookupAssump x assump'
-    return (t, Judge "T-Env2" [j, TJudge (PNeq x y)] (PIn x t assump))
+    return (t, Judge "T-Env2" [TJudge (PNeq x y), j] (PIn x t assump))
 
 constraints :: Assump -> Term -> TM ([(Type, Type)], Type, Judge)
 constraints env e@(Var x) = do
@@ -154,8 +154,9 @@ constraints env e@(Abs x e1) = do
 constraints env e@(Let x e1 e2) = do
     (c1, t1, j1) <- constraints env e1
     s1 <- lift $ unify M.empty c1
+    let env' = substitute_assump s1 env
     let t1' = substitute s1 t1
-    (c2, t2, j2) <- constraints ((x, generalize env t1') : env) e2
+    (c2, t2, j2) <- constraints ((x, generalize env' t1') : env) e2
     return (c1 ++ c2, t2, Judge "T-Let" [j1, j2] (PTypeRel env e t2))
 
 -- parser
@@ -241,7 +242,7 @@ judgePpr tvs judge = judgePpr' tvsMap judge where
         intercalate "  &\n"
             (map (unlines . map ("  " ++) . lines . judgePpr' env) subjs) ++
         "}\n"
-    judgePpr' env (TJudge prop) = "(" ++ propPpr env prop ++ ")\n"
+    judgePpr' env (TJudge prop) = propPpr env prop ++ "\n"
 
 -- main
 

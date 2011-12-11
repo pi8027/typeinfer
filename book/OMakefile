@@ -1,11 +1,8 @@
 LATEX = platex --interaction=nonstopmode --kanji=utf8
 DVIPDFM = dvipdfmx
 
-DVIPSFLAGS = -t jisb5 -P pdf
-DVIPDFMFLAGS = -p jisb5
-
 cover-tree.tex : TTGen.hs
-	echo "\f g x . [y = x] f y (([h = g] h) y)" | runhaskell TTGen > cover-tree.tex
+	echo "\f g x . ([a = f x] a) ([b = g x] b)" | runhaskell TTGen > cover-tree.tex
 
 main-final.pdf : main-final.ps
 	ps2pdf main-final.ps
@@ -17,17 +14,20 @@ layout.pdf : layout.ps
 	ps2pdf layout.ps
 
 cover.pdf : cover.ps
-	ps2pdf -dAutoRotatePages=/None cover.ps
+	ps2pdf cover.ps
 
+DVIPSFLAGS = -t jisb5 -P pdf
+DVIPDFMFLAGS = -p jisb5
 TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
 LaTeXDocument(main-final, main-final)
 
-TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
 LaTeXDocument(main-draft, main-draft)
 
 TEXDEPS =
 LaTeXDocument(layout, layout)
 
+DVIPSFLAGS = -t jisb4 -t landscape -P pdf
+DVIPDFMFLAGS = -p jisb4 -l
 TEXDEPS = cover-tree.tex
 LaTeXDocument(cover, cover)
 
