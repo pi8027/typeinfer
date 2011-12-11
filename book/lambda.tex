@@ -67,7 +67,7 @@ $\lambda$計算の関数適用は、関数と引数を順番に並べて表記�
 カリー化によって、どのような多変数関数も1引数関数の入れ子で表現できます。
 
 これらの記号$\lambda$で関数を表す計算の表現を$\lambda$計算の\textbf{項(term)}
-もしくは\textbf{$\lambda$項($\lambda$-term)}と呼びます。
+もしくは\textbf{$\lambda$項($\lambda$-term)}といいます。
 
 \section{$\lambda$計算}
 
@@ -112,7 +112,7 @@ BNFは良く構文の表現に利用されますが、本書では主に構造�
 ここでは分かりやすいように適宜整数値などを使うことがあります。
 
 $\lambda$項$e$の一部分となっている項を、$e$の
-\textbf{$\lambda$部分項($\lambda$-subterm)}もしくは単に\textbf{部分項(subterm)}と呼びます。
+\textbf{$\lambda$部分項($\lambda$-subterm)}もしくは単に\textbf{部分項(subterm)}といいます。
 
 $\lambda$項において、変数$x$の\textbf{出現(occurence)}とは、項の上で変数$x$が現れる位置を意味します。
 とある変数$x$の出現が$\lambda$抽象$(\lambda x . e)$の部分項であるとき、
@@ -210,7 +210,7 @@ $\alpha$同値の基本は、とある項の束縛変数の名前を置き換え
 $\lambda x . e$に関して、項$e$に自由出現する変数$x$を全て置き換えた項を考える必要があります。
 
 まず、この置き換えを考えましょう。項に自由出現する特定の変数を別の項で置き換える操作を
-\textbf{代入(substitution)}と呼びます。
+\textbf{代入(substitution)}といいます。
 
 自由変数$x$を全て項$e$に置き換える代入を
 \[
@@ -249,7 +249,7 @@ $\lambda x . e$に関して、項$e$に自由出現する変数$x$を全て置�
 
 $\alpha$同値関係は同値関係であるため、反射性、対称性、推移性を満たしていなければなりません。
 まずは、それらの性質を含まず一箇所の束縛変数だけの名前を付け替えるだけの関係を定義します。
-これを\textbf{$\alpha$変換($\alpha$-conversion)}と呼び、項$e_1$を$\alpha$変換して
+これを\textbf{$\alpha$変換($\alpha$-conversion)}といい、項$e_1$を$\alpha$変換して
 項$e_2$にできるということを記号$\to_\alpha$を用いて$e_1 \to_\alpha e_2$と表記します。
 
 $\alpha$変換を、図\ref{fig:alpha-conversion}のように定義します。
@@ -438,7 +438,7 @@ $\lambda f . \lambda x . f \, (f \, x) \alphaeq \lambda f . \lambda y . f \, (f 
 のように表記します。
 この表記によって、複雑な構造を持つ証明を分かりやすく記述できます。
 
-本書では、このような形で記述された証明を\textbf{証明木}と呼びます。
+本書では、このような形で記述された証明を\textbf{証明木}といいます。
 
 \end{exercise}
 
