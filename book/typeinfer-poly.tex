@@ -71,6 +71,8 @@ $\lambda$抽象で束縛されている変数を単相的な変数、let項で�
 省略に関する追加の規則は以下の通りです。
 
 \begin{enumerate}
+  \item 項$e$の部分項$(\letterm{x}{e_1}{e_2})$は、$e_1$の左右に対応する括弧があれば、
+        その括弧を省略できます。
   \item 項$e$の部分項$(\letterm{x}{e_1}{e_2})$は、$e_2$の左右に対応する括弧があれば、
         その括弧を省略できます。
 \end{enumerate}
@@ -130,8 +132,8 @@ $\lambda^\mathrm{let}$項には、単相的に束縛される変数と多相的�
 単相の変数は型だけを持っておけば良いはずです。一方、多相の変数は型環境と項を持っておき、
 変数が使われる度に制約を生成することで適切な制約集合が得られます。
 これらを区別するため、前者は持つ型を$\tau$としたときに$\mathrm{Mono}(\tau)$と、
-後者は型環境と項をそれぞれ$\Gamma$と$e$としたときに$\mathrm{Poly}(\Gamma, e)$と表記します。
-\footnote{それぞれ、monomorphic(単相的)とpolymorphic(多相的)の略。}
+後者は型環境と項をそれぞれ$\Gamma$と$e$としたときに$\mathrm{Poly}(\Gamma, e)$と表記します
+\footnote{それぞれ、monomorphic(単相的)とpolymorphic(多相的)の略。}。
 
 $\lambda^\mathrm{let}$項に対する制約生成アルゴリズム$\mathcal C^\mathrm{let}$を、
 図\ref{fig:algorithm-cp}のように定義します。
@@ -605,7 +607,7 @@ letによる最初の束縛は真に一致するものであると言えます�
 二番目の束縛では最初の束縛で得られた代入$s_1$を型環境に適用して使っています。
 このように生成された代入を次々と適用していくことによって、
 $\mathcal C^\mathrm{let'}$と同等の計算ができます。
-それ以降でも同様に型$\tau_1$に代入$s_2$を適用し、型$tau_3$に代入$s_3$を適用しています。
+それ以降でも同様に型$\tau_1$に代入$s_2$を適用し、型$\tau_3$に代入$s_3$を適用しています。
 また、結果の代入は途中で得られた代入を全て足したものとなっています。
 
 項が$\lambda$抽象$\lambda x. e$の場合も、同様の変更が為されています。
@@ -634,7 +636,7 @@ type typescheme = Int.Set.t * ty
 \end{lstlisting}
 
 \texttt{Int.Set.t}は整数(\texttt{int}型の値)の集合を表す型です。マップなどと同様に、
-\texttt{String.Set}モジュールで同じように操作できる文字列の集合が提供されています。
+\texttt{Core.Std.String.Set}モジュールで同じように操作できる文字列の集合が提供されています。
 これを用いて、任意の型変数の集合を表しています。
 
 型環境の型\texttt{assump}を、リスト\ref{list:ocaml-def-type-environment-w}のように定義します。
