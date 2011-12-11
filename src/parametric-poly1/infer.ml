@@ -24,6 +24,9 @@ let rec substitute (s : subst) : ty -> ty =
       end
     | TFun (tl, tr) -> TFun (substitute s tl, substitute s tr)
 
+let substitute_assump (subst : subst) (assump : assump) : assump =
+  String.Map.map (fun (vs, t) -> vs, substitute subst t) assump
+
 let rec occurs_check (n : int) : ty -> bool =
   function
     | TVar n' -> n = n'
@@ -43,15 +46,10 @@ let rec unify (env : subst) : tconst list -> subst option =
     | (TFun (t1l, t1r), TFun (t2l, t2r)) :: cs ->
       unify env ((t1l, t2l) :: (t1r, t2r) :: cs)
 
-let generalize (env : assump) (c : tconst list) (t : ty) :
-    typescheme option =
+let generalize (env : assump) (t : ty) : typescheme =
   let vs = String.Map.fold ~init:Int.Set.empty env
     ~f:(fun ~key:_ ~data:t m -> Int.Set.union (freevars_ts t) m) in
-  match unify Int.Map.empty c with
-    | Some s ->
-      let t' = substitute s t in
-      Some (Int.Set.diff (freevars t') vs , t')
-    | None -> None
+  (Int.Set.diff (freevars t) vs , t)
 
 let instantiate (n : int) (vs, ty : typescheme) : int * ty =
   let (n', s) = Int.Set.fold vs ~init:(n, Int.Map.empty)
@@ -88,8 +86,9 @@ let rec constraints (n : int) (env : assump) :
     | ELet (ident, term1, term2) ->
       begin match constraints n env term1 with
         | Some (n1, c1, t1) ->
-          begin match generalize env c1 t1 with
-            | Some ts ->
+          begin match unify Int.Map.empty c1 with
+            | Some s ->
+              let ts = generalize (substitute_assump s env) (substitute s t1) in
               let newenv = String.Map.add ident ts env in
               begin match constraints n1 newenv term2 with
                 | Some (n2, c2, t2) -> Some (n2, c1 @ c2, t2)

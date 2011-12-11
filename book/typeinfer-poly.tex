@@ -523,8 +523,8 @@ $\mathcal C^\mathrm{let'}$は図\ref{fig:algorithm-c-let2}のように定義で�
       \mathrm{let}
         \begin{array}[t]{l}
           (c_1, \tau_1) = \mathcal C^\mathrm{let'}(\Gamma, e_1) \\
-          \tau_1'       = \tau_1 \, \mathcal U(c_1) \\
-          (c_2, \tau_2) = \mathcal C^\mathrm{let'}((\Gamma, x : \mathit{generalize(\Gamma, \tau_1')}) , e_2)
+          s             = \mathcal U(c_1) \\
+          (c_2, \tau_2) = \mathcal C^\mathrm{let'}((\Gamma, x : \mathit{generalize(\Gamma s, \tau_1 s)}) , e_2)
         \end{array} \\
       \mathrm{in} (c_1 \cup c_2, \tau_2)
     \end{array}
