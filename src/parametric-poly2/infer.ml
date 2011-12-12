@@ -78,8 +78,7 @@ let rec infer (n : int) (env : assump) : term -> (int * subst * ty) option =
     | ELet (ident, term1, term2) ->
       infer n env term1 >>= fun (n1, s1, t1) ->
       let env' = substitute_assump s1 env in
-      let sigma = generalize env' t1 in
-      let newenv = String.Map.add ident sigma env' in
+      let newenv = String.Map.add ident (generalize env' t1) env' in
       infer n1 newenv term2 >>= fun (n2, s2, t2) ->
       merge_substs [s1; s2] >>| fun s3 ->
       n2, s3, t2
