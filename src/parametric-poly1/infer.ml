@@ -61,8 +61,7 @@ let rec constraints (n : int) (env : assump) :
   function
     | EVar str ->
       begin match String.Map.find env str with
-        | Some ts ->
-          let (n', ty) = instantiate n ts in Some (n', [], ty)
+        | Some ts -> let (n', ty) = instantiate n ts in Some (n', [], ty)
         | None -> None
       end
     | EApp (term1, term2) ->
@@ -70,8 +69,7 @@ let rec constraints (n : int) (env : assump) :
         | Some (n1, c1, t1) ->
           begin match constraints n1 env term2 with
             | Some (n2, c2, t2) ->
-              let tn = TVar n in
-              Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
+              let tn = TVar n in Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
             | None -> None
           end
         | None -> None

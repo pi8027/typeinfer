@@ -627,19 +627,17 @@ let rec constraints (n : int) (env : assump) :
         | Some (n1, c1, t1) ->
           begin match constraints n1 env term2 with
             | Some (n2, c2, t2) ->
-              let tn = TVar n in
-              Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
+              let tn = TVar n in Some (n2, (t1, TFun (t2, tn)) :: c1 @ c2, tn)
             | None -> None
           end
         | None -> None
       end
     | EAbs (ident, term) ->
-      begin
-        let tn = TVar n in
-        let newenv = String.Map.add ident tn env in
-        match constraints (succ n) newenv term with
-          | Some (n', c, t) -> Some (n', c, TFun (tn, t))
-          | None -> None
+      let tn = TVar n in
+      let newenv = String.Map.add ident tn env in
+      begin match constraints (succ n) newenv term with
+        | Some (n', c, t) -> Some (n', c, TFun (tn, t))
+        | None -> None
       end
 \end{lstlisting}
 

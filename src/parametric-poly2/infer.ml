@@ -57,8 +57,7 @@ let instantiate (n : int) (vs, ty : typescheme) : int * ty =
     ~f:(fun v (n, s) -> (succ n, Int.Map.add v (TVar n) s)) in
   n', substitute s ty
 
-let rec infer (n : int) (env : assump) :
-    term -> (int * subst * ty) option =
+let rec infer (n : int) (env : assump) : term -> (int * subst * ty) option =
   let open Option.Monad_infix in
   function
     | EVar str ->
@@ -66,11 +65,9 @@ let rec infer (n : int) (env : assump) :
       let (n', ty) = instantiate n ts in (n', Int.Map.empty, ty)
     | EApp (term1, term2) ->
       infer (succ n) env term1 >>= fun (n1, s1, t1) ->
-      infer n1 (substitute_assump s1 env) term2
-        >>= fun (n2, s2, t2) ->
+      infer n1 (substitute_assump s1 env) term2 >>= fun (n2, s2, t2) ->
       let tn = TVar n in
-      unify Int.Map.empty [substitute s2 t1, TFun (t2, tn)]
-        >>= fun s3 ->
+      unify Int.Map.empty [substitute s2 t1, TFun (t2, tn)] >>= fun s3 ->
       merge_substs [s1; s2; s3] >>| fun s4 ->
       n2, s4, substitute s3 tn
     | EAbs (ident, term) ->
