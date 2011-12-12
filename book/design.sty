@@ -6,10 +6,8 @@
 %%%%%%%%%% ヘッダとフッタ
 
 \def\ps@mypagestyle{
-  \def\@oddhead{\hspace{-\paperwidth}\underline{\hbox to 2\paperwidth{%
-    \hfil\rightmark\hspace{\paperwidth}\hspace{-\fullwidth}}}}
-  \def\@evenhead{\hspace{-\paperwidth}\underline{\hbox to 2\paperwidth{%
-    \hspace{\paperwidth}\hspace{\textwidth}\hspace{-\fullwidth}\leftmark\hfil}}}
+  \def\@oddhead{\underline{\hbox to \fullwidth{\hfil\rightmark}}\hss}
+  \def\@evenhead{\hss\underline{\hbox to \fullwidth{\leftmark\hfil}}}
   \def\@oddfoot{\hbox to \fullwidth{\hfil\textbf\thepage}\hss}
   \def\@evenfoot{\hss\hbox to \fullwidth{\textbf\thepage\hfil}}
   \let\@mkboth\markboth
@@ -45,16 +43,16 @@
     \if@mainmatter%
       \parindent \z@ \raggedright \normalfont%
       \begin{picture}(0, 0)%
-        \put(0,-10.0){\color[gray]{0.0}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-9.6){\color[gray]{0.1}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-9.2){\color[gray]{0.2}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-8.8){\color[gray]{0.3}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-8.4){\color[gray]{0.4}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-8.0){\color[gray]{0.5}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-7.6){\color[gray]{0.6}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-7.2){\color[gray]{0.7}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-6.8){\color[gray]{0.8}\rule[0zw]{\paperwidth}{0.4pt}}%
-        \put(0,-6.4){\color[gray]{0.9}\rule[0zw]{\paperwidth}{0.4pt}}%
+        \put(0,-10.0){\color[gray]{0.0}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-9.6){\color[gray]{0.1}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-9.2){\color[gray]{0.2}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-8.8){\color[gray]{0.3}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-8.4){\color[gray]{0.4}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-8.0){\color[gray]{0.5}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-7.6){\color[gray]{0.6}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-7.2){\color[gray]{0.7}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-6.8){\color[gray]{0.8}\rule[0zw]{\fullwidth}{0.4pt}}%
+        \put(0,-6.4){\color[gray]{0.9}\rule[0zw]{\fullwidth}{0.4pt}}%
       \end{picture}%
       \huge\hspace*{0.5em}\@chapapp\thechapter\@chappos%
       \begin{flushright}%
