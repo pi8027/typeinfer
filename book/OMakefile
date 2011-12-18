@@ -18,17 +18,20 @@ cover.pdf : cover.ps
 
 DVIPSFLAGS = -t jisb5 -P pdf
 DVIPDFMFLAGS = -p jisb5
-TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex colophon.tex
+TEXDEPS = main.tex preface.tex lambda.tex typeinfer-stlc.tex typeinfer-poly.tex postface.tex colophon.tex
+
 LaTeXDocument(main-final, main-final)
 
 LaTeXDocument(main-draft, main-draft)
 
 TEXDEPS =
+
 LaTeXDocument(layout, layout)
 
 DVIPSFLAGS = -t jisb4 -t landscape -P pdf
 DVIPDFMFLAGS = -p jisb4 -l
 TEXDEPS = cover-tree.tex
+
 LaTeXDocument(cover, cover)
 
 .DEFAULT : main-final.pdf main-draft.pdf cover.pdf layout.pdf
