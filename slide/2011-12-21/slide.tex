@@ -1,4 +1,4 @@
-\documentclass[cjk, 14pt]{beamer}
+\documentclass[cjk, 17pt]{beamer}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -14,15 +14,8 @@
 
 \setbeamercovered{transparent}
 
-\lstset{
-  basicstyle=\ttfamily,
-  basicstyle=\color{white}\ttfamily\scriptsize,
-  backgroundcolor=\color{black},
-  columns=[l]{fullflexible}
-}
-
 \title{Algolithm $\mathcal W$ 入門}
-\subtitle{分かりやすい型推論入門本}
+\subtitle{2011年度 情報特別演習I}
 \author{坂口和彦}
 \institute{筑波大学 情報学群 情報科学類 B1}
 \date{2011/12/21}
@@ -46,6 +39,16 @@
 
 \end{frame}
 
+\begin{frame}{型推論とは}
+
+ 型情報の欠けたプログラムから、それが持つ型を推論する計算のこと。
+
+ 例: $\lambda f \, g \, x . f \, x \, (g \, x)$ という項は、
+ $(\alpha \to \beta \to \gamma) \to (\alpha \to \beta) \to \alpha \to \gamma$
+ という型を持つ。
+
+\end{frame}
+
 \begin{frame}{なぜ型推論?}
 
  \begin{itemize}
@@ -60,38 +63,46 @@
 \begin{frame}{成果物}
 
  \begin{itemize}
-  \item \texttt{http://github.com/pi8027/typeinfer}
+  \item http://github.com/pi8027/typeinfer
   \begin{itemize}
    \item OCaml による何種類かの型推論の実装
    \item Algorithm $\mathcal W$ 入門
   \end{itemize}
  \end{itemize}
 
- % ここで本の実物を見せる
-
 \end{frame}
 
 \begin{frame}{実装}
 
  \begin{itemize}
-  \item 単純型付き$\lambda$計算の型推論 (\texttt{stlc})
-  \item 置換による多相型の型推論 (\texttt{poly})
-  \item パラメトリック多相型の型推論 (\texttt{parametric-poly1})
-  \item Algorithm $\mathcal W$ (\texttt{parametric-poly2})
-  \item Algorithm $\mathcal W$ (\texttt{parametric-poly3})
+  \item 単純型付き$\lambda$計算の型推論
+  \item 置換による多相型の型推論
+  \item パラメトリック多相型の型推論
+  \item Algorithm $\mathcal W$
  \end{itemize}
 
 \end{frame}
 
-\begin{frame}{書籍}
+\begin{frame}{解説本}
 
- (ここに章の(?)依存関係グラフを入れる)
+\includegraphics[width=110mm]{graph.ps}
 
 \end{frame}
 
-\begin{frame}[plain]
+\begin{frame}{まとめ}
 
- ご清聴ありがとうございました。
+  \begin{itemize}
+    \item 主に二つの目標を設定し、それぞれを達成しました
+    \begin{itemize}
+      \item 型推論の実装
+      \item 解説本の製作
+    \end{itemize}
+    \item 評価
+    \begin{itemize}
+      \item 内容は最初予定していたものよりも少ない
+      \item 分かりやすさの面では、目標以上のことを達成できた
+    \end{itemize}
+  \end{itemize}
 
 \end{frame}
 
