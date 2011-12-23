@@ -349,6 +349,9 @@ $R$を含みかつ反射性、対称性、推移性を満たす最小の二項�
   \label{fig:equivalence-closure}
 \end{figure}
 
+\textsc{Eq-Refl}規則のように上が空になっている規則は、
+無条件で下に書いてあることを認めて良いことを表しています。
+
 規則\textsc{Eq-R}は、$e R e'$であれば$e =_R e'$であるという規則です。
 
 規則\textsc{Eq-Refl}、規則\textsc{Eq-Sym}、規則\textsc{Eq-Trans}は、
@@ -555,9 +558,6 @@ $\lambda$計算の$\beta$簡約を、図\ref{fig:beta-reduction}のように定�
   \caption{$\beta$簡約}
   \label{fig:beta-reduction}
 \end{figure}
-
-\textsc{R-Beta}規則のように上が空になっている規則は、
-無条件で下に書いてあることを認めて良いことを表しています。
 
 $(\lambda x . e_1) \, e_2$の形をしている項のみが、\textsc{R-Beta}規則を用いて簡約できます。
 この形をしている項のことを、\textbf{$\beta$基($\beta$-redex)}といいます。
