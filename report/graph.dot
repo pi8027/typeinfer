@@ -1,0 +1,40 @@
+
+digraph init {
+  graph[ranksep = 0.6, charset = "UTF-8"];
+  node [fontname = "Ryumin-Light-UniJIS-UTF8-H"];
+  edge [fontname = "Ryumin-Light-UniJIS-UTF8-H"];
+  lambda [label = "型無しλ計算", style = filled, fillcolor = bisque];
+  stlc [label = "単純型付きλ計算", style = filled, fillcolor = bisque];
+  polylambda [label = "多相型付きλ計算", style = filled, fillcolor = bisque];
+  parametricpoly [label = "パラメトリック多相", style = filled, fillcolor = bisque];
+  reducelet [label = "let の簡約"];
+  unification [label = "単一化", style = filled, fillcolor = azure2];
+  constraints1 [label = "単純型付きλ計算の制約生成", style = filled, fillcolor = azure2];
+  typeinfer1 [label = "単純型付きλ計算の型推論"];
+  typeinfer2 [label = "多相型の型推論(1)"];
+  constraints2 [label = "多相型の制約生成", style = filled, fillcolor = azure2];
+  typeinfer3 [label = "多相型の型推論(2)"];
+#  typeinfer3 [label = "多相型の型推論"];
+  constraints3 [label = "パラメトリック多相の制約生成", style = filled, fillcolor = azure2];
+  typeinfer4 [label = "パラメトリック多相の型推論"];
+  typeinfer5 [label = "Algorithm W", style = filled, fillcolor = azure2];
+  lambda -> stlc;
+  stlc -> polylambda;
+  stlc -> constraints1;
+  constraints1 -> typeinfer1;
+  unification -> typeinfer1;
+  polylambda -> reducelet;
+  reducelet -> typeinfer2;
+  typeinfer1 -> typeinfer2;
+  reducelet -> constraints2;
+  constraints1 -> constraints2;
+  constraints2 -> typeinfer3;
+  unification -> typeinfer3;
+  polylambda -> parametricpoly;
+  parametricpoly -> constraints3;
+  constraints2 -> constraints3;
+  unification -> constraints3;
+  unification -> typeinfer4;
+  constraints3 -> typeinfer4;
+  typeinfer4 -> typeinfer5;
+}

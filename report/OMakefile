@@ -1,0 +1,21 @@
+
+LATEX = platex --interaction=nonstopmode --kanji=utf8
+DVIPDFM = dvipdfmx
+BIBTEX = bibtex
+MAKEINDEX = mendex
+
+DVIPSFLAGS = -P pdf
+
+graph.ps : graph.dot
+	dot -Tps graph.dot -o graph.ps
+
+report.pdf : report.ps
+	ps2pdf report.ps
+
+TEXDEPS[] = graph.ps
+LaTeXDocument(report, report)
+
+report.dvi : report.bib
+
+.DEFAULT : report.pdf
+
