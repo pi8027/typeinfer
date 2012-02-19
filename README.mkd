@@ -1,5 +1,5 @@
 
-# typeinfer
+# Algorithm W 入門
 
 ## これはなに?
 
