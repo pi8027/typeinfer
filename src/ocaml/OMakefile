@@ -1,0 +1,3 @@
+
+.SUBDIRS: stlc poly parametric-poly1 parametric-poly2
+
